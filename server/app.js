@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import 'dotenv/config';
+import cron from 'node-cron';
 
 import getPlayerdata from './utils/epl-utils.js';
 import prismaInit from './prisma/prisma-connect.js';
@@ -9,7 +10,7 @@ import prismaInit from './prisma/prisma-connect.js';
 const app = express();
 const port = process.env.NODE_PORT || '3000';
 
-// Parse body of incoming requests as JSON data. 
+// Parse body of incoming requests as JSON data.
 app.use(bodyParser.json());
 
 // access control and headers for REST API
@@ -33,6 +34,20 @@ app.use((err, req, res, next) => {
     });
 });
 
+// EPL cron job to pull player data.
+// We'll have to implement websockets here to push updates to the client once goal numbers change for each player.
+cron.schedule(
+    '*/15 * * * * *',
+    function () {
+        console.log('---------------------');
+        console.log('running a task every 15 seconds');
+    },
+    {
+        scheduled: false,
+        timezone: '"America/Vancouver"',
+    }
+);
+
 // Boot command for server and other systems
 const boot = async () => {
     app.listen(port, () => {
@@ -49,7 +64,6 @@ const boot = async () => {
 
     const payload = await getPlayerdata();
     console.log('EPL API connection status:', payload.status);
-    
 };
 
 boot();
