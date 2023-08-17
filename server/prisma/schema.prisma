@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+}
+
+model Init {
+  id   String @id @default(uuid())
+  name String @default("prisma")
+}
+
+// model User {
+//   id            String  @id @default(uuid())
+//   fn            String
+//   ln            String
+//   email         String  @unique
+//   team          String?
+//   avatar        String?
+//   entry         Entry[]
+//   wins          Int     @default(0)
+//   losses        Int     @default(0)
+//   ties          Int     @default(0)
+//   role          Role    @default(USER)
+//   currentWinner Winner  @default(NO)
+
+//   @@index([email])
+// }
+
+// model Entry {
+//   id           String   @id @default(uuid())
+//   year         String
+//   user         User     @relation(fields: [userId], references: [id])
+//   userId       String
+//   players      Player[]
+//   goals        Int      @default(0)
+//   goalsAgainst Int      @default(0)
+//   netGoals     Int      @default(0)
+//   createdAt    DateTime @default(now())
+//   updatedAt    DateTime @updatedAt
+
+//   @@unique([userId, year])
+// }
+
+// model Player {
+//   id          String  @id @default(uuid())
+//   eplPlayerId Int     @unique
+//   fn          String
+//   ln          String
+//   team        Team    @relation(fields: [teamId], references: [id])
+//   teamId      String
+//   entry       Entry[]
+// }
+
+// model Team {
+//   id          String   @id @default(uuid())
+//   eplTeamId   String   @unique
+//   eplTeamName String
+//   Player      Player[]
+// }
+
+// enum Role {
+//   USER
+//   ADMIN
+// }
+
+// enum Winner {
+//   YES
+//   NO
+// }
