@@ -8,7 +8,7 @@ import prismaInit from './prisma/prisma-connect.js';
 
 // Express server setup
 const app = express();
-const port = process.env.NODE_PORT || '3000';
+const port = process.env.NODE_PORT || '8090';
 
 // Parse body of incoming requests as JSON data.
 app.use(bodyParser.json());
@@ -21,6 +21,11 @@ app.use((req, res, next) => {
     // This says clients can send requests that hold extra authorziation and content types in the header
     next();
 });
+
+// graphql middleware
+// app.use('/graphql', graphqlHttp({
+
+// }))
 
 /// route req/res error handling for API requests
 app.use((err, req, res, next) => {

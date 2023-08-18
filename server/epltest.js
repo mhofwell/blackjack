@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { emitKeypressEvents } from 'readline';
 
 const prisma = new PrismaClient();
 
