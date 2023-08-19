@@ -10,7 +10,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "nodemon app.js",
-        "epltest": "node epltest.js"
+        "eplApi": "node testing/test.js"
     },
     "author": "",
     "license": "ISC",

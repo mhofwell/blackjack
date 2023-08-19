@@ -1,4 +1,4 @@
-const getPlayerdata = async () => {
+const eplData = async () => {
     try {
         const res = await fetch(
             'https://fantasy.premierleague.com/api/bootstrap-static'
@@ -14,4 +14,4 @@ const getPlayerdata = async () => {
     }
 };
 
-export default getPlayerdata;
+export default eplData;

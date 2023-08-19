@@ -3,8 +3,8 @@ import express from 'express';
 import 'dotenv/config';
 import cron from 'node-cron';
 
-import getPlayerdata from './utils/epl-utils.js';
-import prismaInit from './prisma/prisma-connect.js';
+import getPlayerdata from './utils/epl-connect.js';
+import prismaInit from './prisma/ping.js';
 
 // Express server setup
 const app = express();
