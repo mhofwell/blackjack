@@ -390,7 +390,6 @@ const picks = [
 const fnln = [
     { fn: 'Reece', ln: 'James' },
     { fn: 'Brennan', ln: 'Johnson' },
-    // { fn: 'Dan', ln: 'James' },
 ];
 
 export { picks, users, fnln };

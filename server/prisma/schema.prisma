@@ -50,12 +50,10 @@ model Entry {
 }
 
 model Player {
-  // id          String  @id @default(uuid())
   id        Int      @id @unique
   avatar    String?
   fn        String
   ln        String
-  // team_id   Int
   club      Club     @relation(fields: [club_id], references: [id])
   club_id   Int
   entry     Entry[]
@@ -67,7 +65,6 @@ model Player {
 }
 
 model Club {
-  // id          String   @id @default(uuid())
   id      Int      @id @unique
   name    String
   logo    String?
