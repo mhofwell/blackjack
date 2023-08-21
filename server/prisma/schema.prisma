@@ -16,37 +16,42 @@ model Init {
 }
 
 model User {
-  id            String  @id @default(uuid())
-  fn            String
-  ln            String
+  id          String   @id @default(uuid())
+  fn          String
+  ln          String
   // email         String  @unique
-  password      String  @default("eplblackjack")
-  team          String?
-  avatar        String?
-  entry         Entry[]
-  wins          Int     @default(0)
-  losses        Int     @default(0)
-  ties          Int     @default(0)
-  role          Role    @default(USER)
-  currentWinner Winner  @default(NO)
+  password    String   @default("eplblackjack")
+  team        String?
+  avatar      String?
+  entry       Entry[]
+  owned_pools Pool[]
+  wins        Int      @default(0)
+  losses      Int      @default(0)
+  ties        Int      @default(0)
+  role        Role     @default(USER)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Entry {
-  id        String   @id @default(uuid())
-  season    Int
-  league    League
-  pool      Pool
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  players   Player[]
-  goals     Int      @default(0)
-  own_goals Int      @default(0)
-  net_goals Int      @default(0)
-  suit      Suit
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  season        Int
+  league        League
+  region        Region
+  players       Player[]
+  suit          Suit
+  goals         Int      @default(0)
+  own_goals     Int      @default(0)
+  net_goals     Int      @default(0)
+  pool          Pool     @relation(fields: [poolId], references: [id])
+  poolId        String
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  currentWinner Winner   @default(NO)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  @@unique([userId, season, league])
+  @@unique([id, userId])
 }
 
 model Player {
@@ -64,11 +69,23 @@ model Player {
   updatedAt DateTime @updatedAt
 }
 
+model Pool {
+  id        String   @id @default(uuid())
+  name      String
+  owner     User     @relation(fields: [userId], references: [id])
+  userId    String
+  entries   Entry[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Club {
-  id      Int      @id @unique
-  name    String
-  logo    String?
-  players Player[]
+  id        Int      @id @unique
+  name      String
+  logo      String?
+  players   Player[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -88,7 +105,7 @@ enum Suit {
   HEARTS
 }
 
-enum Pool {
+enum Region {
   UK
   CANADA
 }

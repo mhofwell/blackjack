@@ -126,62 +126,10 @@ async function main() {
         console.log(newPlayer);
     }
 
-    //  create users in our database.
-    for (const user of users) {
-        const newUser = await prisma.user.create({
-            data: {
-                fn: user.fn,
-                ln: user.ln,
-            },
-            select: {
-                fn: true,
-                id: true,
-            },
-        });
-        console.log(newUser);
-    }
-
-    // Create pools attached to users.
-
-    const teddyId = await prisma.user.findFirst({
-        where: {
-            fn: 'Teddy',
-        },
-        select: {
-            id: true,
-        },
-    });
-    console.log("Teddy's Id ", teddyId);
-
-    const pools = await prisma.pool.createMany({
-        data: [
-            {
-                name: 'CANADA',
-                userId: teddyId.id,
-            },
-            {
-                name: 'UK',
-                userId: teddyId.id,
-            },
-        ],
-    });
-
-    console.log(pools);
-
-    // Entries of users attached to pools
-
+    //  create users in our database with entries.
     for (const user of users) {
         let entryPicks = [];
         let p;
-
-        const databaseUserId = await prisma.user.findFirst({
-            where: {
-                ln: user.ln,
-            },
-            select: {
-                id: true,
-            },
-        });
 
         if (user.entry.p1) {
             p = { id: user.entry.p1 };
@@ -200,52 +148,41 @@ async function main() {
             entryPicks.push(p);
         }
 
-        const userPool = user.entry.pool;
+        // else data = connect a pool
 
-        console.log('User Pool', userPool);
-
-        const poolId = await prisma.pool.findFirst({
-            where: {
-                name: userPool,
-            },
-            select: {
-                id: true,
-            },
-        });
-
-        console.log('Pool Id: ', poolId);
-
-        // Entry data
         const data = {
-            season: user.entry.season,
-            league: user.entry.league,
-            pool: {
-                connect: {
-                    id: poolId.id,
+            fn: user.fn,
+            ln: user.ln,
+            entry: {
+                create: {
+                    season: user.entry.season,
+                    league: user.entry.league,
+                    pool: user.entry.pool,
+                    region: user.entry.region,
+                    players: {
+                        connect: entryPicks,
+                    },
+                    suit: user.entry.suit,
                 },
-            },
-            region: user.entry.region,
-            user: {
-                connect: { id: databaseUserId.id },
-            },
-            suit: user.entry.suit,
-            players: {
-                connect: entryPicks,
             },
         };
 
-        const newEntry = await prisma.entry.create({
+        const newUser = await prisma.user.create({
             data,
             select: {
-                id: true,
-                user: {
+                fn: true,
+                entry: {
                     select: {
-                        fn: true,
+                        players: {
+                            select: {
+                                fn: true,
+                            },
+                        },
                     },
                 },
             },
         });
-        console.log('Entry Id ', newEntry);
+        console.log(newUser);
     }
 }
 main()

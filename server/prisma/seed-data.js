@@ -5,6 +5,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'SPADES',
             p1: 5,
@@ -19,6 +20,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'DIAMONDS',
             p1: 290,
@@ -35,6 +37,7 @@ const users = [
             league: 'EPL',
             suit: 'CLUBS',
             pool: 'CANADA',
+            region: 'CANADA',
             p1: 436,
             p2: 442,
             p3: 447,
@@ -47,6 +50,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'HEARTS',
             p1: 5,
@@ -61,6 +65,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'SPADES',
             p1: 303,
@@ -75,6 +80,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'DIAMONDS',
             p1: 526,
@@ -89,6 +95,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'CLUBS',
             p1: 290,
@@ -103,6 +110,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'HEARTS',
             p1: 354,
@@ -117,6 +125,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'SPADES',
             p1: 246,
@@ -131,6 +140,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'DIAMONDS',
             p1: 523,
@@ -145,6 +155,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'CANADA',
             pool: 'CANADA',
             suit: 'CLUBS',
             p1: 5,
@@ -159,6 +170,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'SPADES',
             p1: 140,
@@ -173,6 +185,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'DIAMONDS',
             p1: 354,
@@ -188,6 +201,7 @@ const users = [
             season: 2023,
             league: 'EPL',
             suit: 'CLUBS',
+            region: 'UK',
             pool: 'UK',
             p1: 354,
             p2: 140,
@@ -201,6 +215,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'HEARTS',
             p1: 195,
@@ -215,6 +230,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'SPADES',
             p1: 290,
@@ -229,6 +245,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'DIAMONDS',
             p1: 99,
@@ -243,6 +260,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'CLUBS',
             p1: 353,
@@ -257,6 +275,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'HEARTS',
             p1: 226,
@@ -271,6 +290,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'SPADES',
             p1: 226,
@@ -285,6 +305,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'DIAMONDS',
             p1: 290,
@@ -299,6 +320,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'CLUBS',
             p1: 412,
@@ -313,6 +335,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'HEARTS',
             p1: 450,
@@ -327,6 +350,7 @@ const users = [
         entry: {
             season: 2023,
             league: 'EPL',
+            region: 'UK',
             pool: 'UK',
             suit: 'SPADES',
             p1: 270,

@@ -7,44 +7,54 @@ const getPlayerdata = async () => {
     // await prisma.entry.deleteMany();
     // await prisma.club.deleteMany();
     // await prisma.user.deleteMany();
-    try {
-        const entries = await prisma.entry.findMany({
-            include: {
-                user: {
-                    select: {
-                        fn: true,
-                    },
-                },
-                players: {
-                    select: {
-                        fn: true,
-                        ln: true,
-                    },
-                },
-            },
-        });
+    // try {
+    //     const entries = await prisma.entry.findMany({
+    //         include: {
+    //             user: {
+    //                 select: {
+    //                     fn: true,
+    //                 },
+    //             },
+    //             players: {
+    //                 select: {
+    //                     fn: true,
+    //                     ln: true,
+    //                 },
+    //             },
+    //         },
+    //     });
 
-        entries.forEach((entry) => {
-            console.log(entry.players);
-        });
-    } catch (err) {
-        console.log(err);
-    }
+    //     entries.forEach((entry) => {
+    //         console.log(entry.players);
+    //     });
+    // } catch (err) {
+    //     console.log(err);
+    // }
 
-    const players = await prisma.player.findMany({
-        include: {
-            entry: {
-                include: {
-                    user: {
-                        select: {
-                            fn: true,
-                        },
-                    },
-                },
-            },
+    // const players = await prisma.player.findMany({
+    //     include: {
+    //         entry: {
+    //             include: {
+    //                 user: {
+    //                     select: {
+    //                         fn: true,
+    //                     },
+    //                 },
+    //             },
+    //         },
+    //     },
+    // });
+    // console.log(players[0].entry[0].user.fn);
+
+    const teddy = await prisma.user.findUnique({
+        where: {
+            fn: 'Teddy',
+        },
+        select: {
+            id: true,
         },
     });
-    console.log(players[0].entry[0].user.fn);
+    console.log(teddy);
 };
 
 getPlayerdata();
