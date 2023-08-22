@@ -34,22 +34,23 @@ model User {
 }
 
 model Entry {
-  id            String   @id @default(uuid())
-  season        Int
-  league        League
-  region        Region
-  players       Player[]
-  suit          Suit
-  goals         Int      @default(0)
-  own_goals     Int      @default(0)
-  net_goals     Int      @default(0)
-  pool          Pool     @relation(fields: [poolId], references: [id])
-  poolId        String
-  user          User     @relation(fields: [userId], references: [id])
-  userId        String
-  currentWinner Winner   @default(NO)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        String   @id @default(uuid())
+  season    Int
+  league    League
+  region    Region
+  players   Player[]
+  suit      Suit
+  goals     Int      @default(0)
+  own_goals Int      @default(0)
+  net_goals Int      @default(0)
+  pool      Pool     @relation(fields: [poolId], references: [id])
+  poolId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  winner    Winner   @default(NO)
+  standing  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([id, userId])
 }

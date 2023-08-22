@@ -2,13 +2,39 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import 'dotenv/config';
 import cron from 'node-cron';
+import { ApolloServer, gql } from 'apollo-server-express';
 
-import getPlayerdata from './utils/epl-connect.js';
+import pingEpl from './utils/epl-connect.js';
 import prismaInit from './prisma/ping.js';
 
 // Express server setup
 const app = express();
 const port = process.env.NODE_PORT || '8090';
+
+// graphQL types and resolvers
+const typeDefs = gql`
+    type Query {
+        hello: String
+    }
+`;
+
+const resolvers = {
+    Query: {
+        hello: () => 'Hello World!',
+    },
+};
+
+// Apollo-server configuration for new instance.
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+});
+
+// Start Apollo-server
+await server.start();
+
+// Apply Apollo-sever as middleware
+server.applyMiddleware({ app });
 
 // Parse body of incoming requests as JSON data.
 app.use(bodyParser.json());
@@ -17,15 +43,10 @@ app.use(bodyParser.json());
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', '*'); // or GET, POST, PUT, PATCH, DELETE
-    res.setHeader('Access-Control-Allow-Header', 'Content-Type, Authorization'); // could use a wildcard (*).
     // This says clients can send requests that hold extra authorziation and content types in the header
+    res.setHeader('Access-Control-Allow-Header', 'Content-Type, Authorization'); // could use a wildcard (*).
     next();
 });
-
-// graphql middleware
-// app.use('/graphql', graphqlHttp({
-
-// }))
 
 /// route req/res error handling for API requests
 app.use((err, req, res, next) => {
@@ -40,7 +61,6 @@ app.use((err, req, res, next) => {
 });
 
 // EPL cron job to pull player data.
-// We'll have to implement websockets here to push updates to the client once goal numbers change for each player.
 cron.schedule(
     '*/15 * * * * *',
     function () {
@@ -53,10 +73,10 @@ cron.schedule(
     }
 );
 
-// Boot command for server and other systems
+// Boot express server and ping other systems
 const boot = async () => {
     app.listen(port, () => {
-        console.log('Server running on port:', port);
+        console.log(`Server running on port: ${port}`);
     });
 
     const data = await prismaInit();
@@ -67,8 +87,8 @@ const boot = async () => {
         console.log('Connected to PRISMA!');
     }
 
-    const payload = await getPlayerdata();
-    console.log('EPL API connection status:', payload.status);
+    const payload = await pingEpl();
+    console.log(`EPL API connection status: ${payload.status}`);
 };
 
 boot();
