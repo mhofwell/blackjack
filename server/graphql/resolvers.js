@@ -11,8 +11,21 @@ const resolvers = {
                     players: true,
                 },
             });
-            console.log(entries);
             return entries;
+        },
+        pools: () => {
+            const pools = prisma.pool.findMany({
+                include: {
+                    entries: {
+                        include: {
+                            players: true,
+                            user: true,
+                        },
+                    },
+                    owner: true,
+                },
+            });
+            return pools;
         },
     },
 };
