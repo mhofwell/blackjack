@@ -1,6 +1,19 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 const resolvers = {
     Query: {
-        hello: () => 'Hello World!',
+        entries: () => {
+            const entries = prisma.entry.findMany({
+                include: {
+                    user: true,
+                    players: true,
+                },
+            });
+            console.log(entries);
+            return entries;
+        },
     },
 };
 

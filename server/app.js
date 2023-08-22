@@ -4,7 +4,6 @@ import 'dotenv/config';
 
 // Functions to ping services
 import { pingEpl, pingPrisma } from './utils/ping-services.js';
-
 // Apollo-server
 import apolloServer from './utils/apollo-server.js';
 
@@ -15,6 +14,12 @@ const port = process.env.NODE_PORT || '8090';
 // Parse body of incoming requests as JSON data.
 app.use(bodyParser.json());
 
+// Start apollo-server
+const server = await apolloServer();
+
+// Apply Apollo-sever as middleware
+server.applyMiddleware({ app, path: '/graphql' });
+
 // access control and headers for REST API
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,12 +28,6 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Header', 'Content-Type, Authorization'); // could use a wildcard (*).
     next();
 });
-
-// Start apollo-server
-const server = await apolloServer();
-
-// Apply Apollo-sever as middleware
-server.applyMiddleware({ app, path: '/graphql' });
 
 /// route req/res error handling for API requests
 app.use((err, req, res, next) => {
