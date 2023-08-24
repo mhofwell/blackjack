@@ -354,7 +354,7 @@ const users = [
             pool: 'UK',
             suit: 'SPADES',
             p1: 270,
-            // p2: 354,
+            p2: 267,
             p3: 280,
             p4: 287,
         },
@@ -410,6 +410,7 @@ const picks = [
     'Alves Morais', // Carlos Vinícius
     'De Cordova-Reid', // *
     'Palhinha Gonçalves', // Palhinha
+    'Hoelgebaum Pereira',
 ];
 const fnln = [
     { fn: 'Reece', ln: 'James' },

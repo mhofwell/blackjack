@@ -4,7 +4,10 @@ import { gql } from 'apollo-server-express';
 export const typeDefs = gql`
     type Query {
         entries: [Entry]
+        user(id: ID!): User
         pools: [Pool]
+        # Also define a single Pool query with all entries. 
+        # Single entry for a user based on Pool
     }
 
     type Entry {
@@ -42,7 +45,7 @@ export const typeDefs = gql`
         password: String
         team: String
         avatar: String
-        entry: [Entry]
+        entries: [Entry]
         owned_pools: [Pool]
         wins: Int!
         losses: Int!

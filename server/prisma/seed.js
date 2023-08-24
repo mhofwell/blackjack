@@ -239,14 +239,57 @@ async function main() {
             data,
             select: {
                 id: true,
+                players: {
+                    select: {
+                        goals: true,
+                        own_goals: true,
+                        net_goals: true,
+                    },
+                },
+            },
+        });
+
+        const goals =
+            newEntry.players[0].goals +
+            newEntry.players[1].goals +
+            newEntry.players[2].goals +
+            newEntry.players[3].goals;
+
+        const own_goals =
+            newEntry.players[0].own_goals +
+            newEntry.players[1].own_goals +
+            newEntry.players[2].own_goals +
+            newEntry.players[3].own_goals;
+
+        const net_goals =
+            newEntry.players[0].net_goals +
+            newEntry.players[1].net_goals +
+            newEntry.players[2].net_goals +
+            newEntry.players[3].net_goals;
+
+        console.log(
+            `goals ${goals}, own_goals ${own_goals}, net_goals ${net_goals}`
+        );
+
+        const updatedEntry = await prisma.entry.update({
+            where: { id: newEntry.id },
+            data: {
+                goals: goals,
+                own_goals: own_goals,
+                net_goals: net_goals,
+            },
+            select: {
                 user: {
                     select: {
                         fn: true,
                     },
                 },
+                goals: true,
+                own_goals: true,
+                net_goals: true,
             },
         });
-        console.log('Entry Id ', newEntry);
+        console.log(updatedEntry);
     }
 }
 main()
