@@ -3,18 +3,19 @@ import { gql } from 'apollo-server-express';
 // graphQL types and resolvers
 export const typeDefs = gql`
     type Query {
-        entries: [Entry]
-        user(id: ID!): User
-        pools: [Pool]
-        # Also define a single Pool query with all entries. 
+        user(id: ID!): User!
+        login(pw: String!, fn: String!, ln: String!): User!
+        entries: [Entry!]!
+        entry(poolId: ID!, userId: ID!): Entry
+        pools: [Pool!]!
+        pool(id: ID!): Pool
+        players: [Player!]!
+        # Also define a single Pool query with all entries.
         # Single entry for a user based on Pool
     }
 
     type Entry {
         id: String!
-        season: Int!
-        league: League!
-        region: Region!
         players: [Player]!
         suit: Suit!
         goals: Int!
@@ -55,6 +56,9 @@ export const typeDefs = gql`
 
     type Pool {
         id: String!
+        season: Int!
+        league: League!
+        region: Region!
         name: String!
         owner: User!
         entries: [Entry]

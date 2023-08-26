@@ -22,6 +22,7 @@ async function main() {
                     avatar: null,
                     fn: player.first_name,
                     ln: player.second_name,
+                    avatar: player.photo,
                     team_id: player.team,
                     goals: player.goals_scored,
                     own_goals: player.own_goals,
@@ -43,6 +44,7 @@ async function main() {
                     avatar: null,
                     fn: player.first_name,
                     ln: player.second_name,
+                    avatar: player.photo,
                     team_id: player.team,
                     goals: player.goals_scored,
                     own_goals: player.own_goals,
@@ -159,10 +161,17 @@ async function main() {
             {
                 name: 'CANADA',
                 userId: teddyId.id,
+                season: 2023,
+                league: 'EPL',
+                region: 'CANADA',
             },
             {
                 name: 'UK',
                 userId: teddyId.id,
+                region: 'UK',
+                season: 2023,
+                league: 'EPL',
+                region: 'UK',
             },
         ],
     });
@@ -178,6 +187,7 @@ async function main() {
         const databaseUserId = await prisma.user.findFirst({
             where: {
                 ln: user.ln,
+                fn: user.fn,
             },
             select: {
                 id: true,
@@ -218,14 +228,14 @@ async function main() {
 
         // Entry data
         const data = {
-            season: user.entry.season,
-            league: user.entry.league,
+            // season: user.entry.season,
+            // league: user.entry.league,
+            // region: user.entry.region,
             pool: {
                 connect: {
                     id: poolId.id,
                 },
             },
-            region: user.entry.region,
             user: {
                 connect: { id: databaseUserId.id },
             },

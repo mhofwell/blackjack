@@ -16,14 +16,15 @@ model Init {
 }
 
 model User {
-  id          String   @id @default(uuid()) @unique
+  id          String   @id @unique @default(uuid())
   fn          String
   ln          String
-  // email         String  @unique
+  isLoggedIn  Boolean  @default(false)
+  email       String   @default("test@blackjack.com")
   password    String   @default("eplblackjack")
   team        String?
   avatar      String?
-  entries       Entry[]
+  entries     Entry[]
   owned_pools Pool[]
   wins        Int      @default(0)
   losses      Int      @default(0)
@@ -31,14 +32,10 @@ model User {
   role        Role     @default(USER)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
 }
 
 model Entry {
-  id        String   @id @default(uuid()) @unique
-  season    Int
-  league    League
-  region    Region
+  id        String   @id @unique @default(uuid())
   players   Player[]
   suit      Suit
   goals     Int      @default(0)
@@ -53,7 +50,7 @@ model Entry {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, poolId, id])
+  @@unique([userId, poolId])
 }
 
 model Player {
@@ -72,8 +69,11 @@ model Player {
 }
 
 model Pool {
-  id        String   @id @default(uuid()) @unique
+  id        String   @id @unique @default(uuid())
   name      String
+  season    Int
+  league    League
+  region    Region
   owner     User     @relation(fields: [userId], references: [id])
   userId    String
   entries   Entry[]
