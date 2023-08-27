@@ -15,15 +15,20 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@apollo/server": "^4.9.2",
+        "@graphql-tools/schema": "^10.0.0",
         "@prisma/client": "^5.2.0",
         "apollo-server-express": "^3.12.0",
         "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "graphql": "^16.8.0",
+        "graphql-ws": "^5.14.0",
         "multer": "^1.4.5-lts.1",
         "node": "^20.5.0",
-        "node-cron": "^3.0.2"
+        "node-cron": "^3.0.2",
+        "ws": "^8.13.0"
     },
     "devDependencies": {
         "nodemon": "^3.0.1",

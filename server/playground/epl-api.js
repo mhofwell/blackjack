@@ -2,59 +2,48 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const getPlayerdata = async () => {
-    // await prisma.player.deleteMany();
-    // await prisma.entry.deleteMany();
-    // await prisma.club.deleteMany();
-    // await prisma.user.deleteMany();
-    // try {
-    //     const entries = await prisma.entry.findMany({
-    //         include: {
-    //             user: {
-    //                 select: {
-    //                     fn: true,
-    //                 },
-    //             },
-    //             players: {
-    //                 select: {
-    //                     fn: true,
-    //                     ln: true,
-    //                 },
-    //             },
-    //         },
-    //     });
-
-    //     entries.forEach((entry) => {
-    //         console.log(entry.players);
-    //     });
-    // } catch (err) {
-    //     console.log(err);
-    // }
-
-    // const players = await prisma.player.findMany({
-    //     include: {
-    //         entry: {
-    //             include: {
-    //                 user: {
-    //                     select: {
-    //                         fn: true,
-    //                     },
-    //                 },
-    //             },
-    //         },
-    //     },
-    // });
-    // console.log(players[0].entry[0].user.fn);
-
-    const teddy = await prisma.user.findUnique({
-        where: {
-            fn: 'Teddy',
-        },
+const test = async () => {
+    // get all player numbers
+    const playerNumbers = await prisma.player.findMany({
         select: {
             id: true,
         },
     });
-    console.log(teddy);
+
+    let allFixtureTimes = [];
+
+    for (const player of playerNumbers) {
+        const id = player.id;
+        const res = await fetch(
+            `https://fantasy.premierleague.com/api/element-summary/${id}/`
+        );
+        const data = await res.json();
+        const fixtureArray = data.fixtures;
+
+        fixtureArray.forEach((fixture) => {
+            const index = allFixtureTimes.indexOf(fixture.kickoff_time);
+            if (index > -1) {
+                return;
+            } else {
+                console.log(`Player id: ${id} Fixture: ${fixture.kickoff_time}`);
+                allFixtureTimes.push(fixture.kickoff_time);
+            }
+        });
+    }
+
+    console.log(allFixtureTimes);
 };
 
-getPlayerdata();
+test();
+
+// what is the time now. 
+
+// what is the difference in time between the next game. 
+
+// set a function to run when time difference reaches 0. 
+
+// get the time now and find the difference in between the next game. 
+
+// set a function to run when the time difference reaches 0. 
+
+// 
