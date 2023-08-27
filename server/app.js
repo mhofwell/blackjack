@@ -52,17 +52,33 @@ const server = new ApolloServer({
 });
 
 await server.start();
+
 app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server));
 
-const PORT = 4000;
-// Now that our HTTP server is fully set up, we can listen to it.
-httpServer.listen(PORT, () => {
-    console.log(`Server is now running on http://localhost:${PORT}/graphql`);
+// access control and headers for REST API
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*'); // or GET, POST, PUT, PATCH, DELETE
+    // This says clients can send requests that hold extra authorziation and content types in the header
+    res.setHeader('Access-Control-Allow-Header', 'Content-Type, Authorization'); // could use a wildcard (*).
+    next();
 });
 
-const boot = async () => {
-    app.listen(port, () => {
-        console.log(`Express server running on port: ${port}`);
+/// route req/res error handling for API requests
+app.use((err, req, res, next) => {
+    console.log(err);
+    const status = err.statusCode || 500;
+    const message = err.message;
+    const data = err.data;
+    res.status(status).json({
+        message: message,
+        data: data,
+    });
+});
+
+const main = async () => {
+    httpServer.listen(port, () => {
+        console.log(`Server is now running on http://localhost:${port}/graphql`);
     });
 
     const data = await pingPrisma();
@@ -77,4 +93,4 @@ const boot = async () => {
     console.log(`EPL API connection status: ${payload.status}`);
 };
 
-boot();
+main();
