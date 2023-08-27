@@ -11,24 +11,25 @@ import cors from 'cors';
 import resolvers from './graphql/resolvers.js';
 import typeDefs from './graphql/typeDefs.js';
 
+// utils 
 import { pingPrisma, pingEpl } from './utils/ping-services.js';
 
-// Create the schema, which will be used separately by ApolloServer and
+// Create the schema, this will be used separately by ApolloServer and
 // the WebSocket server.
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-// Create an Express app and HTTP server; we will attach both the WebSocket
+// Create an Express app and HTTP server; attach both the WebSocket
 // server and the ApolloServer to this HTTP server.
 const app = express();
 const httpServer = createServer(app);
 const port = process.env.NODE_PORT || '8090';
 
-// Create our WebSocket server using the HTTP server we just set up.
+// Create WebSocket server using the HTTP server we just set up.
 const wsServer = new WebSocketServer({
     server: httpServer,
     path: '/graphql',
 });
-// Save the returned server's info so we can shutdown this server later
+// Save returned server's info so we can shutdown this server later
 const serverCleanup = useServer({ schema }, wsServer);
 
 // Set up ApolloServer.

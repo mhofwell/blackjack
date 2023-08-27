@@ -108,6 +108,11 @@ const resolvers = {
             return user;
         },
     },
+    Subscription: {
+        playerUpdate: async (parent, args, context) => {
+            return 'Hello world!';
+        },
+    },
 };
 
 export default resolvers;

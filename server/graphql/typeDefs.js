@@ -14,6 +14,10 @@ export const typeDefs = gql`
         # Single entry for a user based on Pool
     }
 
+    type Subscription {
+        playerUpdate: String
+    }
+
     type Entry {
         id: String!
         players: [Player]!
@@ -96,6 +100,7 @@ export const typeDefs = gql`
     enum League {
         EPL
     }
+
 `;
 
 // create League, Region, Player, Suit, Pool, User, Winner
