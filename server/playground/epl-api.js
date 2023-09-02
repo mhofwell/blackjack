@@ -38,12 +38,12 @@ test();
 
 // what is the time now. 
 
-// what is the difference in time between the next game. 
+// what is the difference in time between the next game and now. 
 
 // set a function to run when time difference reaches 0. 
 
-// get the time now and find the difference in between the next game. 
+// after the game get the time now and find the difference in between the next game. 
 
 // set a function to run when the time difference reaches 0. 
 
-// 
+// continue until season is finished
