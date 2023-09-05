@@ -109,17 +109,7 @@ const test = async () => {
 
 test();
 
-// what is the time now.
 
-// what is the difference in time between the next game and now.
-
-// set a function to run when time difference reaches 0.
-
-// after the game get the time now and find the difference in between the next game.
-
-// set a function to run when the time difference reaches 0.
-
-// continue until season is finished
 
 [
     {
@@ -159,3 +149,44 @@ test();
         ],
     },
 ];
+
+
+// weekly cron job on Sunday at midnight PDT
+// get all the fixtures for the coming week
+//https://fantasy.premierleague.com/api/fixtures?future=1
+
+// get clubs for each fixture
+
+
+// get players in those clubs in each fixture. 
+
+
+// get entries that contain those players
+
+
+// get all kickoff times for those fixtures. 
+
+
+// save fixtures in Postgres
+
+
+// stack rank fixture array in order from soonest to latest
+
+
+// get time now 
+
+
+// set coundown for cron job 
+
+
+// CRON 2 when timer = 0 launch second cron job for 3h to hit live update API and scan for player ids in that match every 2 minutes. 
+
+
+// run mutation to update player and entry scores. 
+
+
+// get difference between time now and time to next fixture. 
+
+
+// repeat CRON 2 job
+
