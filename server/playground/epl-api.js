@@ -7,149 +7,100 @@ const sortByDateAsc = (a, b) => {
 };
 
 const test = async () => {
-    // get all player numbers
-    const allPlayersInPool = await prisma.player.findMany({
+    const res = await fetch(
+        `https://fantasy.premierleague.com/api/fixtures?future=1`
+    );
+    const data = await res.json();
+    const nextGameWeek = data[0].event;
+
+    // console.log(nextGameWeek);
+
+    // get weekly fixures every Sunday at midnight CRON 1
+    const fixturesInNextGameWeek = data.filter(
+        (fixture) => fixture.event === nextGameWeek
+    );
+
+    // console.log(fixturesInNextGameWeek);
+
+    // get all clubs in postgres database.
+    const allClubsInPool = await prisma.club.findMany({
         select: {
             id: true,
+            name: true,
+            logo: true,
         },
     });
 
-    let allFixturesForThePool = [];
+    // console.log(allClubsInPool);
 
-    for (const p of allPlayersInPool) {
-        const { id } = p;
-        // get the player
-        const player = await prisma.player.findUnique({
+    const clubIdsInPool = allClubsInPool.map((club) => club.id);
+
+    // console.log(clubIdsInPool);
+
+    // filter for fixtures that only have clubs in our data base, return those fixtures.
+    const fixturesWithClubsInPool = await fixturesInNextGameWeek.filter(
+        (fixture) =>
+            clubIdsInPool.some((id) => fixture.team_a || fixture.team_h === id)
+    );
+
+    // console.log(fixturesWithClubsInPool);
+
+    const fixtureKickoffTimes = fixturesWithClubsInPool.map(
+        (fixture) => fixture.kickoff_time
+    );
+    // console.log(fixtureKickoffTimes);
+
+    // filter for fixtures only that have clubs in our data base, return those fixtures.
+    let clubsInNextGameWeekInPool = [];
+
+    await fixturesWithClubsInPool.forEach((fixture) => {
+        if (clubIdsInPool.indexOf(fixture.team_h) > -1) {
+            clubsInNextGameWeekInPool.push(fixture.team_h);
+        }
+        if (clubIdsInPool.indexOf(fixture.team_a) > -1) {
+            clubsInNextGameWeekInPool.push(fixture.team_a);
+        }
+    });
+
+    // console.log(clubsInNextGameWeekInPool);
+
+    // get players playing in the coming week in those clubs.
+    const playerIdsInNextGameWeek = [];
+
+    for (const clubId of clubsInNextGameWeekInPool) {
+        const clubObject = await prisma.club.findUnique({
             where: {
-                id: id,
+                id: clubId,
             },
-            include: {
-                club: true,
+            select: {
+                players: true,
             },
         });
-        console.log(player);
 
-        // get player fixtures
-        const res = await fetch(
-            `https://fantasy.premierleague.com/api/element-summary/${id}/`
+        const playersInClub = clubObject.players;
+
+        playersInClub.forEach((player) =>
+            playerIdsInNextGameWeek.push(player.id)
         );
-
-        const data = await res.json();
-        const playerFixtures = data.fixtures;
-
-        // for each fixture the player is in, see if it exists already. If not, add fixture information.
-
-        playerFixtures.forEach(async (fixture) => {
-            const homeTeam = await prisma.club.findUnique({
-                where: {
-                    id: team_h,
-                },
-                select: {
-                    name: true,
-                },
-            });
-
-            const i = allFixturesForThePool.indexOf(fixture.id);
-            if (i === -1) {
-                // Fixture does not exist, add the fixture
-
-                const fixtureToAdd = {};
-            } else {
-            }
-        });
-
-        //     playerFixtures.forEach((fixture) => {
-        //         // removing duplicate games
-        //         const index = allFixturesForThePool.indexOf(fixture.id);
-        //         if (index > -1) {
-        //             // this means the fixture ID is NOT in the allFixturesForThePool
-        //             // if the ID is NOT in the allFixturesForThePool then add it in a new fixture object to push into allFixtures array.
-
-        //             const player = await prisma.player.findUnique({
-        //                 where: {
-        //                     id: id,
-        //                 },
-        //                 select:  {
-        //                     fn: true,
-        //                     ln: true,
-        //                     avatar: true,
-        //                     net_goals: true,
-
-        //                 },
-        //                 include: {
-        //                     club: true
-        //                 }
-
-        //             })
-
-        //         } else {
-        //             console.log(
-        //                 `Player id: ${id} Fixture: ${fixture.kickoff_time}`
-        //             );
-
-        //         }
-        //     });
-        // }
-
-        // console.log(allFixturesForThePool);
-
-        // const timeNow = Date.now();
-
-        // const fixtureTimeStamp = Date.parse(allFixturesForThePool[0]);
-        // const difference = fixtureTimeStamp - timeNow;
-
-        // console.log(`time difference is: ${difference}`);
-
-        // const hours = Math.floor(difference / 3600000);
-        // const minutes = Math.floor((difference % 3600000) / 60000);
-        // const seconds = Math.floor(((difference % 360000) % 60000) / 1000);
-        // console.log(`${hours}h ${minutes}m ${seconds}s`);
     }
+    console.log(playerIdsInNextGameWeek);
 };
 
 test();
 
+// const timeNow = Date.now();
 
+// const fixtureTimeStamp = Date.parse(allFixturesForThePool[0]);
+// const difference = fixtureTimeStamp - timeNow;
 
-[
-    {
-        fixture_id,
-        fixture_kickoff, 
-        home_club: {
-            name: Chelsea,
-            players: [
-                {
-                    fn,
-                    ln,
-                    net_goals,
-                },
-            ],
-        },
-        away_club: {
-            name: Chelsea,
-            players: [
-                {
-                    fn,
-                    ln,
-                    net_goals,
-                },
-            ],
-        },
-        entries: [
-            {
-                fn,
-                ln,
-                goals,
-            },
-            {
-                fn,
-                ln,
-                goals,
-            },
-        ],
-    },
-];
+// console.log(`time difference is: ${difference}`);
 
+// const hours = Math.floor(difference / 3600000);
+// const minutes = Math.floor((difference % 3600000) / 60000);
+// const seconds = Math.floor(((difference % 360000) % 60000) / 1000);
+// console.log(`${hours}h ${minutes}m ${seconds}s`);
+
+// For Frontend
 
 // weekly cron job on Sunday at midnight PDT
 // get all the fixtures for the coming week
@@ -157,36 +108,81 @@ test();
 
 // get clubs for each fixture
 
+// home team id
+// home team name
+// away team id
+// away team name
+// kickoff time
+// game week
 
-// get players in those clubs in each fixture. 
+// get players in those clubs in each fixture.
 
+// findMany for home team
+// findMany for away team
+// each player get fn ln goals, net, own, club id
+// match club id with home or away
 
-// get entries that contain those players
+// [
+//     {
+//         fixture_id,
+//         fixture_kickoff,
+//         gameweek,
+//         home_club: {
+//             name: Chelsea,
+//             players: [
+//                 {
+//                     fn,
+//                     ln,
+//                     net_goals,
+//                 },
+//             ],
+//         },
+//         away_club: {
+//             name: Everton,
+//             players: [
+//                 {
+//                     fn,
+//                     ln,
+//                     net_goals,
+//                 },
+//             ],
+//         },
+//     },
+// ];
 
+// get weekly fixures every Sunday at midnight CRON 1
+//--->  https://fantasy.premierleague.com/api/fixtures?future=1
+//---> get eventId (Fixture week)
 
-// get all kickoff times for those fixtures. 
+// get all clubs in postgres database.
+//---> club.findMany() to get an array of club objects. get Ids
 
+// filter for fixtures only that have clubs in our data base, return those fixtures.
+//---> forEach fixture, get
+//---> team_a: Int
+//---> team_h: Int
+//---> kickoff_time: Date()
 
-// save fixtures in Postgres
+// get players playing in the coming week in those clubs.
+//---> forEach fixture
+//---> club.findMany() where: id: team_a || team_h include: players: true
+//---> get player Id's
 
+// get time now and set cron job for when time now - kickoff time = 0
 
-// stack rank fixture array in order from soonest to latest
+// cron job queries live data API, searches for the player objects in the array that match ids of players in that game
+//---> https://fantasy.premierleague.com/api/event/{eventId}/live/
+//---> findIndex of each player Id in live array.
 
+// evaluate change in goals_scored, own_goals, save the difference.
+//---> if goals_scored, own_goals === 0, do nothing.
+//---> else if goals_scored > 0 increase player goals by (x), else if own_goals > -, increase player own_goals by (y)
+//---> save goals_scored, own_goals for each player.
+//---> update entries with those players goals
 
-// get time now 
+// next query
+//---> if goals_scored > (x) or own_goals > (x) then
+//---> save goals_scored, own_goals for each player.
+//---> update entries with those players goals
 
-
-// set coundown for cron job 
-
-
-// CRON 2 when timer = 0 launch second cron job for 3h to hit live update API and scan for player ids in that match every 2 minutes. 
-
-
-// run mutation to update player and entry scores. 
-
-
-// get difference between time now and time to next fixture. 
-
-
-// repeat CRON 2 job
-
+// repeat cron job every 2 minutes until 3 hours is up.

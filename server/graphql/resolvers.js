@@ -48,6 +48,7 @@ const resolvers = {
             return entry;
         },
         // return all entries across all pools
+
         entries: async () => {
             const entries = await prisma.entry.findMany({
                 include: {
