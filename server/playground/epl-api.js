@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const sortByDateAsc = (a, b) => {
-    return new Date(a.date) - new Date(b.date);
+    return new Date(a.kickoff_time) - new Date(b.kickoff_time);
 };
 
 const test = async () => {
@@ -43,47 +43,115 @@ const test = async () => {
             clubIdsInPool.some((id) => fixture.team_a || fixture.team_h === id)
     );
 
-    // console.log(fixturesWithClubsInPool);
+    console.log(fixturesWithClubsInPool.length);
 
-    const fixtureKickoffTimes = fixturesWithClubsInPool.map(
-        (fixture) => fixture.kickoff_time
-    );
-    // console.log(fixtureKickoffTimes);
+    const fixtureOrderArray = [];
 
-    // filter for fixtures only that have clubs in our data base, return those fixtures.
-    let clubsInNextGameWeekInPool = [];
+    const n = fixturesWithClubsInPool.length;
 
-    await fixturesWithClubsInPool.forEach((fixture) => {
-        if (clubIdsInPool.indexOf(fixture.team_h) > -1) {
-            clubsInNextGameWeekInPool.push(fixture.team_h);
+    for (let i = 0; i < n; i++) {
+        console.log('Count Index ', i);
+
+        const homeTeamId = fixturesWithClubsInPool[i].team_h;
+        const awayTeamId = fixturesWithClubsInPool[i].team_a;
+        const kickoff_time = fixturesWithClubsInPool[i].kickoff_time;
+
+        let clubs = [];
+        let players = [];
+
+        const fixtureIndex =
+            fixturesWithClubsInPool[i].kickoff_time.indexOf(fixtureOrderArray);
+
+        console.log('Fixture Index ', fixtureIndex);
+
+        if (fixtureIndex < 0) {
+            // clubs in fixtures that are also in our pool
+            if (clubIdsInPool.indexOf(homeTeamId) > -1) {
+                clubs.push(homeTeamId);
+
+                // get players in that club
+                const clubObjectWithPlayers = await prisma.club.findUnique({
+                    where: {
+                        id: homeTeamId,
+                    },
+                    select: {
+                        players: true,
+                    },
+                });
+
+                // iterate through array and push ids into player array
+                clubObjectWithPlayers.players.forEach((player) => {
+                    players.push(player.id);
+                });
+            }
+
+            if (clubIdsInPool.indexOf(awayTeamId) > -1) {
+                clubs.push(awayTeamId);
+
+                const clubObjectWithPlayers = await prisma.club.findUnique({
+                    where: {
+                        id: awayTeamId,
+                    },
+                    select: {
+                        players: true,
+                    },
+                });
+
+                clubObjectWithPlayers.players.forEach((player) => {
+                    players.push(player.id);
+                });
+            }
+        } else {
+            if (clubIdsInPool.indexOf(homeTeamId) > -1) {
+                clubs.push(homeTeamId);
+
+                // get players in that club
+                const clubObjectWithPlayers = await prisma.club.findUnique({
+                    where: {
+                        id: homeTeamId,
+                    },
+                    select: {
+                        players: true,
+                    },
+                });
+
+                // iterate through array and push ids into player array
+                clubObjectWithPlayers.players.forEach((player) => {
+                    players.push(player.id);
+                });
+            }
+
+            if (clubIdsInPool.indexOf(awayTeamId) > -1) {
+                clubs.push(awayTeamId);
+
+                const clubObjectWithPlayers = await prisma.club.findUnique({
+                    where: {
+                        id: awayTeamId,
+                    },
+                    select: {
+                        players: true,
+                    },
+                });
+
+                clubObjectWithPlayers.players.forEach((player) => {
+                    players.push(player.id);
+                });
+            }
+            clubs.push(homeTeamId, awayTeamId);
         }
-        if (clubIdsInPool.indexOf(fixture.team_a) > -1) {
-            clubsInNextGameWeekInPool.push(fixture.team_a);
-        }
-    });
+        const entry = {
+            kickoff_time: kickoff_time,
+            players: players,
+            clubs: clubs,
+        };
+        console.log(entry);
 
-    // console.log(clubsInNextGameWeekInPool);
-
-    // get players playing in the coming week in those clubs.
-    const playerIdsInNextGameWeek = [];
-
-    for (const clubId of clubsInNextGameWeekInPool) {
-        const clubObject = await prisma.club.findUnique({
-            where: {
-                id: clubId,
-            },
-            select: {
-                players: true,
-            },
-        });
-
-        const playersInClub = clubObject.players;
-
-        playersInClub.forEach((player) =>
-            playerIdsInNextGameWeek.push(player.id)
-        );
+        fixtureOrderArray.push(entry);
     }
-    console.log(playerIdsInNextGameWeek);
+
+    // sort fixtures into order based on time from Sunday.
+    fixtureOrderArray.sort(sortByDateAsc);
+    console.log(fixtureOrderArray);
 };
 
 test();
@@ -122,33 +190,15 @@ test();
 // each player get fn ln goals, net, own, club id
 // match club id with home or away
 
-// [
-//     {
-//         fixture_id,
-//         fixture_kickoff,
-//         gameweek,
-//         home_club: {
-//             name: Chelsea,
-//             players: [
-//                 {
-//                     fn,
-//                     ln,
-//                     net_goals,
-//                 },
-//             ],
-//         },
-//         away_club: {
-//             name: Everton,
-//             players: [
-//                 {
-//                     fn,
-//                     ln,
-//                     net_goals,
-//                 },
-//             ],
-//         },
-//     },
-// ];
+[
+    {
+        // id: 1,
+        // order: 1,
+        kickoff_time: 'time',
+        teamId: [1, 2, 4, 15],
+        playerId: [1, 2, 3, 4, 5, 6],
+    },
+];
 
 // get weekly fixures every Sunday at midnight CRON 1
 //--->  https://fantasy.premierleague.com/api/fixtures?future=1
@@ -168,6 +218,12 @@ test();
 //---> club.findMany() where: id: team_a || team_h include: players: true
 //---> get player Id's
 
+// Sort fixtures into orders based on time from Sunday - kickoff
+
+// If two fixtures play at the same time, assign the same order number
+
+// save fixtures into a new database object, rewrite the object every week.
+
 // get time now and set cron job for when time now - kickoff time = 0
 
 // cron job queries live data API, searches for the player objects in the array that match ids of players in that game
@@ -186,3 +242,38 @@ test();
 //---> update entries with those players goals
 
 // repeat cron job every 2 minutes until 3 hours is up.
+
+// get all clubs in the upcoming gameweek
+// let clubsInNextGameWeekInPool = [];
+
+// await fixturesWithClubsInPool.forEach((fixture) => {
+// if (clubIdsInPool.indexOf(fixture.team_h) > -1) {
+//     clubsInNextGameWeekInPool.push(fixture.team_h);
+// }
+// if (clubIdsInPool.indexOf(fixture.team_a) > -1) {
+//     clubsInNextGameWeekInPool.push(fixture.team_a);
+// }
+// });
+
+// console.log(clubsInNextGameWeekInPool);
+
+// // get players playing in the coming week in those clubs.
+// const playerIdsInNextGameWeek = [];
+
+// for (const clubId of clubsInNextGameWeekInPool) {
+//     const clubObject = await prisma.club.findUnique({
+//         where: {
+//             id: clubId,
+//         },
+//         select: {
+//             players: true,
+//         },
+//     });
+
+//     const playersInClub = clubObject.players;
+
+//     playersInClub.forEach((player) =>
+//         playerIdsInNextGameWeek.push(player.id)
+//     );
+// }
+// console.log(playerIdsInNextGameWeek);
