@@ -90,6 +90,14 @@ model Club {
   updatedAt DateTime @updatedAt
 }
 
+model Fixtures {
+  id                 Int    @id @unique @default(autoincrement())
+  game_week_id       Int
+  number_of_fixtures Int
+  kickoff_time       String
+  ms_kickoff_time    BigInt
+}
+
 enum Role {
   USER
   ADMIN

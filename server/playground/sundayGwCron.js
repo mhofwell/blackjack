@@ -4,7 +4,7 @@ import sortByDateAsc from '../utils/date-utils.js';
 const prisma = new PrismaClient();
 
 const test = async () => {
-    // await prisma.gameweek.deleteMany();
+    await prisma.fixtures.deleteMany();
 
     const res = await fetch(
         `https://fantasy.premierleague.com/api/fixtures?future=1`
@@ -33,32 +33,33 @@ const test = async () => {
         }
     }
 
-    nextGameweekKickoffTimes.sort(sortByDateAsc);
+    let gameweekCronJobInfo = [];
 
-    const gameweekCronJobInfo = {
-        numberOfGames: numberOfGames,
-        gameWeekId: gameWeekId,
-        kickoffTimes: nextGameweekKickoffTimes,
-    };
+    nextGameweekKickoffTimes.forEach((kickoffTime) => {
+        const ms_kickoff_time = Date.parse(kickoffTime);
 
-    console.log(gameweekCronJobInfo);
+        const entry = {
+            game_week_id: gameWeekId,
+            number_of_fixtures: numberOfGames,
+            kickoff_time: kickoffTime,
+            ms_kickoff_time: ms_kickoff_time,
+        };
+        gameweekCronJobInfo.push(entry);
+    });
 
-        // save in prisma?
+    const count = await prisma.fixtures.createMany({
+        data: gameweekCronJobInfo,
+    });
 
-        // prisma.kickoffTimes.insertMany({})
-        // id: int increment,
-        // gameWeekId: gameWeekId, 
-        // numberOfGames: numberOfGames, 
-        // kickoffTime: kickoffTimes 
-
-
-
+    console.log(count);
 };
 
 test();
 
-//--> Cron 2: for all kickoff times, Get next kickoffTime, set 3 hour cron job every 2 mins. 
+//--> Cron 2: for the next (number_of_games) fixtures
 //--> search first numberOfGames in the array for kickoffTime === kickoff_time.
 //--> retreive all club Ids that kickoff at that time that match Ids in our database, include Players. Extract player Id.
 //--> Every 2 mins query  https://fantasy.premierleague.com/api/event/{gameWeek}/live/ and search for playerId = id.
 //--> If goals, own_goals === 0 do nothing. Else mutuate the player entry in our database and the entry where the player exists' goal total.
+
+

@@ -8,6 +8,7 @@ const cleanUp = async () => {
     await prisma.user.deleteMany();
     await prisma.player.deleteMany();
     await prisma.club.deleteMany();
+    await prisma.fixtures.deleteMany();
     console.log('Completed database cleanup');
 };
 
