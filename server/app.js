@@ -12,7 +12,7 @@ import resolvers from './graphql/resolvers.js';
 import typeDefs from './graphql/typeDefs.js';
 
 // utils 
-import { pingPrisma, pingEpl } from './utils/ping-services.js';
+import { pingPrisma, pingEpl } from './utils/services.js';
 
 // Create the schema, this will be used separately by ApolloServer and
 // the WebSocket server.

@@ -1,14 +1,15 @@
 import { PrismaClient } from '@prisma/client';
-import sortByDateAsc from '../utils/date-utils.js';
 
-const prisma = new PrismaClient();
+const sunday = async () => {
+    const prisma = new PrismaClient();
+    // launch sunday at midnight, set to run every week same time.
 
-const test = async () => {
     await prisma.fixtures.deleteMany();
 
     const res = await fetch(
         `https://fantasy.premierleague.com/api/fixtures?future=1`
     );
+
     const data = await res.json();
     const gameWeekId = data[0].event;
 
@@ -51,15 +52,22 @@ const test = async () => {
         data: gameweekCronJobInfo,
     });
 
+    prisma.$disconnect();
+
     console.log(count);
+    // Get time now,
+    // get time diff between (now-first fixture)
+    // set second cron to run in that many miliseconds.
 };
 
-test();
+sunday();
 
-//--> Cron 2: for the next (number_of_games) fixtures
-//--> search first numberOfGames in the array for kickoffTime === kickoff_time.
-//--> retreive all club Ids that kickoff at that time that match Ids in our database, include Players. Extract player Id.
-//--> Every 2 mins query  https://fantasy.premierleague.com/api/event/{gameWeek}/live/ and search for playerId = id.
+//--> Cron 2: 
+//--> on coundown = 0
+//--> for the next (number_of_fixtures) if (kickoff_time = kickoff_time) push (team_a, team_h) into array
+//--> for each teamId in array return all player ids, push into playerIdArray
+//--> every (x) mins query EPL API Live endpoint for {gameweek} 
+//--> https://fantasy.premierleague.com/api/event/{gameWeek}/live/ and search for playerId = id.
 //--> If goals, own_goals === 0 do nothing. Else mutuate the player entry in our database and the entry where the player exists' goal total.
 
 

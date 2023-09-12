@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import sortByDateAsc from '../utils/date-utils.js';
+import sortByDateAsc from '../utils/sort.js';
 
 const prisma = new PrismaClient();
 
@@ -165,56 +165,3 @@ const test = async () => {
 
 test();
 
-
-
-// 
-
-[
-    {
-        kickoff_time: '1234', 
-        games: [
-            {
-                homeTeam: {
-                    id: 2, 
-                    players: [1, 2, 3]
-                },
-                awayTeam: {
-                    id: 3, 
-                    players: [1, 2, 3]
-                },
-            }, 
-            {
-                homeTeam: {
-                    id: 10, 
-                    players: []
-                },
-                awayTeam: {
-                    id: 1, 
-                    players: [1, 2, 3]
-                },
-            }
-        ]
-    },{
-        kickoff_time: '4556', 
-        games: [
-            {
-                homeTeam: 1, 
-                awayTeam: 16, 
-            }
-        ]
-    } 
-]
-
-// We can store this in our database and when each kickoff time is reached we get all the players for those clubs and run the cron job. 
-
-
-// Get upcoming gameweek number (x), Get all kickoff times for the (x) gameweek, remove duplicates, organize asc by time. 
-
-
-// when kickoff time is reached for first match:
-
-//--> visit https://fantasy.premierleague.com/api/fixtures?future=1 
-//--> get all clubIds in those fixtures that are also in the pool
-//--> forEach clubId find all the players, push playerId into an array. 
-//--> Cron 2: Every 2 mins query  https://fantasy.premierleague.com/api/event/{gameWeek}/live/ and search for playerId = id. 
-//--> If goals, own_goals === 0 do nothing. Else mutuate the player entry in our database and the entry where the player exists' goal total. 
