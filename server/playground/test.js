@@ -1,13 +1,12 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+
 import Bree from 'bree';
-import schedule from 'node-schedule';
+import Graceful from '@ladjs/graceful';
 
 const cron = new Bree({
     jobs: [
         {
             name: 'sunday',
-            interval: 'every Sunday at midnight',
+            interval: 'every 10 seconds',
         },
     ],
 });
@@ -20,8 +19,6 @@ graceful.listen();
 (async () => {
     await cron.start();
 })();
-
-
 
 // };
 

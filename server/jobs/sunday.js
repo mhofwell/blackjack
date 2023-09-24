@@ -22,7 +22,7 @@ const sunday = async () => {
     // remove duplicate kickoff times
     for (const id in data) {
         if (
-            data[id].event === 5 &&
+            data[id].event === 7 &&
             nextGameweekKickoffTimes.indexOf(data[id].kickoff_time) < 0
         ) {
             nextGameweekKickoffTimes.push(data[id].kickoff_time);
@@ -57,7 +57,7 @@ const sunday = async () => {
     console.log(count);
     // Get time now,
     // get time diff between (now-first fixture)
-    // set second cron to run in that many miliseconds.
+    // set second cron to run in that many miliseconds. 
 };
 
 sunday();
