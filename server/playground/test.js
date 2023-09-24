@@ -3,24 +3,25 @@ const prisma = new PrismaClient();
 import Bree from 'bree';
 import schedule from 'node-schedule';
 
+const cron = new Bree({
+    jobs: [
+        {
+            name: 'sunday',
+            interval: 'every Sunday at midnight',
+        },
+    ],
+});
 
-// const cron = new Bree({
-//     jobs: [
-//         'sunday',
-//     ],
-// });
+// handle graceful reloads, pm2 support, and events like SIGHUP, SIGINT, etc.
+const graceful = new Graceful({ brees: [cron] });
+graceful.listen();
 
-// cron.start();
+// start all jobs (this is the equivalent of reloading a crontab):
+(async () => {
+    await cron.start();
+})();
 
-const hw = () => {
-    console.log('Hello World');
-    console.log(new Date(Date.now()).toString());
-};
 
-// every 5 seconds
-const interval = '*/5 * * * * *';
-
-const job = schedule.scheduleJob(interval, hw);
 
 // };
 
@@ -42,3 +43,11 @@ const job = schedule.scheduleJob(interval, hw);
 // if goals (x), own_goals (y) > 0, update player and entry with mutation. Record x, y.
 
 // Next query; if x, y change, update player and entry records with mutations.
+
+// new cron job sequence
+
+// Sunday job runs, stores kickoff times in database. Emits event(?) to kickoff job2.
+
+// Job 2: Takes in all kickoff times, forEach kickoff time create a new job and push it into the Bree jobs array?
+
+// Each new job fires at the kickoff time and runs every two minutes in an interval.

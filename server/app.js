@@ -29,6 +29,7 @@ const wsServer = new WebSocketServer({
     server: httpServer,
     path: '/graphql',
 });
+
 // Save returned server's info so we can shutdown this server later
 const serverCleanup = useServer({ schema }, wsServer);
 
@@ -57,25 +58,25 @@ await server.start();
 app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server));
 
 // access control and headers for REST API
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*'); // or GET, POST, PUT, PATCH, DELETE
-    // This says clients can send requests that hold extra authorziation and content types in the header
-    res.setHeader('Access-Control-Allow-Header', 'Content-Type, Authorization'); // could use a wildcard (*).
-    next();
-});
+// app.use((req, res, next) => {
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', '*'); // or GET, POST, PUT, PATCH, DELETE
+//     // This says clients can send requests that hold extra authorziation and content types in the header
+//     res.setHeader('Access-Control-Allow-Header', 'Content-Type, Authorization'); // could use a wildcard (*).
+//     next();
+// });
 
-/// route req/res error handling for API requests
-app.use((err, req, res, next) => {
-    console.log(err);
-    const status = err.statusCode || 500;
-    const message = err.message;
-    const data = err.data;
-    res.status(status).json({
-        message: message,
-        data: data,
-    });
-});
+// /// route req/res error handling for API requests
+// app.use((err, req, res, next) => {
+//     console.log(err);
+//     const status = err.statusCode || 500;
+//     const message = err.message;
+//     const data = err.data;
+//     res.status(status).json({
+//         message: message,
+//         data: data,
+//     });
+// });
 
 const main = async () => {
     httpServer.listen(port, () => {
