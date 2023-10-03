@@ -57,6 +57,26 @@ await server.start();
 
 app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server));
 
+const main = async () => {
+    httpServer.listen(port, () => {
+        console.log(`Server is now running on http://localhost:${port}/graphql`);
+    });
+
+    const data = await pingPrisma();
+
+    if (data.name !== 'prisma') {
+        console.log('Cannot connect to PRISMA');
+    } else {
+        console.log('Connected to PRISMA!');
+    }
+
+    const payload = await pingEpl();
+    console.log(`EPL API connection status: ${payload.status}`);
+};
+
+main();
+
+
 // access control and headers for REST API
 // app.use((req, res, next) => {
 //     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -77,22 +97,3 @@ app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server));
 //         data: data,
 //     });
 // });
-
-const main = async () => {
-    httpServer.listen(port, () => {
-        console.log(`Server is now running on http://localhost:${port}/graphql`);
-    });
-
-    const data = await pingPrisma();
-
-    if (data.name !== 'prisma') {
-        console.log('Cannot connect to PRISMA');
-    } else {
-        console.log('Connected to PRISMA!');
-    }
-
-    const payload = await pingEpl();
-    console.log(`EPL API connection status: ${payload.status}`);
-};
-
-main();
