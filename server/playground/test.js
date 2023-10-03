@@ -14,8 +14,6 @@ const graceful = new Graceful({ brees: [cron] });
 graceful.listen();
 
 // start all jobs
-(async () => {
-    await cron.start();
-})();
+cron.start();
 
 export default cron;

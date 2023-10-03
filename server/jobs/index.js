@@ -1,9 +1,8 @@
 const jobList = [
     {
-        name: 'gameweekUpdate',
-        interval: 'every 2 seconds',
+        name: 'cronFactory',
+        interval: '2s',
     },
-    { name: 'goalUpdate', interval: 'every 3 seconds' },
 ];
 
 export default jobList;
