@@ -1,18 +1,9 @@
 import Bree from 'bree';
 import Graceful from '@ladjs/graceful';
+import jobs from '../jobs/index.js'
 
 const cron = new Bree({
-    jobs: [
-        {
-            name: 'getWeeklyFixtures',
-            interval: '20s',
-            timeout: 0,
-        },
-        {
-            name: 'cronFactory',
-            interval: '25s',
-        },
-    ],
+    jobs: jobs
 });
 
 // handle graceful reloads, pm2 support, and events like SIGHUP, SIGINT, etc.

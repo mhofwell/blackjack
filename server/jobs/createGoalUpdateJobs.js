@@ -3,7 +3,7 @@ import ms from 'ms';
 import Bree from 'bree';
 import { PrismaClient } from '@prisma/client';
 
-const cronFactory = async () => {
+const createGoalUpdateJobs = async () => {
     const prisma = new PrismaClient();
 
     const fixtures = await prisma.fixtures.findMany();
@@ -17,13 +17,13 @@ const cronFactory = async () => {
     fixtures.forEach((fixture) => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
-            path: path.join(appDir + '/jobs', 'updateGoals.js'),
+            path: path.join(appDir + '/jobs', 'updateGoalData.js'),
             interval: '20s',
             timeout: 0,
             outputWorkerMetadata: true,
             worker: {
                 workerData: {
-                    kickoff_time: fixture.kickoff_time,
+                    kickoffTime: fixture.kickoff_time,
                     numberOfFixtures: fixture.number_of_fixtures,
                 },
             },
@@ -41,7 +41,7 @@ const workerMessageHAndler = (worker) => {
     }, 1000);
 };
 
-const cronJobs = await cronFactory();
+const cronJobs = await createGoalUpdateJobs();
 
 const cron = new Bree({
     root: false,
