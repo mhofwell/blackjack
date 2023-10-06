@@ -1,35 +1,35 @@
 import path from 'path';
-import ms from 'ms';
 import Bree from 'bree';
 import { PrismaClient } from '@prisma/client';
 
 const createGoalUpdateJobs = async () => {
     const prisma = new PrismaClient();
 
-    const fixtures = await prisma.fixtures.findMany();
+    const fixture = await prisma.fixtures.findFirst();
     const appDir =
         '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
 
-    console.log(fixtures);
+    console.log(fixture);
 
     let newCronJobs = [];
 
-    fixtures.forEach((fixture) => {
-        newCronJobs.push({
-            name: `gw-worker-${fixture.kickoff_time}`,
-            path: path.join(appDir + '/jobs', 'updateGoalData.js'),
-            interval: '20s',
-            timeout: 0,
-            outputWorkerMetadata: true,
-            worker: {
-                workerData: {
-                    kickoffTime: fixture.kickoff_time,
-                    numberOfFixtures: fixture.number_of_fixtures,
-                },
+    // fixtures.forEach((fixture) => {
+    newCronJobs.push({
+        name: `gw-worker-${fixture.kickoff_time}`,
+        path: path.join(appDir + '/jobs', 'updateGoalData.js'),
+        interval: '20s',
+        timeout: 0,
+        outputWorkerMetadata: true,
+        worker: {
+            workerData: {
+                kickoffTime: fixture.kickoff_time,
+                numberOfFixtures: fixture.number_of_fixtures,
+                gameWeekId: fixture.game_week_id,
             },
-        });
+        },
     });
     return newCronJobs;
+    // });
 };
 
 const workerMessageHAndler = (worker) => {
@@ -42,6 +42,7 @@ const workerMessageHAndler = (worker) => {
 };
 
 const cronJobs = await createGoalUpdateJobs();
+console.log(cronJobs);
 
 const cron = new Bree({
     root: false,
