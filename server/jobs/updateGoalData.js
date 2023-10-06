@@ -1,22 +1,21 @@
 import getUpcomingPlayers from '../utils/data/getUpcomingPlayers.js';
 import { parentPort } from 'worker_threads';
 
+const kickoffTime = new Date('2023-10-07T11:30:00Z').toString();
+console.log('kickoffTime ', kickoffTime);
+
+const numberOfFixtures = 5;
+const gameWeekId = 8;
+
+const players = await getUpcomingPlayers(kickoffTime, numberOfFixtures);
+
+let newData = {};
+let updatePrisma = false;
+let c = 0;
+let i = 0;
+// const { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
+
 const updateGoalData = async () => {
-    // const { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
-
-    const kickoffTime = new Date('2023-10-07T11:30:00Z').toString();
-    console.log('kickoffTime ', kickoffTime);
-
-    const numberOfFixtures = 5;
-    const gameWeekId = 8;
-
-    const players = await getUpcomingPlayers(kickoffTime, numberOfFixtures);
-
-    let newData = {};
-    let updatePrisma = false;
-
-    let i = 0;
-
     setInterval(async () => {
         console.log('iteration 1');
         i++;
@@ -34,38 +33,48 @@ const updateGoalData = async () => {
                     '---------> Cannot fetch gameweek live data from EPL API, check connection.'
                 );
             }
-            // parentPort.postMessage(
-            //     `--------->  Gameweek live data fetched for week ${gameWeekId}`
-            // );
-            console.log(
-                `---------> Gameweek live data fetched for week ${gameWeekId}`
+            parentPort.postMessage(
+                `--------->  Gameweek live data fetched for week ${gameWeekId}`
             );
+            // console.log(
+            //     `---------> Gameweek live data fetched for week ${gameWeekId}`
+            // );
 
             const data = await res.json();
 
-            for (const n in players) {
-                console.log(
-                    `---------> Fetching player live data for player id ${players[n].id}`
+            for (const player of players) {
+                // console.log(
+                //     `---------> Fetching player live data for player id ${player.id}`
+                // );
+                parentPort.postMessage(
+                    `---------> Fetching player live data for player id ${player.id}`
                 );
 
-                const playerObject = data.elements[players[n].id - 1];
+                const playerObject = data.elements[player.id - 1];
                 console.log('Fetched player is: ', playerObject);
 
                 if (playerObject.stats.goals_scored !== 0) {
                     newData.goals =
-                        players[n].goals + playerObject.stats.goals_scored;
+                        player.goals + playerObject.stats.goals_scored;
                 }
                 if (playerObject.stats.own_goals !== 0) {
                     newData.own_goals =
-                        players[n].own_goals + playerObject.stats.own_goals;
+                        player.own_goals + playerObject.stats.own_goals;
                 }
 
                 newData.goals > 0 || newData.own_goals > 0
                     ? updatePrisma === true
                     : updatePrisma === false;
 
+                c++;
+                console.log('c', c);
+
                 if (updatePrisma) {
                     console.log('New player data object to save: ', newData);
+                    parentPort.postMessage(
+                        'New player data object to save: ',
+                        newData
+                    );
                     const updatedPlayer = await prisma.player.update({
                         where: {
                             id: player.id,
@@ -73,10 +82,18 @@ const updateGoalData = async () => {
                         data: newData,
                     });
                     console.log(`Updated! ${updatedPlayer}`);
+                    parentPort.postMessage(`Updated! ${updatedPlayer}`);
                 } else {
                     console.log('No new player object to save: ', newData);
+                    parentPort.postMessage(
+                        'No new player object to save: ',
+                        newData
+                    );
                 }
-                console.log(`Iteration complete for player ${players[n].id}`);
+                console.log(`Iteration complete for player ${player.id}`);
+                parentPort.postMessage(
+                    `Iteration complete for player ${player.id}`
+                );
             }
         } catch (err) {
             // parentPort.postMessage(

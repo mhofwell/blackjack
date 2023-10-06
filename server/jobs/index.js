@@ -1,13 +1,15 @@
 const jobs = [
     {
         name: 'getWeeklyFixtures',
-        interval: 'every wednesday at midnight',
+        // cron: '0 0 * * WED',
+        interval: '30s',
         timeout: 0,
     },
     {
         name: 'createGoalUpdateJobs',
-        interval: 'every thursday at 12:30 am',
-        timeout: 5000,
+        // interval: 'Thursday at 12:30 am',
+        // cron: '0 0 * * WED'
+        interval: '15s',
     },
 ];
 
