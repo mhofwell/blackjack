@@ -1,5 +1,6 @@
 // import { parentPort } from 'worker_threads';
 import { PrismaClient } from '@prisma/client';
+import { parentPort } from 'worker_threads';
 
 const getWeeklyFixtures = async () => {
     const prisma = new PrismaClient();
@@ -61,10 +62,28 @@ const getWeeklyFixtures = async () => {
         });
         console.log('count: ', count);
     } catch (err) {
-        console.error(err);
-        process.exit(1);
+        if (parentPort) {
+            parentPort.postMessage('---------> Something went wrong...');
+            parentPort.postMessage(err);
+            process.exit(1);
+        } else {
+            console.log('---------> Something went wrong...');
+            console.error(err);
+            process.exit(1);
+        }
     }
-    process.exit(0);
+    if (parentPort) {
+        parentPort.postMessage(
+            `---------> Completed update of fixtures for gameweek ${gameWeekId}`
+        );
+        parentPort.postMessage('done');
+    } else {
+        console.log(
+            `---------> Completed update of fixtures for gameweek ${gameWeekId}`
+        );
+        console.log('done');
+        process.exit(0);
+    }
 };
 
 getWeeklyFixtures();

@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 
-const getUpcomingPlayers = async (kickoffTime, numberOfFixtures) => {
+export default async function getUpcomingPlayers(
+    kickoffTime,
+    numberOfFixtures
+) {
     const prisma = new PrismaClient();
     const players = [];
     const teamIdArray = [];
@@ -60,7 +63,9 @@ const getUpcomingPlayers = async (kickoffTime, numberOfFixtures) => {
             // parentPort.postMessage(
             //     `----> Players fetched for club ${teamIdArray[id]}`
             // );
-            console.log(`---------> Players fetched for club ${teamIdArray[id]}`);
+            console.log(
+                `---------> Players fetched for club ${teamIdArray[id]}`
+            );
         }
         console.log('Players fetched: ', players);
         return players;
@@ -68,6 +73,4 @@ const getUpcomingPlayers = async (kickoffTime, numberOfFixtures) => {
         console.error(err);
         process.exit(1);
     }
-};
-
-export default getUpcomingPlayers;
+}

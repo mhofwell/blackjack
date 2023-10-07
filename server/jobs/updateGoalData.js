@@ -1,19 +1,17 @@
 import getUpcomingPlayers from '../utils/data/getUpcomingPlayers.js';
 import { parentPort } from 'worker_threads';
 
-const kickoffTime = new Date('2023-10-07T11:30:00Z').toString();
-console.log('kickoffTime ', kickoffTime);
+const players = await getUpcomingPlayers(kickoffTime, numberOfFixtures);
+// const { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
 
 const numberOfFixtures = 5;
 const gameWeekId = 8;
-
-const players = await getUpcomingPlayers(kickoffTime, numberOfFixtures);
-
-let newData = {};
+let goalData = {};
 let updatePrisma = false;
-let c = 0;
+
 let i = 0;
-// const { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
+const kickoffTime = new Date('2023-10-07T11:30:00Z').toString();
+console.log('kickoffTime ', kickoffTime);
 
 const updateGoalData = async () => {
     setInterval(async () => {
@@ -54,41 +52,35 @@ const updateGoalData = async () => {
                 console.log('Fetched player is: ', playerObject);
 
                 if (playerObject.stats.goals_scored !== 0) {
-                    newData.goals =
+                    goalData.goals =
                         player.goals + playerObject.stats.goals_scored;
                 }
                 if (playerObject.stats.own_goals !== 0) {
-                    newData.own_goals =
+                    goalData.own_goals =
                         player.own_goals + playerObject.stats.own_goals;
                 }
 
-                newData.goals > 0 || newData.own_goals > 0
+                goalData.goals > 0 || goalData.own_goals > 0
                     ? updatePrisma === true
                     : updatePrisma === false;
 
-                c++;
-                console.log('c', c);
-
                 if (updatePrisma) {
-                    console.log('New player data object to save: ', newData);
+                    console.log('New player data object to save: ', goalData);
                     parentPort.postMessage(
                         'New player data object to save: ',
-                        newData
+                        goalData
                     );
                     const updatedPlayer = await prisma.player.update({
                         where: {
                             id: player.id,
                         },
-                        data: newData,
+                        data: goalData,
                     });
                     console.log(`Updated! ${updatedPlayer}`);
                     parentPort.postMessage(`Updated! ${updatedPlayer}`);
                 } else {
-                    console.log('No new player object to save: ', newData);
-                    parentPort.postMessage(
-                        'No new player object to save: ',
-                        newData
-                    );
+                    console.log('No changes in player goals.');
+                    parentPort.postMessage('No changes in player goals.');
                 }
                 console.log(`Iteration complete for player ${player.id}`);
                 parentPort.postMessage(
@@ -96,12 +88,6 @@ const updateGoalData = async () => {
                 );
             }
         } catch (err) {
-            // parentPort.postMessage(
-            //     'Worker: ',
-            //     workerData.kickoff_time,
-            //     'Iteration: ',
-            //     i
-            // );
             if (parentPort) {
                 parentPort.postMessage('---------> Something went wrong...');
                 parentPort.postMessage(err);
@@ -117,7 +103,6 @@ const updateGoalData = async () => {
             if (parentPort) {
                 parentPort.postMessage('---------> Process complete...');
                 parentPort.postMessage('done');
-                process.exit(0);
             } else {
                 console.log('---------> Process complete...');
                 console.log('done');

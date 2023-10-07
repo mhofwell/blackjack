@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 
 const prisma = new PrismaClient();
+const pubsub = new RedisPubSub();
 
 const resolvers = {
     Query: {
@@ -109,9 +111,12 @@ const resolvers = {
             return user;
         },
     },
+    Mutation: {
+        // add redisPubSub here for the entry mutations when goals are scored. 
+    },
     Subscription: {
-        playerUpdate: async (parent, args, context) => {
-            return 'Hello world!';
+        playerUpdate: {
+            subscribe: () => pubsub.asyncIterator('Hello World!'),
         },
     },
 };
