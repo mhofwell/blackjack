@@ -112,11 +112,14 @@ const resolvers = {
         },
     },
     Mutation: {
-        // add redisPubSub here for the entry mutations when goals are scored. 
+        // add redisPubSub here for the entry mutations when goals are scored.
+        updateEntry: async (parent, args, context) => {
+            pubsub.publish('ENTRY_UPDATED');
+        },
     },
     Subscription: {
         playerUpdate: {
-            subscribe: () => pubsub.asyncIterator('Hello World!'),
+            subscribe: () => pubsub.asyncIterator(['ENTRY_UPDATED']),
         },
     },
 };

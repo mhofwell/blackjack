@@ -15,7 +15,7 @@ export const typeDefs = gql`
     }
 
     type Subscription {
-        playerUpdate: String
+        updateEntry: Entry!
     }
 
     type Entry {
@@ -100,7 +100,6 @@ export const typeDefs = gql`
     enum League {
         EPL
     }
-
 `;
 
 // create League, Region, Player, Suit, Pool, User, Winner
