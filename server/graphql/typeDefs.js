@@ -14,8 +14,19 @@ export const typeDefs = gql`
         # Single entry for a user based on Pool
     }
 
+    type Mutation {
+        updateEntry(input: updateEntryInput!): Entry!
+    }
+
+    input updateEntryInput {
+        id: String!
+        goals: Int!
+        own_goals: Int!
+        net_goals: Int!
+    }
+
     type Subscription {
-        updateEntry: Entry!
+        updateEntry(id: ID!): Entry!
     }
 
     type Entry {

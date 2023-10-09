@@ -8,15 +8,30 @@ import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import resolvers from './graphql/resolvers.js';
 import typeDefs from './graphql/typeDefs.js';
+import Query from './graphql/resolvers/Query.js';
+import Mutation from './graphql/resolvers/Mutation.js';
+import Subscription from './graphql/resolvers/Subscription.js';
+import { PrismaClient } from '@prisma/client';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 
-// utils 
+// utils
 import { pingPrisma, pingEpl } from './utils/services.js';
 
 // Create the schema, this will be used separately by ApolloServer and
 // the WebSocket server.
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+const prisma = new PrismaClient();
+const pubsub = new RedisPubSub();
+
+const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers: {
+        Query,
+        Mutation,
+        Subscription,
+    },
+});
 
 // Create an Express app and HTTP server; attach both the WebSocket
 // server and the ApolloServer to this HTTP server.
@@ -55,11 +70,25 @@ const server = new ApolloServer({
 
 await server.start();
 
-app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server));
+app.use(
+    '/graphql',
+    cors(),
+    bodyParser.json(),
+    expressMiddleware(server, {
+        context: () => {
+            return {
+                prisma,
+                pubsub,
+            };
+        },
+    })
+);
 
 const main = async () => {
     httpServer.listen(port, () => {
-        console.log(`Server is now running on http://localhost:${port}/graphql`);
+        console.log(
+            `Server is now running on http://localhost:${port}/graphql`
+        );
     });
 
     const data = await pingPrisma();
@@ -75,7 +104,6 @@ const main = async () => {
 };
 
 main();
-
 
 // access control and headers for REST API
 // app.use((req, res, next) => {
