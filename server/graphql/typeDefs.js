@@ -8,25 +8,34 @@ export const typeDefs = gql`
         entries: [Entry!]!
         entry(poolId: ID!, userId: ID!): Entry
         pools: [Pool!]!
-        pool(id: ID!): Pool
+        pool(id: ID!): Pool!
         players: [Player!]!
+        player(id: ID!): Player!
         # Also define a single Pool query with all entries.
         # Single entry for a user based on Pool
     }
 
     type Mutation {
         updateEntry(input: updateEntryInput!): Entry!
+        updatePlayer(input: updatePlayerInput!): Player!
     }
 
+    type Subscription {
+        entryUpdated: Entry!
+        playerUpdated: Player!
+    }
+    
     input updateEntryInput {
         id: String!
         goals: Int!
         own_goals: Int!
         net_goals: Int!
     }
-
-    type Subscription {
-        updateEntry(id: ID!): Entry!
+    input updatePlayerInput {
+        id: Int!
+        goals: Int!
+        own_goals: Int!
+        net_goals: Int!
     }
 
     type Entry {

@@ -92,6 +92,16 @@ const Query = {
         const players = await prisma.player.findMany();
         return players;
     },
+    player: async (parent, args, { prisma }) => {
+        const { id } = args;
+        const intId = parseInt(id);
+        const player = await prisma.player.findUnique({
+            where: {
+                id: intId,
+            },
+        });
+        return player;
+    },
     login: async (parent, args, { prisma }) => {
         const { pw, fn, ln } = args;
         const user = await prisma.user.findFirst({

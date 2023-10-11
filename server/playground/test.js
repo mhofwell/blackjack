@@ -1,20 +1,16 @@
-const updateEntryInput = {
-    id: '0752d106-14fe-44c0-a058-382a25077089',
-    goals: 5,
-    own_goals: 5,
-    net_goals: 5,
-};
+const id = 447;
 
-const query = `mutation Mutation($input: updateEntryInput!) {
-    updateEntry(input: $input) {
+const getPlayer = `query Query($playerId: ID!) {
+    player(id: $playerId) {
       id
       net_goals
       own_goals
       goals
     }
-}`;
+  }`;
 
-const submit = async () => {
+// get player data from database.
+const pObjDb = async () => {
     try {
         const res = await fetch('http://localhost:8080/graphql', {
             method: 'POST',
@@ -22,9 +18,9 @@ const submit = async () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                query: query,
+                query: getPlayer,
                 variables: {
-                    input: updateEntryInput,
+                    playerId: id,
                 },
             }),
         });
@@ -35,4 +31,6 @@ const submit = async () => {
     }
 };
 
-console.log(await submit());
+const dbPlayer = await pObjDb();
+
+console.log(dbPlayer);

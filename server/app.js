@@ -46,9 +46,17 @@ const wsServer = new WebSocketServer({
 });
 
 // Save returned server's info so we can shutdown this server later
-const serverCleanup = useServer({ schema }, wsServer);
+const wsServerCleanup = useServer(
+    {
+        schema,
+        context: async (ctx, msg, args) => {
+            return { pubsub };
+        },
+    },
+    wsServer
+);
 
-// Set up ApolloServer.
+// Create ApolloServer.
 const server = new ApolloServer({
     schema,
     plugins: [
@@ -60,7 +68,7 @@ const server = new ApolloServer({
             async serverWillStart() {
                 return {
                     async drainServer() {
-                        await serverCleanup.dispose();
+                        await wsServerCleanup.dispose();
                     },
                 };
             },
@@ -68,6 +76,7 @@ const server = new ApolloServer({
     ],
 });
 
+// Apollo/GraphQL server start.
 await server.start();
 
 app.use(

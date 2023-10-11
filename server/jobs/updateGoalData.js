@@ -1,7 +1,7 @@
 import getUpcomingPlayers from '../utils/data/getUpcomingPlayers.js';
 import { parentPort } from 'worker_threads';
 import { PrismaClient } from '@prisma/client';
-
+import playerState from '../state/playerUpdateState.js';
 const prisma = new PrismaClient();
 
 // const { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
@@ -10,7 +10,6 @@ const gameWeekId = 8;
 const kickoffTime = new Date('2023-10-07T11:30:00Z').toString();
 console.log('kickoffTime ', kickoffTime);
 
-let goalData = {};
 let updatePrisma = false;
 let i = 0;
 
@@ -44,6 +43,68 @@ const updateGoalData = async () => {
             const data = await res.json();
 
             for (const player of players) {
+                let updatePlayerInput = {};
+
+                parentPort.postMessage(
+                    `--------->  Fetching player from DB ${player.id}`
+                );
+                // console.log(
+                //     `--------->  Fetching player from DB ${player.id}`
+                // );
+
+                const getPlayer = `query Query($playerId: ID!) {
+                    player(id: $playerId) {
+                      id
+                      net_goals
+                      own_goals
+                      goals
+                    }
+                  }`;
+
+                // get player data from database.
+                const pObjDb = async () => {
+                    try {
+                        const res = await fetch(
+                            'http://localhost:8080/graphql',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    query: getPlayer,
+                                    variables: {
+                                        playerId: id,
+                                    },
+                                }),
+                            }
+                        );
+                        const data = await res.json();
+                        return data;
+                    } catch (err) {
+                        console.error(err);
+                    }
+                };
+
+                const dbPlayer = await pObjDb();
+
+                console.log(dbPlayer);
+
+                // we only care about the last state of the live update!
+                const livePlayer = data.elements[player.id - 1];
+
+                const playerIndex = playerState.indexOf(livePlayer.id);
+
+                let lastState;
+
+                if (playerIndex < 0) {
+                    const length = playerState.push(livePlayer);
+                    const index = length - 1;
+                    lastState = playerState[index];
+                } else {
+                    lastState = playerState[playerIndex];
+                }
+
                 // console.log(
                 //     `---------> Fetching player live data for player id ${player.id}`
                 // );
@@ -51,20 +112,27 @@ const updateGoalData = async () => {
                     `---------> Fetching player live data for player id ${player.id}`
                 );
 
-                const playerObject = data.elements[player.id - 1];
+                const goalDiff = livePlayer.goals_scored - lastState.goals;
+                const ownGoalDiff = livePlayer.own_scored - lastState.own_goals;
+                const netGoalDiff =
+                    livePlayer.goals_scored - livePlayer.own_goals;
 
-                console.log('Fetched player is: ', playerObject);
-
-                if (goals_scored > 0) {
-                    goalData.goals = 0 + goals_scored;
+                if (goalDiff > 0) {
+                    dbPlayer.goals = dbPlayer.goals + goalDiff;
+                    dbPlayer.net_goals = dbPlayer.net_goals + goalDiff;
+                    updatePrisma = true;
                 }
-                if (own_goals > 0) {
-                    goalData.own_goals = 0 + own_goals;
+                if (ownGoalDiff > 0) {
+                    dbPlayer.own_goals = dbPlayer.own_goals + ownGoalDiff;
+                    dbPlayer.net_goals = net_goals--;
+                    updatePrisma = true;
                 }
 
-                goalData.goals > 0 || goalData.own_goals > 0
-                    ? (updatePrisma = true)
-                    : (updatePrisma = false);
+                if (netGoalDiff > 0) {
+                    dbPlayer.net_goals = dbPlayer.net_goals + netGoalDiff;
+                }
+
+                console.log('Fetched live data for player: ', playerObject);
 
                 if (updatePrisma) {
                     console.log('New player data object to save: ', goalData);
@@ -73,13 +141,15 @@ const updateGoalData = async () => {
                         where: {
                             id: player.id,
                         },
-                        data: goalData,
+                        data: dbPlayer,
                     });
                     console.log('Updated player ', updatedPlayer);
                     // parentPort.postMessage(`Updated! ${updatedPlayer}`);
 
                     console.log('New entry data to save.');
                     // parentPort.postMessage('New player data object to save: ', goalData);
+
+                    // work on the Query for this entry!
                     player.entry.forEach(async (entry) => {
                         const e = await prisma.entry.findUnique({
                             where: {
@@ -87,9 +157,9 @@ const updateGoalData = async () => {
                             },
                         });
 
-                        e.goals = e.goals + goals_scored;
-                        e.own_goals = e.own_goals + own_goals;
-                        e.net_goals = e.goals - e.own_goals;
+                        e.goals = e.goals + goalDiff;
+                        e.own_goals = e.own_goals + ownGoalDiff;
+                        e.net_goals = e.net_goals + netGoalDiff;
 
                         const updateEntryInput = {
                             id: entry.id,
@@ -98,7 +168,7 @@ const updateGoalData = async () => {
                             net_goals: e.net_goals,
                         };
 
-                        const query = `mutation Mutation($input: updateEntryInput!) {
+                        const updateEntry = `mutation Mutation($input: updateEntryInput!) {
                             updateEntry(input: $input) {
                               id
                               net_goals
@@ -117,7 +187,7 @@ const updateGoalData = async () => {
                                             'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
-                                            query: query,
+                                            query: updateEntry,
                                             variables: {
                                                 input: updateEntryInput,
                                             },
