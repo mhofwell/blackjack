@@ -1,10 +1,11 @@
 // import { parentPort } from 'worker_threads';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
 
 const getWeeklyFixtures = async () => {
-    const prisma = new PrismaClient();
     await prisma.fixtures.deleteMany();
+
+    let gameWeekId;
 
     try {
         const res = await fetch(
@@ -14,7 +15,7 @@ const getWeeklyFixtures = async () => {
         const data = await res.json();
 
         // get the gameweekId
-        const gameWeekId = data[0].event;
+        gameWeekId = data[0].event;
 
         // set up the array to hold the gameweek information
         const kickoffTimes = [];

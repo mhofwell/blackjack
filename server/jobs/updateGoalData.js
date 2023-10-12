@@ -1,24 +1,69 @@
-import getUpcomingPlayers from '../utils/data/getUpcomingPlayers.js';
 import { parentPort } from 'worker_threads';
-import { PrismaClient } from '@prisma/client';
-import playerState from '../state/playerUpdateState.js';
-const prisma = new PrismaClient();
+import { getRedisJSON, setRedisJSON } from '../utils/redis/json.js';
+import fetchGQL from '../utils/graphql/fetch.js';
+import PLAYER_KEY from '../utils/redis/keys/index.js';
+import { workerData } from 'worker_threads';
 
-// const { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
-const numberOfFixtures = 5;
-const gameWeekId = 8;
-const kickoffTime = new Date('2023-10-07T11:30:00Z').toString();
-console.log('kickoffTime ', kickoffTime);
+// const numberOfFixtures = 5;
+let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
+// const kickoffTime = new Date('2023-10-21T14:00:00Z').toString();
+// console.log('kickoffTime ', kickoffTime);
 
-let updatePrisma = false;
-let i = 0;
+const data = {
+    input: {
+        kickoffTime: new Date(kickoffTime).toString(),
+        numberOfFixtures,
+    },
+};
 
-const players = await getUpcomingPlayers(kickoffTime, numberOfFixtures);
+const query = ` query GetGameweekPlayers($input: getGameweekPlayers) {
+        getGameweekPlayers(input: $input) {
+          id
+          net_goals
+          own_goals
+          goals
+        }
+      }`;
+
+const res = await fetchGQL(query, data);
+
+let players = res.getGameweekPlayers;
+
+console.log('Worker: ', kickoffTime, 'Players: ', players);
+
+// const gameWeekId = 9;
+
+// const players = [
+//     { id: 353, goals: 0, net_goals: 0, own_goals: 0 },
+//     { id: 354, goals: 0, net_goals: 0, own_goals: 0 },
+//     { id: 368, goals: 0, net_goals: 0, own_goals: 0 },
+//     { id: 616, goals: 1, net_goals: 2, own_goals: 0 },
+// ];
+
+// const liveData = [
+//     { id: 353, stats: { goals_scored: 2, net_goals: 0, own_goals: 0 } },
+//     { id: 354, stats: { goals_scored: 0, net_goals: 0, own_goals: 1 } },
+//     { id: 368, stats: { goals_scored: 0, net_goals: 0, own_goals: 0 } },
+//     { id: 616, stats: { goals_scored: 1, net_goals: 0, own_goals: 0 } },
+// ];
+
+// const result = [
+//     { id: 353, goals: 2, net_goals: 0, own_goals: 0 },
+//     { id: 354, goals: 0, net_goals: -1, own_goals: 1 },
+//     { id: 368, goals: 0, net_goals: 0, own_goals: 0 },
+//     { id: 616, goals: 2, net_goals: 2, own_goals: 0 },
+// ];
 
 const updateGoalData = async () => {
+    let goalDiff;
+    let ownGoalDiff;
+    let netGoalDiff;
+    let updatePrisma = false;
+    let i = 0;
+
     setInterval(async () => {
-        console.log('iteration 1');
         i++;
+        console.log(`iteration: ${i}`);
 
         try {
             const res = await fetch(
@@ -33,183 +78,214 @@ const updateGoalData = async () => {
                     '---------> Cannot fetch gameweek live data from EPL API, check connection.'
                 );
             }
-            parentPort.postMessage(
-                `--------->  Gameweek live data fetched for week ${gameWeekId}`
-            );
-            // console.log(
-            //     `---------> Gameweek live data fetched for week ${gameWeekId}`
+            // parentPort.postMessage(
+            //     `--------->  Gameweek live data fetched for week ${gameWeekId}`
             // );
+            console.log(
+                `---------> Worker ${workerData.kickoffTime}: Gameweek live data fetched for week ${gameWeekId}`
+            );
 
             const data = await res.json();
 
             for (const player of players) {
-                let updatePlayerInput = {};
-
-                parentPort.postMessage(
-                    `--------->  Fetching player from DB ${player.id}`
-                );
-                // console.log(
+                console.log('Player: ', player);
+                let isNew;
+                // parentPort.postMessage(
                 //     `--------->  Fetching player from DB ${player.id}`
                 // );
 
-                const getPlayer = `query Query($playerId: ID!) {
-                    player(id: $playerId) {
-                      id
-                      net_goals
-                      own_goals
-                      goals
-                    }
-                  }`;
-
-                // get player data from database.
-                const pObjDb = async () => {
-                    try {
-                        const res = await fetch(
-                            'http://localhost:8080/graphql',
-                            {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    query: getPlayer,
-                                    variables: {
-                                        playerId: id,
-                                    },
-                                }),
-                            }
-                        );
-                        const data = await res.json();
-                        return data;
-                    } catch (err) {
-                        console.error(err);
-                    }
-                };
-
-                const dbPlayer = await pObjDb();
-
-                console.log(dbPlayer);
-
-                // we only care about the last state of the live update!
-                const livePlayer = data.elements[player.id - 1];
-
-                const playerIndex = playerState.indexOf(livePlayer.id);
-
-                let lastState;
-
-                if (playerIndex < 0) {
-                    const length = playerState.push(livePlayer);
-                    const index = length - 1;
-                    lastState = playerState[index];
-                } else {
-                    lastState = playerState[playerIndex];
-                }
-
-                // console.log(
-                //     `---------> Fetching player live data for player id ${player.id}`
-                // );
-                parentPort.postMessage(
-                    `---------> Fetching player live data for player id ${player.id}`
+                console.log(
+                    '--------->  Retrieved next active player:',
+                    player
                 );
 
-                const goalDiff = livePlayer.goals_scored - lastState.goals;
-                const ownGoalDiff = livePlayer.own_scored - lastState.own_goals;
-                const netGoalDiff =
-                    livePlayer.goals_scored - livePlayer.own_goals;
+                console.log(
+                    `--------->  Fetching player id from live data: ${player.id}`
+                );
+                const livePlayerIndex = data.elements.findIndex(
+                    (element) => element.id === player.id
+                );
 
-                if (goalDiff > 0) {
-                    dbPlayer.goals = dbPlayer.goals + goalDiff;
-                    dbPlayer.net_goals = dbPlayer.net_goals + goalDiff;
-                    updatePrisma = true;
+                console.log('Live Player data: ', data[livePlayerIndex]);
+
+                const livePlayerData = data.elements[livePlayerIndex];
+
+                console.log(
+                    `--------->  Fetching player id from redis cache: ${player.id}`
+                );
+
+                const cachedPlayerData = await getRedisJSON(
+                    PLAYER_KEY,
+                    player.id
+                );
+
+                if (!cachedPlayerData) {
+                    isNew = true;
+
+                    livePlayerData.goals_scored > 0
+                        ? (player.goals =
+                              player.goals + livePlayerData.goals_scored)
+                        : (player.goals = player.goals);
+
+                    livePlayerData.own_goals > 0
+                        ? (player.own_goals =
+                              player.own_goals + livePlayerData.own_goals)
+                        : (player.own_goals = player.own_goals);
+
+                    livePlayerData.goals_scored > 0 ||
+                    livePlayerData.own_goals > 0
+                        ? (updatePrisma = true)
+                        : (updatePrisma = false);
+
+                    await setRedisJSON(PLAYER_KEY, player.id, player);
+
+                    console.log('Saved player into cache: ', livePlayerData);
+                } else {
+                    isNew = false;
+
+                    const cachedPlayerData = await getRedisJSON(
+                        PLAYER_KEY,
+                        player.id
+                    );
+
+                    console.log('Cached Player: ', cachedPlayerData);
+
+                    goalDiff =
+                        livePlayerData.goals_scored - cachedPlayerData.goals;
+                    console.log('goalDiff: ', goalDiff);
+
+                    livePlayerData.goals_scored > cachedPlayerData.goals
+                        ? (player.goals =
+                              livePlayerData.goals_scored -
+                              cachedPlayerData.goals)
+                        : (player.goals = player.goals);
+
+                    ownGoalDiff =
+                        livePlayerData.own_goals - cachedPlayerData.own_goals;
+
+                    livePlayerData.own_goals > cachedPlayerData.own_goals
+                        ? (player.own_goals =
+                              livePlayerData.own_goals -
+                              cachedPlayerData.own_goals)
+                        : (player.own_goals = player.own_goals);
+
+                    netGoalDiff = goalDiff - ownGoalDiff;
+
+                    console.log(
+                        '---------> Updated cached player data: ',
+                        player
+                    );
+
+                    livePlayerData.goals_scored - cachedPlayerData.goals > 0 ||
+                    livePlayerData.own_goals - cachedPlayerData.own_goals > 0
+                        ? (updatePrisma = true)
+                        : (updatePrisma = false);
+
+                    console.log(updatePrisma);
+
+                    console.log(
+                        '---------> Finished analyzing goal data for player: ',
+                        player.id
+                    );
                 }
-                if (ownGoalDiff > 0) {
-                    dbPlayer.own_goals = dbPlayer.own_goals + ownGoalDiff;
-                    dbPlayer.net_goals = net_goals--;
-                    updatePrisma = true;
-                }
-
-                if (netGoalDiff > 0) {
-                    dbPlayer.net_goals = dbPlayer.net_goals + netGoalDiff;
-                }
-
-                console.log('Fetched live data for player: ', playerObject);
-
                 if (updatePrisma) {
-                    console.log('New player data object to save: ', goalData);
                     // parentPort.postMessage('New player data object to save: ', goalData);
-                    const updatedPlayer = await prisma.player.update({
-                        where: {
-                            id: player.id,
-                        },
-                        data: dbPlayer,
-                    });
-                    console.log('Updated player ', updatedPlayer);
+
+                    if (isNew) {
+                        goalDiff = livePlayerData.goals_scored;
+                        ownGoalDiff = livePlayerData.own_goals;
+                        netGoalDiff = goalDiff - ownGoalDiff;
+                    }
+
+                    player.net_goals =
+                        player.goals - player.own_goals + player.net_goals;
+
+                    console.log(
+                        '---------> New player data object to save: ',
+                        player
+                    );
+
+                    const updatePlayerQuery = `mutation Mutation($input: updatePlayerInput!) {
+                        updatePlayer(input: $input) {
+                          goals
+                          id
+                          net_goals
+                          own_goals
+                        }
+                      }`;
+
+                    const updatedPlayerInput = {
+                        input: player,
+                    };
+
+                    const updatedPlayer = await fetchGQL(
+                        updatePlayerQuery,
+                        updatedPlayerInput
+                    );
+
+                    console.log('---------> Updated player ', updatedPlayer);
                     // parentPort.postMessage(`Updated! ${updatedPlayer}`);
 
-                    console.log('New entry data to save.');
+                    console.log('---------> New entry data to save.');
                     // parentPort.postMessage('New player data object to save: ', goalData);
 
-                    // work on the Query for this entry!
-                    player.entry.forEach(async (entry) => {
-                        const e = await prisma.entry.findUnique({
-                            where: {
-                                id: entry.id,
-                            },
-                        });
+                    const entryQuery = `query PlayerEntries($id: ID!) {
+                        playerEntries(id: $id) {
+                          id
+                          net_goals
+                          own_goals
+                          goals
+                        }
+                      }`;
 
-                        e.goals = e.goals + goalDiff;
-                        e.own_goals = e.own_goals + ownGoalDiff;
-                        e.net_goals = e.net_goals + netGoalDiff;
+                    const entryQueryVariables = {
+                        id: player.id,
+                    };
 
-                        const updateEntryInput = {
+                    const dbEntries = await fetchGQL(
+                        entryQuery,
+                        entryQueryVariables
+                    );
+
+                    const iteratableEntries = dbEntries.playerEntries;
+
+                    console.log('---------> Queried entries successfully.');
+
+                    for (const entry of iteratableEntries) {
+                        console.log('Entry', entry);
+                        const input = {
                             id: entry.id,
-                            goals: e.goals,
-                            own_goals: e.own_goals,
-                            net_goals: e.net_goals,
+                            goals: entry.goals + goalDiff,
+                            own_goals: entry.own_goals + ownGoalDiff,
+                            net_goals: entry.net_goals + netGoalDiff,
+                        };
+                        const updateEntryInput = {
+                            input,
                         };
 
                         const updateEntry = `mutation Mutation($input: updateEntryInput!) {
-                            updateEntry(input: $input) {
-                              id
-                              net_goals
-                              own_goals
-                              goals
-                            }
-                        }`;
-
-                        const submit = async () => {
-                            try {
-                                const res = await fetch(
-                                    'http://localhost:8080/graphql',
-                                    {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({
-                                            query: updateEntry,
-                                            variables: {
-                                                input: updateEntryInput,
-                                            },
-                                        }),
+                                    updateEntry(input: $input) {
+                                      id
+                                      goals
+                                      own_goals
+                                      net_goals
                                     }
-                                );
-                                const data = await res.json();
-                                return data;
-                            } catch (err) {
-                                console.error(err);
-                            }
-                        };
+                                }`;
 
-                        const entryUpdated = await submit();
+                        const updatedEntry = await fetchGQL(
+                            updateEntry,
+                            updateEntryInput
+                        );
 
-                        console.log('Entry updated: ', entryUpdated);
-                    });
+                        console.log('---------> Entry updated: ', updatedEntry);
+                    }
                 } else {
-                    console.log('No changes in player goals.');
+                    console.log('---------> No changes in player goals.');
                     // parentPort.postMessage('No changes in player goals.');
                 }
-                console.log(`Iteration complete for player ${player.id}`);
+                console.log(
+                    `---------> Iteration complete for player ${player.id}`
+                );
                 // parentPort.postMessage(`Iteration complete for player ${player.id}`);
             }
         } catch (err) {

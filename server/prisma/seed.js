@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from './client.js';
 
 import { fnln, picks, users } from './seed-data.js';
 

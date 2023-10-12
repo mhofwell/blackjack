@@ -1,18 +1,17 @@
 import { gql } from 'apollo-server-express';
 
-// graphQL types and resolvers
 export const typeDefs = gql`
     type Query {
         user(id: ID!): User!
         login(pw: String!, fn: String!, ln: String!): User!
-        entries: [Entry!]!
-        entry(poolId: ID!, userId: ID!): Entry
+        allEntries: [Entry!]!
+        entry(id: ID!): Entry!
+        playerEntries(id: ID!): [Entry!]!
         pools: [Pool!]!
         pool(id: ID!): Pool!
-        players: [Player!]!
+        allPlayers: [Player!]!
+        getGameweekPlayers(input: getGameweekPlayers): [Player!]!
         player(id: ID!): Player!
-        # Also define a single Pool query with all entries.
-        # Single entry for a user based on Pool
     }
 
     type Mutation {
@@ -23,8 +22,9 @@ export const typeDefs = gql`
     type Subscription {
         entryUpdated: Entry!
         playerUpdated: Player!
+        hi: String
     }
-    
+
     input updateEntryInput {
         id: String!
         goals: Int!
@@ -36,6 +36,10 @@ export const typeDefs = gql`
         goals: Int!
         own_goals: Int!
         net_goals: Int!
+    }
+    input getGameweekPlayers {
+        kickoffTime: String!
+        numberOfFixtures: Int!
     }
 
     type Entry {
@@ -121,7 +125,5 @@ export const typeDefs = gql`
         EPL
     }
 `;
-
-// create League, Region, Player, Suit, Pool, User, Winner
 
 export default typeDefs;

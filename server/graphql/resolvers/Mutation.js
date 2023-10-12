@@ -10,14 +10,14 @@ const Mutation = {
         return entry;
     },
     updatePlayer: async (parent, { input }, { prisma, pubsub }) => {
-        const entry = await prisma.entry.update({
+        const player = await prisma.player.update({
             where: {
                 id: input.id,
             },
             data: input,
         });
         pubsub.publish('PLAYER_UPDATED', { playerUpdated: player });
-        return entry;
+        return player;
     },
 };
 

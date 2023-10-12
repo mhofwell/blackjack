@@ -1,19 +1,16 @@
 import path from 'path';
 import Bree from 'bree';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../prisma/client.js';
 
-const createGoalUpdateJobs = async () => {
-    const prisma = new PrismaClient();
+const fixtures = await prisma.fixtures.findMany();
+const appDir = '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
 
-    const fixture = await prisma.fixtures.findFirst();
-    const appDir =
-        '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
+// console.log(fixtures);
+// process.exit(0);
+let newCronJobs = [];
 
-    console.log(fixture);
-
-    let newCronJobs = [];
-
-    // fixtures.forEach((fixture) => {
+fixtures.forEach((fixture) => {
+    // console.log(fixture);
     newCronJobs.push({
         name: `gw-worker-${fixture.kickoff_time}`,
         path: path.join(appDir + '/jobs', 'updateGoalData.js'),
@@ -29,8 +26,7 @@ const createGoalUpdateJobs = async () => {
         },
     });
     return newCronJobs;
-    // });
-};
+});
 
 const workerMessageHAndler = (worker) => {
     let threadId = cron.getWorkerMetadata(worker.name).worker.threadId;
@@ -41,12 +37,11 @@ const workerMessageHAndler = (worker) => {
     }, 1000);
 };
 
-const cronJobs = await createGoalUpdateJobs();
-console.log(cronJobs);
+// const cronJobs = await createGoalUpdateJobs();
 
 const cron = new Bree({
     root: false,
-    jobs: cronJobs,
+    jobs: newCronJobs,
     outputWorkerMetadata: true,
     workerMessageHandler: workerMessageHAndler,
     errorHandler: (error, workerMetadata) => {
@@ -66,6 +61,4 @@ const cron = new Bree({
     },
 });
 
-(async () => {
-    await cron.start();
-})();
+await cron.start();

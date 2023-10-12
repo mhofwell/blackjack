@@ -12,18 +12,17 @@ import typeDefs from './graphql/typeDefs.js';
 import Query from './graphql/resolvers/Query.js';
 import Mutation from './graphql/resolvers/Mutation.js';
 import Subscription from './graphql/resolvers/Subscription.js';
-import { PrismaClient } from '@prisma/client';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
+import pubsub from './utils/redis/pubsub.js';
+import prisma from './prisma/client.js';
 
 // utils
 import { pingPrisma, pingEpl } from './utils/services.js';
 
+// const prisma = new PrismaClient();
+// const pubsub = new RedisPubSub();
+
 // Create the schema, this will be used separately by ApolloServer and
 // the WebSocket server.
-
-const prisma = new PrismaClient();
-const pubsub = new RedisPubSub();
-
 const schema = makeExecutableSchema({
     typeDefs,
     resolvers: {
@@ -85,10 +84,7 @@ app.use(
     bodyParser.json(),
     expressMiddleware(server, {
         context: () => {
-            return {
-                prisma,
-                pubsub,
-            };
+            return { prisma, pubsub };
         },
     })
 );
@@ -113,24 +109,3 @@ const main = async () => {
 };
 
 main();
-
-// access control and headers for REST API
-// app.use((req, res, next) => {
-//     res.setHeader('Access-Control-Allow-Origin', '*');
-//     res.setHeader('Access-Control-Allow-Methods', '*'); // or GET, POST, PUT, PATCH, DELETE
-//     // This says clients can send requests that hold extra authorziation and content types in the header
-//     res.setHeader('Access-Control-Allow-Header', 'Content-Type, Authorization'); // could use a wildcard (*).
-//     next();
-// });
-
-// /// route req/res error handling for API requests
-// app.use((err, req, res, next) => {
-//     console.log(err);
-//     const status = err.statusCode || 500;
-//     const message = err.message;
-//     const data = err.data;
-//     res.status(status).json({
-//         message: message,
-//         data: data,
-//     });
-// });

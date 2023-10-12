@@ -1,36 +1,28 @@
-const id = 447;
+import 'dotenv/config';
+import fetchGQL from '../utils/graphql/fetch.js';
 
-const getPlayer = `query Query($playerId: ID!) {
-    player(id: $playerId) {
-      id
-      net_goals
-      own_goals
-      goals
-    }
-  }`;
+const kickoffTime = new Date('2023-10-21T14:00:00Z').toString();
 
-// get player data from database.
-const pObjDb = async () => {
-    try {
-        const res = await fetch('http://localhost:8080/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: getPlayer,
-                variables: {
-                    playerId: id,
-                },
-            }),
-        });
-        const data = await res.json();
-        return data;
-    } catch (err) {
-        console.error(err);
-    }
+const numberOfFixtures = 5;
+
+const data = {
+    input: {
+        kickoffTime,
+        numberOfFixtures,
+    },
 };
 
-const dbPlayer = await pObjDb();
+console.log(data);
 
-console.log(dbPlayer);
+const query = ` query GetGameweekPlayers($input: getGameweekPlayers) {
+        getGameweekPlayers(input: $input) {
+          id
+          net_goals
+          own_goals
+          goals
+        }
+      }`;
+
+const res = await fetchGQL(query, data);
+
+console.log(res.getGameweekPlayers);
