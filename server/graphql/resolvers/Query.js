@@ -114,7 +114,7 @@ const Query = {
         return entries;
     },
     getGameweekPlayers: async (parent, args, { prisma }) => {
-        
+
         const { input } = args;
         const k = input.kickoffTime;
         const n = input.numberOfFixtures;
@@ -136,7 +136,7 @@ const Query = {
             let data = await res.json();
             const weeklyFixtures = data.slice(0, n - 1);
 
-            console.log('Weekly Fixtures ', weeklyFixtures);
+            // console.log('Weekly Fixtures ', weeklyFixtures);
 
             await weeklyFixtures.forEach((fixture) => {
                 const fixtureDate = new Date(fixture.kickoff_time).toString();

@@ -4,10 +4,7 @@ import fetchGQL from '../utils/graphql/fetch.js';
 import PLAYER_KEY from '../utils/redis/keys/index.js';
 import { workerData } from 'worker_threads';
 
-// const numberOfFixtures = 5;
 let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
-// const kickoffTime = new Date('2023-10-21T14:00:00Z').toString();
-// console.log('kickoffTime ', kickoffTime);
 
 const data = {
     input: {
@@ -31,7 +28,12 @@ let players = res.getGameweekPlayers;
 
 console.log('Worker: ', kickoffTime, 'Players: ', players);
 
+//////////////////////// TEST BELOW
+
 // const gameWeekId = 9;
+// const kickoffTime = new Date('2023-10-21T14:00:00Z').toString();
+// console.log('kickoffTime ', kickoffTime);
+// const numberOfFixtures = 5;
 
 // const players = [
 //     { id: 353, goals: 0, net_goals: 0, own_goals: 0 },
@@ -40,7 +42,7 @@ console.log('Worker: ', kickoffTime, 'Players: ', players);
 //     { id: 616, goals: 1, net_goals: 2, own_goals: 0 },
 // ];
 
-// const liveData = [
+// const livePlayerData = [
 //     { id: 353, stats: { goals_scored: 2, net_goals: 0, own_goals: 0 } },
 //     { id: 354, stats: { goals_scored: 0, net_goals: 0, own_goals: 1 } },
 //     { id: 368, stats: { goals_scored: 0, net_goals: 0, own_goals: 0 } },
@@ -88,7 +90,6 @@ const updateGoalData = async () => {
             const data = await res.json();
 
             for (const player of players) {
-                console.log('Player: ', player);
                 let isNew;
                 // parentPort.postMessage(
                 //     `--------->  Fetching player from DB ${player.id}`
@@ -106,20 +107,22 @@ const updateGoalData = async () => {
                     (element) => element.id === player.id
                 );
 
-                console.log('Live Player data: ', data[livePlayerIndex]);
+                const livePlayerData = data.elements[livePlayerIndex].stats;
 
-                const livePlayerData = data.elements[livePlayerIndex];
+                console.log('Live data from EPL API: ', livePlayerData);
 
                 console.log(
-                    `--------->  Fetching player id from redis cache: ${player.id}`
+                    '---------> Fetching player from redis cache:',
+                    player.id
                 );
 
                 const cachedPlayerData = await getRedisJSON(
                     PLAYER_KEY,
-                    player.id
+                    data.elements[livePlayerIndex].id
                 );
 
                 if (!cachedPlayerData) {
+                    console.log('No cached data found.');
                     isNew = true;
 
                     livePlayerData.goals_scored > 0
@@ -136,19 +139,12 @@ const updateGoalData = async () => {
                     livePlayerData.own_goals > 0
                         ? (updatePrisma = true)
                         : (updatePrisma = false);
-
                     await setRedisJSON(PLAYER_KEY, player.id, player);
 
-                    console.log('Saved player into cache: ', livePlayerData);
+                    console.log('Saved new player into cache: ', player);
                 } else {
+                    console.log('Cached player found:', cachedPlayerData);
                     isNew = false;
-
-                    const cachedPlayerData = await getRedisJSON(
-                        PLAYER_KEY,
-                        player.id
-                    );
-
-                    console.log('Cached Player: ', cachedPlayerData);
 
                     goalDiff =
                         livePlayerData.goals_scored - cachedPlayerData.goals;
@@ -171,10 +167,7 @@ const updateGoalData = async () => {
 
                     netGoalDiff = goalDiff - ownGoalDiff;
 
-                    console.log(
-                        '---------> Updated cached player data: ',
-                        player
-                    );
+                    console.log('Updated cached player data: ', player);
 
                     livePlayerData.goals_scored - cachedPlayerData.goals > 0 ||
                     livePlayerData.own_goals - cachedPlayerData.own_goals > 0
@@ -299,7 +292,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 1) {
+        if (i === 2) {
             if (parentPort) {
                 parentPort.postMessage('---------> Process complete...');
                 parentPort.postMessage('done');
