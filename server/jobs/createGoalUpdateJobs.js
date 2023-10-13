@@ -1,6 +1,7 @@
 import path from 'path';
 import Bree from 'bree';
 import prisma from '../prisma/client.js';
+import { getEnvironmentData } from 'worker_threads';
 
 const createGoalUpdateJobs = async () => {
     const fixtures = await prisma.fixtures.findMany();
@@ -10,13 +11,12 @@ const createGoalUpdateJobs = async () => {
     let newCronJobs = [];
 
     fixtures.forEach((fixture) => {
-        // console.log(fixture);
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
             path: path.join(appDir + '/jobs', 'updateGoalData.js'),
             interval: '20s',
             timeout: 0,
-            outputWorkerMetadata: true,
+            outputWorkerMetadata: false,
             worker: {
                 workerData: {
                     kickoffTime: fixture.kickoff_time,
@@ -28,22 +28,17 @@ const createGoalUpdateJobs = async () => {
         return newCronJobs;
     });
 
-    const workerMessageHAndler = (worker) => {
-        let threadId = cron.getWorkerMetadata(worker.name).worker.threadId;
+    async function workerMessageHandler(message) {
         setTimeout(() => {
-            console.log(
-                `Id: ${threadId}, Name: ${worker.name}, Message: ${worker.message}`
-            );
+            console.log(`Name: ${message.name}, Message: ${message.message}`);
         }, 1000);
-    };
-
-    // const cronJobs = await createGoalUpdateJobs();
+    }
 
     const cron = new Bree({
         root: false,
         jobs: newCronJobs,
-        outputWorkerMetadata: true,
-        workerMessageHandler: workerMessageHAndler,
+        outputWorkerMetadata: false,
+        workerMessageHandler: workerMessageHandler,
         errorHandler: (error, workerMetadata) => {
             // workerMetadata will be populated with extended worker information only if
             // Bree instance is initialized with parameter `workerMetadata: true
@@ -55,9 +50,8 @@ const createGoalUpdateJobs = async () => {
                 console.log(
                     `There was an error while running a worker ${workerMetadata.name}`
                 );
+                console.error(error);
             }
-            console.error(error);
-            // errorService.captureException(error);
         },
     });
 

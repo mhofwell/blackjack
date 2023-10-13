@@ -114,9 +114,8 @@ const Query = {
         return entries;
     },
     getGameweekPlayers: async (parent, args, { prisma }) => {
-
         const { input } = args;
-        const k = input.kickoffTime;
+        const inputKT = input.kickoffTime;
         const n = input.numberOfFixtures;
         const players = [];
         const teamIdArray = [];
@@ -126,28 +125,23 @@ const Query = {
 
             if (!res) {
                 throw new Error(
-                    '---------> Cannot fetch upcoming fixture information from EPL API, check connection.'
+                    'GQL: Cannot fetch upcoming fixture information from EPL API, check connection.'
                 );
             }
-            console.log(
-                `---------> Upcoming fixture information fetched for the next gameweek.`
-            );
+            console.log(`GQL: Upcoming fixture information fetched.`);
 
             let data = await res.json();
+
             const weeklyFixtures = data.slice(0, n - 1);
 
-            // console.log('Weekly Fixtures ', weeklyFixtures);
-
             await weeklyFixtures.forEach((fixture) => {
-                const fixtureDate = new Date(fixture.kickoff_time).toString();
+                const fixtureKT = new Date(fixture.kickoff_time).toString();
 
-                if (fixtureDate === k) {
+                if (fixtureKT === inputKT) {
                     teamIdArray.push(fixture.team_a);
                     teamIdArray.push(fixture.team_h);
                 }
             });
-
-            console.log(`teamIdArray is ${teamIdArray}`);
 
             for (const id in teamIdArray) {
                 const p = await prisma.player.findMany({
@@ -162,18 +156,13 @@ const Query = {
                     },
                 });
                 if (!p) {
-                    throw new Error(
-                        '---------> Cannot save player data to PRISMA'
-                    );
+                    throw new Error('GQL: Cannot save player data to PRISMA');
                 }
                 p.forEach((player) => {
                     players.push(player);
                 });
-                console.log(
-                    `---------> Players fetched for club ${teamIdArray[id]}`
-                );
+                console.log(`GQL: Players fetched for club ${teamIdArray[id]}`);
             }
-            console.log('Players fetched: ', players);
             return players;
         } catch (err) {
             console.error(err);
