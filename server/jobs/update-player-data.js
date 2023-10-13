@@ -11,30 +11,25 @@ import { workerData, parentPort } from 'worker_threads';
 // const numberOfFixtures = 5;
 
 // const players = [
-//     { id: 353, goals: 0, net_goals: 0, own_goals: 0 },
-//     { id: 354, goals: 0, net_goals: 0, own_goals: 0 },
-//     { id: 368, goals: 0, net_goals: 0, own_goals: 0 },
-//     { id: 616, goals: 1, net_goals: 2, own_goals: 0 },
+//     { id: 353, goals: 0, own_goals: 0, net_goals: 0 },
+//     { id: 354, goals: 0, own_goals: 0, net_goals: 0 },
+//     { id: 368, goals: 0, own_goals: 0, net_goals: 0 },
+//     { id: 616, goals: 1, own_goals: 0, net_goals: 2 },
 // ];
 
-// const livePlayerData = [
-//     { id: 353, stats: { goals_scored: 2, net_goals: 0, own_goals: 0 } },
-//     { id: 354, stats: { goals_scored: 0, net_goals: 0, own_goals: 1 } },
-//     { id: 368, stats: { goals_scored: 0, net_goals: 0, own_goals: 0 } },
-//     { id: 616, stats: { goals_scored: 1, net_goals: 0, own_goals: 0 } },
-// ];
-
-// const result = [
-//     { id: 353, goals: 2, net_goals: 0, own_goals: 0 },
-//     { id: 354, goals: 0, net_goals: -1, own_goals: 1 },
-//     { id: 368, goals: 0, net_goals: 0, own_goals: 0 },
-//     { id: 616, goals: 2, net_goals: 2, own_goals: 0 },
-// ];
+// const data = {
+//     elements: [
+//         { id: 353, stats: { goals_scored: 2, own_goals: 0, net_goals: 0 } },
+//         { id: 354, stats: { goals_scored: 0, own_goals: 1, net_goals: 0 } },
+//         { id: 368, stats: { goals_scored: 0, own_goals: 0, net_goals: 0 } },
+//         { id: 616, stats: { goals_scored: 1, own_goals: 0, net_goals: 0 } },
+//     ],
+// };
 
 const updateGoalData = async () => {
     let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
 
-    const data = {
+    const queryData = {
         input: {
             kickoffTime: new Date(kickoffTime).toString(),
             numberOfFixtures,
@@ -50,7 +45,7 @@ const updateGoalData = async () => {
         }
       }`;
 
-    const res = await fetchGQL(query, data);
+    const res = await fetchGQL(query, queryData);
 
     let players = res.getGameweekPlayers;
 
@@ -63,7 +58,7 @@ const updateGoalData = async () => {
     setInterval(async () => {
         i++;
 
-        console.log(`iteration: ${i}`);
+        console.log(`${kickoffTime} > Iteration: ${i}`);
 
         try {
             const res = await fetch(
@@ -73,36 +68,52 @@ const updateGoalData = async () => {
                 }/live/`
             );
 
-            if (!res) {
+            if (!res === 0) {
                 throw new Error('Cannot fetch data from EPL API.');
             }
 
             const data = await res.json();
 
-            console.log(`Job ${kickoffTime}: All active players fetched.`);
+            if (data.elements.length === 0) {
+                console.log(`EPL gameweek has not started yet.`);
+                if (parentPort) {
+                    parentPort.postMessage(
+                        `Gameweek ${gameWeekId} has not started yet!`
+                    );
+                    parentPort.postMessage('done');
+                    process.exit(0);
+                } else {
+                    console.log(`Gameweek ${gameWeekId} has not started yet!`);
+                    process.exit(0);
+                }
+            }
+            console.log(`${kickoffTime} > All live players fetched.`);
 
             for (const player of players) {
                 let isNew;
-
                 console.log(
-                    `${kickoffTime} -------> Evaluating player: `,
+                    `${kickoffTime}: ${player.id} -------> Player from DB: `,
                     player
                 );
 
                 const livePlayerIndex = data.elements.findIndex(
+                    // identify the element index [0] ? this is the error
                     (element) => element.id === player.id
                 );
 
-                console.log(
-                    `${kickoffTime} -------> Player index in EPL data found`
-                );
+                if (livePlayerIndex >= 0) {
+                    console.log(
+                        `${kickoffTime}: ${player.id} > Player in EPL data found: `,
+                        data.elements[livePlayerIndex].stats
+                    );
+                } else {
+                    console.log(
+                        `${kickoffTime}: ${player.id} > Player in EPL data not found.`
+                    );
+                    process.exit(1);
+                }
 
                 const livePlayerData = data.elements[livePlayerIndex].stats;
-
-                console.log(
-                    `${kickoffTime} -------> Live player data fetched for: ${player.id}`,
-                    livePlayerData
-                );
 
                 const cachedPlayerData = await getRedisJSON(
                     PLAYER_KEY,
@@ -110,7 +121,9 @@ const updateGoalData = async () => {
                 );
 
                 if (!cachedPlayerData) {
-                    console.log(`${kickoffTime} -------> No redis data found.`);
+                    console.log(
+                        `${kickoffTime}: ${player.id} > No redis data found.`
+                    );
 
                     isNew = true;
 
@@ -129,10 +142,25 @@ const updateGoalData = async () => {
                         ? (updatePrisma = true)
                         : (updatePrisma = false);
 
-                    await setRedisJSON(PLAYER_KEY, player.id, player);
+                    const newRedisData = {
+                        id: data.elements[livePlayerIndex].id,
+                        goals: livePlayerData.goals_scored,
+                        own_goals: livePlayerData.own_goals,
+                        net_goals:
+                            livePlayerData.goals_scored -
+                            livePlayerData.own_goals,
+                    };
+
+                    console.log('new redis data', newRedisData);
+
+                    await setRedisJSON(PLAYER_KEY, player.id, newRedisData);
+                    console.log(
+                        `${kickoffTime}: ${player.id} > Saved new player in redis:`,
+                        newRedisData
+                    );
                 } else {
                     console.log(
-                        `${kickoffTime} -------> Cached player found in redis: `,
+                        `${kickoffTime}: ${player.id} -------> Cached player found in redis: `,
                         cachedPlayerData
                     );
 
@@ -162,11 +190,11 @@ const updateGoalData = async () => {
                     livePlayerData.own_goals - cachedPlayerData.own_goals > 0
                         ? (updatePrisma = true)
                         : (updatePrisma = false);
+                    console.log(
+                        `${kickoffTime}: ${player.id} > Updated player in cache: `,
+                        player
+                    );
                 }
-                console.log(
-                    `${kickoffTime} -------> Saved player into cache: `,
-                    player
-                );
 
                 if (updatePrisma) {
                     if (isNew) {
@@ -175,11 +203,11 @@ const updateGoalData = async () => {
                         netGoalDiff = goalDiff - ownGoalDiff;
                     }
 
-                    player.net_goals =
-                        player.goals - player.own_goals + player.net_goals;
+                    player.net_goals = netGoalDiff + player.net_goals;
 
                     console.log(
-                        `${kickoffTime} -------> New player data object to save: ${player.id}`
+                        `${kickoffTime}: ${player.id} > New player data object to save: `,
+                        player
                     );
 
                     const updatePlayerQuery = `mutation Mutation($input: updatePlayerInput!) {
@@ -201,7 +229,8 @@ const updateGoalData = async () => {
                     );
 
                     console.log(
-                        `${kickoffTime} -------> Updated player: ${updatedPlayer}`
+                        `${kickoffTime}: ${player.id} > Updated player: `,
+                        updatedPlayer
                     );
 
                     const entryQuery = `query PlayerEntries($id: ID!) {
@@ -225,12 +254,10 @@ const updateGoalData = async () => {
                     const iteratableEntries = dbEntries.playerEntries;
 
                     console.log(
-                        'Queried entries successfully: ',
-                        iteratableEntries
+                        `${kickoffTime}: ${player.id} > Queried entries successfully.`
                     );
 
                     for (const entry of iteratableEntries) {
-                        console.log('Entry', entry);
                         const input = {
                             id: entry.id,
                             goals: entry.goals + goalDiff,
@@ -256,36 +283,37 @@ const updateGoalData = async () => {
                         );
 
                         console.log(
-                            `${kickoffTime} -------> Entry updated, `,
-                            updatedEntry
+                            `${kickoffTime}: ${player.id} > Entry updated.`
                         );
                     }
                 } else {
                     console.log(
-                        `${kickoffTime} -------> No changes in player goals.`
+                        `${kickoffTime}: ${player.id} > No changes in player goals.`
                     );
                 }
                 console.log(
-                    `${kickoffTime} -------> Iteration complete for player ${player.id}`
+                    `${kickoffTime}: ${player.id} > Iteration complete for player ${player.id}`
                 );
             }
         } catch (err) {
             if (parentPort) {
-                parentPort.postMessage('Something went wrong...');
+                parentPort.postMessage(
+                    `${kickoffTime} > Something went wrong...`
+                );
                 parentPort.postMessage(err);
                 process.exit(1);
             } else {
-                console.log('Something went wrong...');
+                console.log(`${kickoffTime} > Something went wrong...`);
                 console.error(err);
                 process.exit(1);
             }
         }
         if (i === 2) {
             if (parentPort) {
-                parentPort.postMessage('Process complete...');
+                parentPort.postMessage(`${kickoffTime} > Process complete...`);
                 parentPort.postMessage('done');
             } else {
-                console.log('Process complete...');
+                console.log(`${kickoffTime} > Process complete...`);
                 console.log('done');
                 process.exit(0);
             }

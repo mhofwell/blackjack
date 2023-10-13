@@ -2,7 +2,7 @@ import Bree from 'bree';
 import Graceful from '@ladjs/graceful';
 import jobs from './index.js';
 
-export default async function cronStart() {
+const cronStart = async () => {
     const cron = new Bree({
         jobs: jobs,
     });
@@ -13,5 +13,6 @@ export default async function cronStart() {
 
     // start all jobs
     cron.start();
-}
+};
 
+cronStart();

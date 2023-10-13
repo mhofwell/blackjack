@@ -37,10 +37,7 @@ const getWeeklyFixtures = async () => {
                 }
             }
         }
-
-        console.log(kickoffTimes);
-        console.log(numberOfFixtures);
-
+        
         let kickoffTimesToSave = [];
 
         kickoffTimes.forEach((kickoffTime) => {
@@ -61,26 +58,26 @@ const getWeeklyFixtures = async () => {
         const count = await prisma.fixtures.createMany({
             data: kickoffTimesToSave,
         });
-        console.log('count: ', count);
+        console.log('Count of fixtures: ', count);
     } catch (err) {
         if (parentPort) {
-            parentPort.postMessage('---------> Something went wrong...');
+            parentPort.postMessage('Something went wrong...');
             parentPort.postMessage(err);
             process.exit(1);
         } else {
-            console.log('---------> Something went wrong...');
+            console.log('Something went wrong...');
             console.error(err);
             process.exit(1);
         }
     }
     if (parentPort) {
         parentPort.postMessage(
-            `---------> Completed update of fixtures for gameweek ${gameWeekId}`
+            `Updated fixtures for gameweek ${gameWeekId}`
         );
         parentPort.postMessage('done');
     } else {
         console.log(
-            `---------> Completed update of fixtures for gameweek ${gameWeekId}`
+            `Updated fixtures for gameweek ${gameWeekId}`
         );
         console.log('done');
         process.exit(0);

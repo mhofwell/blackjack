@@ -78,6 +78,7 @@ const server = new ApolloServer({
 // Apollo/GraphQL server start.
 await server.start();
 
+// Middleware for the express application.
 app.use(
     '/graphql',
     cors(),

@@ -1,7 +1,7 @@
 import path from 'path';
 import Bree from 'bree';
 import prisma from '../prisma/client.js';
-import { getEnvironmentData } from 'worker_threads';
+import { parentPort } from 'worker_threads';
 
 const createGoalUpdateJobs = async () => {
     const fixtures = await prisma.fixtures.findMany();
@@ -13,7 +13,7 @@ const createGoalUpdateJobs = async () => {
     fixtures.forEach((fixture) => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
-            path: path.join(appDir + '/jobs', 'updateGoalData.js'),
+            path: path.join(appDir + '/jobs', 'update-player-data.js'),
             interval: '20s',
             timeout: 0,
             outputWorkerMetadata: false,
@@ -38,6 +38,7 @@ const createGoalUpdateJobs = async () => {
         root: false,
         jobs: newCronJobs,
         outputWorkerMetadata: false,
+        removeCompleted: true,
         workerMessageHandler: workerMessageHandler,
         errorHandler: (error, workerMetadata) => {
             // workerMetadata will be populated with extended worker information only if
@@ -54,7 +55,11 @@ const createGoalUpdateJobs = async () => {
             }
         },
     });
-
+    if (parentPort) {
+        parentPort.postMessage('Creating jobs to update player data.');
+    } else {
+        console.log('Creating jobs to update player data.');
+    }
     await cron.start();
 };
 
