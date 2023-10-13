@@ -151,7 +151,10 @@ const updateGoalData = async () => {
                             livePlayerData.own_goals,
                     };
 
-                    console.log('new redis data', newRedisData);
+                    console.log(
+                        `${kickoffTime}: ${player.id} > New redis data to save:`,
+                        newRedisData
+                    );
 
                     await setRedisJSON(PLAYER_KEY, player.id, newRedisData);
                     console.log(
@@ -160,40 +163,50 @@ const updateGoalData = async () => {
                     );
                 } else {
                     console.log(
-                        `${kickoffTime}: ${player.id} -------> Cached player found in redis: `,
+                        `${kickoffTime}: ${player.id} > Cached player found in redis: `,
                         cachedPlayerData
                     );
 
                     isNew = false;
 
-                    goalDiff =
-                        livePlayerData.goals_scored - cachedPlayerData.goals;
+                    if (
+                        livePlayerData.goals_scored - cachedPlayerData.goals >
+                            0 ||
+                        livePlayerData.own_goals - cachedPlayerData.own_goals >
+                            0
+                    ) {
+                        goalDiff =
+                            livePlayerData.goals_scored -
+                            cachedPlayerData.goals;
 
-                    livePlayerData.goals_scored > cachedPlayerData.goals
-                        ? (player.goals =
-                              livePlayerData.goals_scored -
-                              cachedPlayerData.goals)
-                        : (player.goals = player.goals);
+                        livePlayerData.goals_scored > cachedPlayerData.goals
+                            ? (player.goals =
+                                  livePlayerData.goals_scored -
+                                  cachedPlayerData.goals)
+                            : (player.goals = player.goals);
 
-                    ownGoalDiff =
-                        livePlayerData.own_goals - cachedPlayerData.own_goals;
+                        ownGoalDiff =
+                            livePlayerData.own_goals -
+                            cachedPlayerData.own_goals;
 
-                    livePlayerData.own_goals > cachedPlayerData.own_goals
-                        ? (player.own_goals =
-                              livePlayerData.own_goals -
-                              cachedPlayerData.own_goals)
-                        : (player.own_goals = player.own_goals);
+                        livePlayerData.own_goals > cachedPlayerData.own_goals
+                            ? (player.own_goals =
+                                  livePlayerData.own_goals -
+                                  cachedPlayerData.own_goals)
+                            : (player.own_goals = player.own_goals);
 
-                    netGoalDiff = goalDiff - ownGoalDiff;
-
-                    livePlayerData.goals_scored - cachedPlayerData.goals > 0 ||
-                    livePlayerData.own_goals - cachedPlayerData.own_goals > 0
-                        ? (updatePrisma = true)
-                        : (updatePrisma = false);
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Updated player in cache: `,
-                        player
-                    );
+                        netGoalDiff = goalDiff - ownGoalDiff;
+                        updatePrisma = true;
+                        console.log(
+                            `${kickoffTime}: ${player.id} > Updated player in cache: `,
+                            player
+                        );
+                    } else {
+                        updatePrisma = false;
+                        console.log(
+                            `${kickoffTime}: ${player.id} > No cache update needed.`
+                        );
+                    }
                 }
 
                 if (updatePrisma) {

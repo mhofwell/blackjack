@@ -37,6 +37,7 @@ export const typeDefs = gql`
         own_goals: Int!
         net_goals: Int!
     }
+
     input getGameweekPlayers {
         kickoffTime: String!
         numberOfFixtures: Int!
