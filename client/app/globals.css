@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* base styles */
+body {
+  background: #14213D;
+  @apply text-bblack m-8;
+}
+h1, h2 {
+  @apply font-normal text-platinum text-lg;
+}
+main {
+  @apply max-w-5xl my-12 mx-auto px-8;
+}
+main > h2 {
+  @apply mb-4 pb-2 text-base ;
+}
+p > a {
+  @apply text-platinum underline;
+}
+
+/* nav styles */
+nav {
+  @apply
+    pb-4
+    border-b-2 border-gray-200
+    flex items-center gap-5 
+    my-10 mx-auto 
+    max-w-5xl
+    text-platinum
+}
+nav a, nav span {
+  @apply text-platinum
+}
+nav a:hover {
+  @apply text-black;
+}
+
+nav 
+main nav {
+  @apply border-0;
+}
+
+/* button styles */
+button {
+  @apply 
+    px-3 py-2 
+    bg-orange
+    text-white
+    rounded-sm 
+    flex justify-between items-center gap-2
+    text-sm;
+}
+button:hover {
+  @apply bg-opacity-90;
+}
+
+/* feedback styles */
+.error {
+  @apply 
+    border-2 
+    border-red-500 
+    bg-red-300
+    text-red-800 
+    py-1 px-2 
+    rounded-sm
+    block
+    max-w-fit
+    my-4 mx-auto;
+}
+
+/* card styles */
+.card {
+  @apply 
+
+    bg-platinum 
+    shadow-lg 
+    rounded-md 
+    py-3 px-4 my-4 
+    relative 
+    overflow-hidden;
+}
+.card h3 {
+  @apply 
+    font-bold text-gray-700 text-lg 
+    mb-0;
+}
+
+.entry {
+  @apply flex items-stretch bg-wwhite
+}
+
