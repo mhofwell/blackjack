@@ -1,10 +1,9 @@
-import { getClient } from './apollo/apollo-provider';
+import React from 'react';
+import Pool from './Pool';
+
 import { gql } from '@apollo/client';
-import PoolList from './components/PoolList';
 
-export const revalidate = 5;
-
-const query = gql`
+const GET_POOLS = gql`
     query Pools {
         pools {
             id
@@ -40,14 +39,14 @@ const query = gql`
     }
 `;
 
-export default async function Home() {
-    const client = getClient();
-    const { data } = await client.query({ query });
-    const pools = data.pools;
-
+export default async function PoolList({ pools }) {
     return (
         <div>
-            <PoolList pools={pools} />
+            {pools.map((pool) => {
+                return (
+                   <Pool pool={pool} />
+                );
+            })}
         </div>
     );
 }
