@@ -1,4 +1,5 @@
 'use client';
+import { setVerbosity } from 'ts-invariant';
 import { HttpLink, split, ApolloLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import {
@@ -31,6 +32,7 @@ const splitLink = split(
     wsLink,
     httpLink
 );
+// setVerbosity('debug');
 
 function makeClient() {
     return new NextSSRApolloClient({

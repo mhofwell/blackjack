@@ -17,11 +17,13 @@ export const typeDefs = gql`
     type Mutation {
         updateEntry(input: updateEntryInput!): Entry!
         updatePlayer(input: updatePlayerInput!): Player!
+        updatePool(input: updateEntryInput!): Pool!
     }
 
     type Subscription {
         entryUpdated: Entry!
         playerUpdated: Player!
+        poolUpdated: Pool!
         hi: String
     }
 

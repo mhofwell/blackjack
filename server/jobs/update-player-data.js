@@ -254,34 +254,23 @@ const updateGoalData = async () => {
                             own_goals: entry.own_goals + ownGoalDiff,
                             net_goals: entry.net_goals + netGoalDiff,
                         };
-                        const updateEntryInput = {
+                        const updatePoolInput = {
                             input,
                         };
 
-                        const updateEntry = `mutation Mutation($input: updateEntryInput!) {
-                                    updateEntry(input: $input) {
-                                        id
-                                        goals
-                                        own_goals
-                                        net_goals
-                                        players {
-                                            id
-                                            fn
-                                            ln
-                                            goals
-                                            own_goals
-                                            net_goals
-                                        }
-                                    }
-                                }`;
+                        const updatePool = `mutation UpdatePool($input: updateEntryInput!) {
+                            updatePool(input: $input) {
+                              id
+                            }
+                          }`;
 
-                        const updatedEntry = await fetchGQL(
-                            updateEntry,
-                            updateEntryInput
+                        const updatedPool = await fetchGQL(
+                            updatePool,
+                            updatePoolInput
                         );
 
                         console.log(
-                            `${kickoffTime}: ${player.id} > Entry updated.`
+                            `${kickoffTime}: ${player.id} > Entry & pool updated.`
                         );
                     }
                 } else {

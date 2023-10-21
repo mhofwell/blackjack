@@ -1,46 +1,14 @@
-'use client';
-import { gql } from '@apollo/client';
 import PlayerTable from './PlayerTable';
-import { useSubscription } from '@apollo/client';
 import { useEffect, useState } from 'react';
 
-const ENTRY_SUB = gql`
-    subscription Subscription {
-        entryUpdated {
-            id
-            goals
-            net_goals
-            own_goals
-            players {
-                id
-                fn
-                ln
-                goals
-                own_goals
-                net_goals
-            }
-        }
-    }
-`;
-
-export default function Entry({ entry, i, updateHandler }) {
+export default function Entry({ entry }) {
     const [entryState, setEntryState] = useState(entry);
-
-    const { data, loading, error } = useSubscription(ENTRY_SUB);
+    const name = `${entryState.user.fn} ${entryState.user.ln}`;
+    const rankString = `Rank: ${entryState.standing}`;
 
     useEffect(() => {
-        if (data) {
-            if (data.entryUpdated.id === entry.id) {
-                setEntryState(data.entryUpdated);
-                updateHandler();
-                console.log('Made it');
-            }
-            console.log(`No update to ${entry.id}`);
-        }
-    }, [data]);
-
-    const name = `${entry.user.fn} ${entry.user.ln}`;
-    const rankString = `Rank: ${i + 1}`;
+        setEntryState(entry);
+    }, [entry]);
 
     return (
         <>

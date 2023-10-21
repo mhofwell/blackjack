@@ -1,20 +1,63 @@
 'use client';
 import Entry from './Entry';
 import Card from './Card';
-import sortByNetGoals from '../utils/sort';
 import { useState, useEffect } from 'react';
+import { gql, useSubscription } from '@apollo/client';
+import sortByNetGoals from '../utils/sort';
+
+const POOL_SUBSCRIPTION = gql`
+    subscription Subscription {
+        poolUpdated {
+            id
+            league
+            name
+            region
+            season
+            owner {
+                id
+                fn
+                ln
+                avatar
+            }
+            entries {
+                id
+                goals
+                own_goals
+                net_goals
+                standing
+                user {
+                    id
+                    fn
+                    ln
+                }
+                players {
+                    avatar
+                    id
+                    fn
+                    ln
+                    goals
+                    own_goals
+                    net_goals
+                }
+            }
+        }
+    }
+`;
 
 export default function Pool({ pool }) {
-    // const [standings, setStandings] = useState(pool);
-    // // try messing with state to solve this!
+    const [poolState, setPoolState] = useState(pool);
 
-    // useEffect(() => {
-    //     setStandings(pool.entries.sort(sortByNetGoals));
-    // }, [pool]);
-    // const pools = [...data.pools];
-    // pools[0] = 'abc';
+    const { data } = useSubscription(POOL_SUBSCRIPTION);
 
-    const a = pool.entries.sort(sortByNetGoals);
+    poolState.entries.sort(sortByNetGoals);
+
+    useEffect(() => {
+        if (data) {
+            data.poolUpdated.id === poolState.id
+                ? setPoolState(data.poolUpdated)
+                : null;
+        }
+    }, [data]);
 
     return (
         <div>
@@ -46,10 +89,10 @@ export default function Pool({ pool }) {
             </div>
             <div>
                 <ul role="list" className="divide-y divide-gray-100">
-                    {pool.entries.sort(sortByNetGoals).map((entry, i) => {
+                    {poolState.entries.map((entry, i) => {
                         return (
                             <Card key={i}>
-                                <Entry key={entry.id} entry={entry} i={i} />
+                                <Entry key={entry.id} entry={entry} />
                             </Card>
                         );
                     })}
@@ -58,6 +101,3 @@ export default function Pool({ pool }) {
         </div>
     );
 }
-
-// use Prisma to return the entries already sorted by net_goals!!!!
-// Here is your error long standing is you can't edit read only shit.
