@@ -5,7 +5,11 @@ const Mutation = {
                 id: input.id,
             },
             data: input,
+            include: {
+                players: true,
+            },
         });
+        console.log('Entry:', entry);
         pubsub.publish('ENTRY_UPDATED', { entryUpdated: entry });
         return entry;
     },
@@ -16,7 +20,6 @@ const Mutation = {
             },
             data: input,
         });
-        pubsub.publish('PLAYER_UPDATED', { playerUpdated: player });
         return player;
     },
 };

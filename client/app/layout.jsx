@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { ApolloWrapper } from './apollo/client-provider';
 
 // Components
 import Navigation from './components/Navigation.jsx';
@@ -15,8 +16,10 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className={inter.className}>
-                <Navigation />
-                {children}
+                <ApolloWrapper>
+                    <Navigation />
+                    {children}
+                </ApolloWrapper>
             </body>
         </html>
     );

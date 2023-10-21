@@ -1,13 +1,20 @@
+'use client';
 import Entry from './Entry';
 import Card from './Card';
 import sortByNetGoals from '../utils/sort';
-import PlayerTable from './PlayerTable';
+import { useState, useEffect } from 'react';
 
-export default async function Pool({ pool }) {
-    const entries = [...pool.entries];
-    const standings = entries.sort(sortByNetGoals);
+export default function Pool({ pool }) {
+    // const [standings, setStandings] = useState(pool);
+    // // try messing with state to solve this!
 
-    console.log(standings);
+    // useEffect(() => {
+    //     setStandings(pool.entries.sort(sortByNetGoals));
+    // }, [pool]);
+    // const pools = [...data.pools];
+    // pools[0] = 'abc';
+
+    const a = pool.entries.sort(sortByNetGoals);
 
     return (
         <div>
@@ -39,11 +46,10 @@ export default async function Pool({ pool }) {
             </div>
             <div>
                 <ul role="list" className="divide-y divide-gray-100">
-                    {standings.map((entry, i) => {
+                    {pool.entries.sort(sortByNetGoals).map((entry, i) => {
                         return (
-                            <Card>
-                                <Entry entry={entry} i={i} />
-                                <PlayerTable players={entry.players} />
+                            <Card key={i}>
+                                <Entry key={entry.id} entry={entry} i={i} />
                             </Card>
                         );
                     })}
@@ -52,3 +58,6 @@ export default async function Pool({ pool }) {
         </div>
     );
 }
+
+// use Prisma to return the entries already sorted by net_goals!!!!
+// Here is your error long standing is you can't edit read only shit.

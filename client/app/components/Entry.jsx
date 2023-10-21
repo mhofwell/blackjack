@@ -1,10 +1,46 @@
-export default function Entry({ entry, i }) {
-    const rank = i + 1;
+'use client';
+import { gql } from '@apollo/client';
+import PlayerTable from './PlayerTable';
+import { useSubscription } from '@apollo/client';
+import { useEffect, useState } from 'react';
 
-    console.log(entry.user.fn);
+const ENTRY_SUB = gql`
+    subscription Subscription {
+        entryUpdated {
+            id
+            goals
+            net_goals
+            own_goals
+            players {
+                id
+                fn
+                ln
+                goals
+                own_goals
+                net_goals
+            }
+        }
+    }
+`;
+
+export default function Entry({ entry, i, updateHandler }) {
+    const [entryState, setEntryState] = useState(entry);
+
+    const { data, loading, error } = useSubscription(ENTRY_SUB);
+
+    useEffect(() => {
+        if (data) {
+            if (data.entryUpdated.id === entry.id) {
+                setEntryState(data.entryUpdated);
+                updateHandler();
+                console.log('Made it');
+            }
+            console.log(`No update to ${entry.id}`);
+        }
+    }, [data]);
 
     const name = `${entry.user.fn} ${entry.user.ln}`;
-    const rankString = `Rank: ${rank}`
+    const rankString = `Rank: ${i + 1}`;
 
     return (
         <>
@@ -17,16 +53,17 @@ export default function Entry({ entry, i }) {
                 </div>
                 <div className="col-span-3 flex justify-center">
                     <div className="px-3 grid justify-items-center">
-                        <div>Goals: {entry.goals}</div>
+                        <div>Goals: {entryState.goals}</div>
                     </div>
                     <div className="px-3 grid justify-items-center">
-                        <div>Own Goals: {entry.own_goals}</div>
+                        <div>Own Goals: {entryState.own_goals}</div>
                     </div>
                     <div className="px-3 grid justify-items-center">
-                        <div>Net Goals: {entry.net_goals}</div>
+                        <div>Net Goals: {entryState.net_goals}</div>
                     </div>
                 </div>
             </div>
+            <PlayerTable players={entryState.players} />
         </>
     );
 }

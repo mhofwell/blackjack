@@ -264,6 +264,14 @@ const updateGoalData = async () => {
                                         goals
                                         own_goals
                                         net_goals
+                                        players {
+                                            id
+                                            fn
+                                            ln
+                                            goals
+                                            own_goals
+                                            net_goals
+                                        }
                                     }
                                 }`;
 

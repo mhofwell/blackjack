@@ -1,9 +1,11 @@
-import React from 'react';
+'use client';
 import Pool from './Pool';
-
 import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
+import { useState } from 'react';
+import sortByNetGoals from '../utils/sort';
 
-const GET_POOLS = gql`
+const POOL_QUERY = gql`
     query Pools {
         pools {
             id
@@ -39,14 +41,24 @@ const GET_POOLS = gql`
     }
 `;
 
-export default async function PoolList({ pools }) {
-    return (
-        <div>
-            {pools.map((pool) => {
-                return (
-                   <Pool pool={pool} />
-                );
-            })}
-        </div>
-    );
+export default function PoolList() {
+    const { data, loading, error } = useQuery(POOL_QUERY);
+
+    if (loading) {
+        return <h2>Loading...</h2>;
+    }
+
+    // maybe sort the data here? before sending it down?
+
+    if (data) {
+        const pools = data.pools;
+
+        return (
+            <div>
+                {pools.map((pool) => {
+                    return <Pool key={pool.id} pool={pool} />;
+                })}
+            </div>
+        );
+    }
 }
