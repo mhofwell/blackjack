@@ -3,7 +3,6 @@
 import PoolList from './components/PoolList';
 import { gql } from '@apollo/client';
 import { getClient } from './apollo/client';
-const { log } = require('@logtail/next');
 
 export const revalidate = 1;
 
@@ -49,7 +48,6 @@ export default async function Home() {
     const { data } = await getClient().query({ query: POOL_QUERY });
 
     const pools = data.pools;
-    log.info("Next.js client loaded.")
 
     return (
         <main>
