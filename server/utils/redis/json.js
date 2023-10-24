@@ -5,7 +5,8 @@ export async function setRedisJSON(key, id, obj) {
         const KEY = `${key}:${id}`;
         await redisClient.connect();
         await redisClient.json.set(KEY, '.', obj);
-        await redisClient.expire(KEY, 10);
+        // 2 hour expiry on the keys.
+        await redisClient.expire(KEY, 7200);
         await redisClient.quit();
         return KEY;
     } catch (err) {

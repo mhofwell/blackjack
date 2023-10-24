@@ -72,12 +72,12 @@ const getWeeklyFixtures = async () => {
     }
     if (parentPort) {
         parentPort.postMessage(
-            `Updated fixtures for gameweek ${gameWeekId}`
+            `-----> Updated fixtures for gameweek ${gameWeekId}.`
         );
         parentPort.postMessage('done');
     } else {
         console.log(
-            `Updated fixtures for gameweek ${gameWeekId}`
+            `-----> Updated fixtures for gameweek ${gameWeekId}`
         );
         console.log('done');
         process.exit(0);

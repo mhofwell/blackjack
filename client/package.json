@@ -13,6 +13,7 @@
     "@apollo/experimental-nextjs-app-support": "^0.4.3",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@logtail/next": "^0.1.0",
     "@mui/material": "^5.14.14",
     "graphql": "^16.8.1",
     "graphql-ws": "^5.14.1",

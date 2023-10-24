@@ -53,6 +53,7 @@ export default function Pool({ pool }) {
 
     useEffect(() => {
         if (data) {
+            console.log('Subscription information incoming...');
             data.poolUpdated.id === poolState.id
                 ? setPoolState(data.poolUpdated)
                 : null;

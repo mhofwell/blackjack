@@ -1,7 +1,11 @@
-import { getRedisJSON, setRedisJSON } from '../utils/redis/json.js';
-import fetchGQL from '../utils/graphql/fetch.js';
-import PLAYER_KEY from '../utils/redis/keys/index.js';
 import { workerData, parentPort } from 'worker_threads';
+
+// utils
+import fetchGQL from '../utils/graphql/fetch.js';
+import { getRedisJSON, setRedisJSON } from '../utils/redis/json.js';
+
+// keys
+import PLAYER_KEY from '../utils/redis/keys/index.js';
 
 const updateGoalData = async () => {
     let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
@@ -39,10 +43,7 @@ const updateGoalData = async () => {
 
         try {
             const res = await fetch(
-                //// CHANGE THIS TO gameWeekId //// !!!!! //// !!!!!!!!!
-                `https://fantasy.premierleague.com/api/event/${
-                    gameWeekId - 1
-                }/live/`
+                `https://fantasy.premierleague.com/api/event/${gameWeekId}/live/`
             );
 
             if (!res === 0) {
@@ -98,10 +99,6 @@ const updateGoalData = async () => {
                 );
 
                 if (!cachedPlayerData) {
-                    console.log(
-                        `${kickoffTime}: ${player.id} > No redis data found.`
-                    );
-
                     isNew = true;
 
                     livePlayerData.goals_scored > 0
@@ -128,22 +125,8 @@ const updateGoalData = async () => {
                             livePlayerData.own_goals,
                     };
 
-                    console.log(
-                        `${kickoffTime}: ${player.id} > New redis data to save:`,
-                        newRedisData
-                    );
-
                     await setRedisJSON(PLAYER_KEY, player.id, newRedisData);
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Saved new player in redis:`,
-                        newRedisData
-                    );
                 } else {
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Cached player found in redis: `,
-                        cachedPlayerData
-                    );
-
                     isNew = false;
 
                     if (
@@ -295,7 +278,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 2) {
+        if (i === 120) {
             if (parentPort) {
                 parentPort.postMessage(`${kickoffTime} > Process complete...`);
                 parentPort.postMessage('done');

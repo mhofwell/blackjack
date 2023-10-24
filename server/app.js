@@ -1,28 +1,38 @@
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import { createServer } from 'http';
+// node server
 import express from 'express';
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
+
+// websockets
 import { useServer } from 'graphql-ws/lib/use/ws';
-import bodyParser from 'body-parser';
+import { WebSocketServer } from 'ws';
+
+// middleware
+import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
-import typeDefs from './graphql/typeDefs.js';
+import bodyParser from 'body-parser';
+
+// redis
+import pubsub from './utils/redis/pubsub.js';
+
+// databse
+import prisma from './prisma/client.js';
+
+// API
 import Query from './graphql/resolvers/Query.js';
 import Mutation from './graphql/resolvers/Mutation.js';
 import Subscription from './graphql/resolvers/Subscription.js';
-import pubsub from './utils/redis/pubsub.js';
-import prisma from './prisma/client.js';
+import typeDefs from './graphql/typeDefs.js';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServer } from '@apollo/server';
 
 // utils
 import { pingPrisma, pingEpl } from './utils/services.js';
 
-// const prisma = new PrismaClient();
-// const pubsub = new RedisPubSub();
+// logger
+import pino from 'pino-http';
+import logger from './log/logger.js';
 
-// Create the schema, this will be used separately by ApolloServer and
-// the WebSocket server.
 const schema = makeExecutableSchema({
     typeDefs,
     resolvers: {
@@ -90,9 +100,11 @@ app.use(
     })
 );
 
+app.use(pino);
+
 const main = async () => {
     httpServer.listen(port, () => {
-        console.log(
+        logger.info(
             `Server is now running on http://localhost:${port}/graphql`
         );
     });
@@ -100,13 +112,13 @@ const main = async () => {
     const data = await pingPrisma();
 
     if (data.name !== 'prisma') {
-        console.log('Cannot connect to PRISMA');
+        logger.warn('Cannot connect to PRISMA');
     } else {
-        console.log('Connected to PRISMA!');
+        logger.info('Connected to PRISMA!');
     }
 
     const payload = await pingEpl();
-    console.log(`EPL API connection status: ${payload.status}`);
+    logger.info(`EPL API connection status: ${payload.status}`);
 };
 
 main();
