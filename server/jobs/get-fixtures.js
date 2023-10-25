@@ -1,6 +1,9 @@
 // import { parentPort } from 'worker_threads';
 import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
+import getLogger from '../logging/logger.js';
+
+const logger = getLogger('worker');
 
 const getWeeklyFixtures = async () => {
     await prisma.fixtures.deleteMany();
@@ -12,7 +15,15 @@ const getWeeklyFixtures = async () => {
             `https://fantasy.premierleague.com/api/fixtures?future=1`
         );
 
+        if (!res) {
+            throw new Error(
+                'Could not fetch upcoming fixtures for next gameweek from EPL'
+            );
+        }
+
         const data = await res.json();
+
+        logger.info('Success fetching future gameweek data.');
 
         // get the gameweekId
         gameWeekId = data[0].event;
@@ -37,7 +48,7 @@ const getWeeklyFixtures = async () => {
                 }
             }
         }
-        
+
         let kickoffTimesToSave = [];
 
         kickoffTimes.forEach((kickoffTime) => {
@@ -53,20 +64,25 @@ const getWeeklyFixtures = async () => {
 
             kickoffTimesToSave.push(newEntry);
         });
-        console.log(kickoffTimesToSave);
+        logger.info(
+            { Kickoff_times: kickoffTimesToSave },
+            'Kickoff times fetched and sorted successfully'
+        );
+        logger.debug({ Kickoff_times: kickoffTimesToSave });
 
         const count = await prisma.fixtures.createMany({
             data: kickoffTimesToSave,
         });
-        console.log('Count of fixtures: ', count);
+        logger.info({ count: count }, `Count of fixtures: ${count}`);
+        logger.debug({ count: count });
     } catch (err) {
         if (parentPort) {
             parentPort.postMessage('Something went wrong...');
             parentPort.postMessage(err);
             process.exit(1);
         } else {
-            console.log('Something went wrong...');
-            console.error(err);
+            logger.error({ error: err }, 'Something went wrong...');
+            logger.trace({ error: err });
             process.exit(1);
         }
     }
@@ -76,10 +92,8 @@ const getWeeklyFixtures = async () => {
         );
         parentPort.postMessage('done');
     } else {
-        console.log(
-            `-----> Updated fixtures for gameweek ${gameWeekId}`
-        );
-        console.log('done');
+        logger.info(`-----> Updated fixtures for gameweek ${gameWeekId}`);
+        logger.info('done');
         process.exit(0);
     }
 };

@@ -31,7 +31,9 @@ import { pingPrisma, pingEpl } from './utils/services.js';
 
 // logger
 import pino from 'pino-http';
-import logger from './log/logger.js';
+import getLogger from './logging/logger.js';
+
+const logger = getLogger('express');
 
 const schema = makeExecutableSchema({
     typeDefs,
@@ -112,13 +114,18 @@ const main = async () => {
     const data = await pingPrisma();
 
     if (data.name !== 'prisma') {
-        logger.warn('Cannot connect to PRISMA');
+        logger.error('Cannot connect to PRISMA');
     } else {
         logger.info('Connected to PRISMA!');
     }
 
     const payload = await pingEpl();
-    logger.info(`EPL API connection status: ${payload.status}`);
+    if (payload.status !== 200) {
+        logger.info(`EPL API connection status: ${payload.status}`);
+        logger.error('Cannot access EPL servers.');
+    } else {
+        logger.info(`EPL API connection status: ${payload.status}`);
+    }
 };
 
 main();

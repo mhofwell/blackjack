@@ -44,6 +44,7 @@
     },
     "devDependencies": {
         "nodemon": "^3.0.1",
+        "pino-logflare": "^0.4.2",
         "pino-pretty": "^10.2.3",
         "prisma": "^5.2.0"
     }

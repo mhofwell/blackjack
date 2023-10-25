@@ -7,6 +7,11 @@ import { getRedisJSON, setRedisJSON } from '../utils/redis/json.js';
 // keys
 import PLAYER_KEY from '../utils/redis/keys/index.js';
 
+// logging
+import getLogger from '../logging/logger.js';
+
+const logger = getLogger('worker');
+
 const updateGoalData = async () => {
     let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
 
@@ -39,11 +44,13 @@ const updateGoalData = async () => {
     setInterval(async () => {
         i++;
 
-        console.log(`${kickoffTime} > Iteration: ${i}`);
+        logger.info(`${kickoffTime} > Iteration: ${i}`);
 
         try {
             const res = await fetch(
-                `https://fantasy.premierleague.com/api/event/${gameWeekId}/live/`
+                `https://fantasy.premierleague.com/api/event/${
+                    gameWeekId - 1
+                }/live/`
             );
 
             if (!res === 0) {
@@ -53,7 +60,6 @@ const updateGoalData = async () => {
             const data = await res.json();
 
             if (data.elements.length === 0) {
-                console.log(`EPL gameweek has not started yet.`);
                 if (parentPort) {
                     parentPort.postMessage(
                         `Gameweek ${gameWeekId} has not started yet!`
@@ -61,18 +67,16 @@ const updateGoalData = async () => {
                     parentPort.postMessage('done');
                     process.exit(0);
                 } else {
-                    console.log(`Gameweek ${gameWeekId} has not started yet!`);
+                    logger.warn(`Gameweek ${gameWeekId} has not started yet!`);
                     process.exit(0);
                 }
             }
-            console.log(`${kickoffTime} > All live players fetched.`);
+            logger.info(`${kickoffTime} > All live players fetched.`);
 
             for (const player of players) {
                 let isNew;
-                console.log(
-                    `${kickoffTime}: ${player.id} -------> Player from DB: `,
-                    player
-                );
+                logger.info(`${kickoffTime}: Player from DB: ${player.id} `);
+                logger.debug({ player: player });
 
                 const livePlayerIndex = data.elements.findIndex(
                     // identify the element index [0] ? this is the error
@@ -80,12 +84,14 @@ const updateGoalData = async () => {
                 );
 
                 if (livePlayerIndex >= 0) {
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Player in EPL data found: `,
-                        data.elements[livePlayerIndex].stats
+                    logger.info(
+                        `${kickoffTime}: ${player.id} > Player in EPL data found.`
                     );
+                    logger.debug({
+                        player: data.elements[livePlayerIndex].stats,
+                    });
                 } else {
-                    console.log(
+                    logger.warn(
                         `${kickoffTime}: ${player.id} > Player in EPL data not found.`
                     );
                     process.exit(1);
@@ -125,7 +131,16 @@ const updateGoalData = async () => {
                             livePlayerData.own_goals,
                     };
 
-                    await setRedisJSON(PLAYER_KEY, player.id, newRedisData);
+                    const redisPlayer = await setRedisJSON(
+                        PLAYER_KEY,
+                        player.id,
+                        newRedisData
+                    );
+                    logger.info(
+                        `${kickoffTime}: ${player.id} > Saved new player in redis cache successfully.`
+                    );
+                    logger.debug({ newRedisData: newRedisData });
+                    logger.debug({ redisPlayer: redisPlayer });
                 } else {
                     isNew = false;
 
@@ -157,13 +172,13 @@ const updateGoalData = async () => {
 
                         netGoalDiff = goalDiff - ownGoalDiff;
                         updatePrisma = true;
-                        console.log(
-                            `${kickoffTime}: ${player.id} > Updated player in cache: `,
-                            player
+                        logger.info(
+                            `${kickoffTime}: ${player.id} > Updated player in cache: `
                         );
+                        logger.debug({ player: player });
                     } else {
                         updatePrisma = false;
-                        console.log(
+                        logger.info(
                             `${kickoffTime}: ${player.id} > No cache update needed.`
                         );
                     }
@@ -178,10 +193,10 @@ const updateGoalData = async () => {
 
                     player.net_goals = netGoalDiff + player.net_goals;
 
-                    console.log(
-                        `${kickoffTime}: ${player.id} > New player data object to save: `,
-                        player
+                    logger.info(
+                        `${kickoffTime}: ${player.id} > New player data object to save.`
                     );
+                    logger.debug(player);
 
                     const updatePlayerQuery = `mutation Mutation($input: updatePlayerInput!) {
                         updatePlayer(input: $input) {
@@ -201,10 +216,10 @@ const updateGoalData = async () => {
                         updatedPlayerInput
                     );
 
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Updated player: `,
-                        updatedPlayer
+                    logger.info(
+                        `${kickoffTime}: ${player.id} > Updated player.`
                     );
+                    logger.debug({ updatedPlayer: updatedPlayer });
 
                     const entryQuery = `query PlayerEntries($id: ID!) {
                             playerEntries(id: $id) {
@@ -226,9 +241,10 @@ const updateGoalData = async () => {
 
                     const iteratableEntries = dbEntries.playerEntries;
 
-                    console.log(
+                    logger.info(
                         `${kickoffTime}: ${player.id} > Queried entries successfully.`
                     );
+                    logger.debug({ iteratableEntries: iteratableEntries });
 
                     for (const entry of iteratableEntries) {
                         const input = {
@@ -252,16 +268,17 @@ const updateGoalData = async () => {
                             updatePoolInput
                         );
 
-                        console.log(
+                        logger.info(
                             `${kickoffTime}: ${player.id} > Entry & pool updated.`
                         );
+                        logger.debug({ updatedPool: updatedPool });
                     }
                 } else {
-                    console.log(
+                    logger.info(
                         `${kickoffTime}: ${player.id} > No changes in player goals.`
                     );
                 }
-                console.log(
+                logger.info(
                     `${kickoffTime}: ${player.id} > Iteration complete for player ${player.id}`
                 );
             }
@@ -273,8 +290,11 @@ const updateGoalData = async () => {
                 parentPort.postMessage(err);
                 process.exit(1);
             } else {
-                console.log(`${kickoffTime} > Something went wrong...`);
-                console.error(err);
+                logger.error(
+                    { error: err },
+                    `${kickoffTime} > Something went wrong...`
+                );
+                logger.trace({ error: err });
                 process.exit(1);
             }
         }
@@ -283,8 +303,7 @@ const updateGoalData = async () => {
                 parentPort.postMessage(`${kickoffTime} > Process complete...`);
                 parentPort.postMessage('done');
             } else {
-                console.log(`${kickoffTime} > Process complete...`);
-                console.log('done');
+                logger.info(`${kickoffTime} > Process complete...`);
                 process.exit(0);
             }
         }

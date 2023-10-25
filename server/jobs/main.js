@@ -1,17 +1,23 @@
 import Bree from 'bree';
 import Graceful from '@ladjs/graceful';
+
+// all jobs
 import jobs from './index.js';
 
+// logging
+import getLogger from '../logging/logger.js';
+const logger = getLogger('worker');
+
 const cronStart = async () => {
+    logger.info('Starting Bree cron jobs.');
     const cron = new Bree({
+        logger: logger,
         jobs: jobs,
     });
 
-    // handle graceful reloads, pm2 support, and events like SIGHUP, SIGINT, etc.
     const graceful = new Graceful({ brees: [cron] });
     graceful.listen();
 
-    // start all jobs
     cron.start();
 };
 
