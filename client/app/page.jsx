@@ -1,8 +1,7 @@
-// This is a server component, it fetches data and SSR's it.
-// It passes data into another SRC <PoolList />
 import PoolList from './components/PoolList';
 import { gql } from '@apollo/client';
 import { getClient } from './apollo/client';
+// import getLogger from './logger/logger.js';
 
 export const revalidate = 1;
 
@@ -43,9 +42,16 @@ const POOL_QUERY = gql`
     }
 `;
 
+// const logger = getLogger('client');
 
 export default async function Home() {
-    const { data } = await getClient().query({ query: POOL_QUERY });
+    const { data, error } = await getClient().query({ query: POOL_QUERY });
+    if (error) {
+        console.error('POOL_QUERY failed.', error);
+    }
+    if (data) {
+        console.log('POOL_QUERY executed successfully.');
+    }
 
     const pools = data.pools;
 

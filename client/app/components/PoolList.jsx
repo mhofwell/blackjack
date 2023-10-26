@@ -1,6 +1,9 @@
 import Pool from './Pool';
+// import getLogger from '../logger/logger';
 
-export default function PoolList({ pools }) {
+// const logger = getLogger('client');
+
+export default function PoolList({ pools, logger }) {
     return (
         <div>
             {pools.map((pool) => {

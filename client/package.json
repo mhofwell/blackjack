@@ -13,7 +13,6 @@
     "@apollo/experimental-nextjs-app-support": "^0.4.3",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@logtail/next": "^0.1.0",
     "@mui/material": "^5.14.14",
     "graphql": "^16.8.1",
     "graphql-ws": "^5.14.1",
@@ -22,9 +21,14 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@logtail/next": "^0.1.0",
+    "@logtail/pino": "^0.4.12",
     "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "13.5.5",
+    "pino": "^8.16.1",
+    "pino-logflare": "^0.4.2",
+    "pino-pretty": "^10.2.3",
     "postcss": "^8",
     "tailwindcss": "^3"
   }

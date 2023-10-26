@@ -44,7 +44,7 @@ const POOL_SUBSCRIPTION = gql`
     }
 `;
 
-export default function Pool({ pool }) {
+export default function Pool({ pool, logger }) {
     const [poolState, setPoolState] = useState(pool);
 
     const { data } = useSubscription(POOL_SUBSCRIPTION);
@@ -53,10 +53,14 @@ export default function Pool({ pool }) {
 
     useEffect(() => {
         if (data) {
-            console.log('Subscription information incoming...');
+            // logger.info('POOL_SUBSCRIPTION data recieved in Pool component.');
             data.poolUpdated.id === poolState.id
                 ? setPoolState(data.poolUpdated)
                 : null;
+            // logger.debug(
+            //     { data: data },
+            //     'Updated pool with POOL_SUBSCRIPTION data.'
+            // );
         }
     }, [data]);
 
@@ -93,7 +97,11 @@ export default function Pool({ pool }) {
                     {poolState.entries.map((entry, i) => {
                         return (
                             <Card key={i}>
-                                <Entry key={entry.id} entry={entry} />
+                                <Entry
+                                    key={entry.id}
+                                    entry={entry}
+                                    logger={logger}
+                                />
                             </Card>
                         );
                     })}

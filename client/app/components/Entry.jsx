@@ -1,7 +1,8 @@
+'use client';
 import PlayerTable from './PlayerTable';
 import { useEffect, useState } from 'react';
 
-export default function Entry({ entry }) {
+export default function Entry({ entry, logger }) {
     const [entryState, setEntryState] = useState(entry);
     const name = `${entryState.user.fn} ${entryState.user.ln}`;
     const rankString = `Rank: ${entryState.standing}`;
