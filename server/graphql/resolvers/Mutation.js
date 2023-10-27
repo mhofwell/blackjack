@@ -6,7 +6,7 @@ const logger = getLogger('api');
 const Mutation = {
     updateEntry: async (parent, { input }, { prisma, pubsub }) => {
         try {
-            logger.info('Finding entry to mutate.');
+            console.log(`Finding entry ${input.id} mutate.`);
             const entry = await prisma.entry.update({
                 where: {
                     id: input.id,
@@ -20,15 +20,15 @@ const Mutation = {
             pubsub.publish('ENTRY_UPDATED', { entryUpdated: entry });
             return entry;
         } catch (err) {
-            logger.error({ error: err }, 'Error during mutation.');
-            logger.trace({ error: err });
+            console.error({ error: err }, 'Error during mutation.');
+            // logger.trace({ error: err });
         }
     },
     updatePool: async (parent, { input }, { prisma, pubsub }) => {
         try {
             const inputId = input.id;
-            childLogger = logger.child({ inputId });
-            childLogger.info('Finding entry to mutate.');
+            // childLogger = logger.child({ inputId });
+            console.log(`Finding entry ${inputId} to mutate.`);
 
             const entry = await prisma.entry.update({
                 where: {
@@ -38,7 +38,7 @@ const Mutation = {
             });
 
             // Get and re-sort the pool
-            childLogger.info('Fetching pool.');
+            console.log(`Fetching pool ${entry.poolId}.`);
 
             const pool = await prisma.pool.findUnique({
                 where: {
@@ -51,7 +51,7 @@ const Mutation = {
             });
 
             const sortedEntries = pool.entries.sort(sortByNetGoalsDsc);
-            childLogger.info('Sorting entries.');
+            console.log('Sorting entries.');
             // update the rank of each entry
             let i = 0;
 
@@ -73,37 +73,40 @@ const Mutation = {
                 // console.log('GQL: Refreshed standings');
             }
 
-            childLogger.info('New standings stored.');
-            childLogger.debug({ sortedEntries: sortedEntries });
+            console.log('New standings stored.');
+            // childLogger.debug(
+            //     { sortedEntries: sortedEntries },
+            //     'Sorted entries.'
+            // );
 
             pool.entries = sortedEntries;
 
             pubsub.publish('POOL_UPDATED', { poolUpdated: pool });
             return pool;
         } catch (err) {
-            childLogger.error(
+            console.error(
                 { error: err },
                 'Something went wrong during entry updating.'
             );
-            childLogger.trace({ error: err });
+            // childLogger.trace({ error: err });
         }
     },
     updatePlayer: async (parent, { input }, { prisma, pubsub }) => {
         try {
-            const childLogger = logger.child(input.id);
-            childLogger.info(`Updating player ${input.id}`);
+            // const childLogger = logger.child(input.id);
+            console.log(`Updating player ${input.id}`);
             const player = await prisma.player.update({
                 where: {
                     id: input.id,
                 },
                 data: input,
             });
-            childLogger.info('Player updated.');
-            childLogger.debug({ player: player });
+            console.log('Player updated.');
+            // childLogger.debug({ player: player });
             return player;
         } catch (err) {
-            childLogger.error({ error: err }, 'Error updating player.');
-            childLogger.trace({ error: err });
+            console.error({ error: err }, 'Error updating player.');
+            // childLogger.trace({ error: err });
         }
     },
 };

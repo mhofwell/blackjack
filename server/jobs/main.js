@@ -5,13 +5,13 @@ import Graceful from '@ladjs/graceful';
 import jobs from './index.js';
 
 // logging
-import getLogger from '../logging/logger.js';
-const logger = getLogger('worker');
+// import getLogger from '../logging/logger.js';
+// const logger = getLogger('worker');
 
 const cronStart = async () => {
-    logger.info('Starting Bree cron jobs.');
+    console.log('Starting Bree cron jobs.');
     const cron = new Bree({
-        logger: logger,
+        // logger: logger,
         jobs: jobs,
     });
 

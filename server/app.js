@@ -106,7 +106,7 @@ app.use(pino);
 
 const main = async () => {
     httpServer.listen(port, () => {
-        logger.info(
+        console.log(
             `Server is now running on http://localhost:${port}/graphql`
         );
     });
@@ -114,17 +114,17 @@ const main = async () => {
     const data = await pingPrisma();
 
     if (data.name !== 'prisma') {
-        logger.error('Cannot connect to PRISMA');
+        console.error('Cannot connect to PRISMA');
     } else {
-        logger.info('Connected to PRISMA!');
+        console.log('Connected to PRISMA!');
     }
 
     const payload = await pingEpl();
     if (payload.status !== 200) {
-        logger.info(`EPL API connection status: ${payload.status}`);
-        logger.error('Cannot access EPL servers.');
+        console.log(`EPL API connection status: ${payload.status}`);
+        console.error('Cannot access EPL servers.');
     } else {
-        logger.info(`EPL API connection status: ${payload.status}`);
+        console.log(`EPL API connection status: ${payload.status}`);
     }
 };
 

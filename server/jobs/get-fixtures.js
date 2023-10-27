@@ -1,9 +1,9 @@
 // import { parentPort } from 'worker_threads';
 import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
-import getLogger from '../logging/logger.js';
+// import getLogger from '../logging/logger.js';
 
-const logger = getLogger('worker');
+// const logger = getLogger('worker');
 
 const getWeeklyFixtures = async () => {
     await prisma.fixtures.deleteMany();
@@ -23,7 +23,8 @@ const getWeeklyFixtures = async () => {
 
         const data = await res.json();
 
-        logger.info('Success fetching future gameweek data.');
+        console.log('Success fetching future gameweek data.');
+        // logger.debug({ data: data }, 'Gameweek data');
 
         // get the gameweekId
         gameWeekId = data[0].event;
@@ -64,36 +65,34 @@ const getWeeklyFixtures = async () => {
 
             kickoffTimesToSave.push(newEntry);
         });
-        logger.info(
-            { Kickoff_times: kickoffTimesToSave },
-            'Kickoff times fetched and sorted successfully'
+        console.log(
+            'Kickoff times fetched and sorted successfully:',
+            kickoffTimes
         );
-        logger.debug({ Kickoff_times: kickoffTimesToSave });
+        // logger.debug({ Kickoff_times: kickoffTimesToSave }, 'Kickoff Times');
 
         const count = await prisma.fixtures.createMany({
             data: kickoffTimesToSave,
         });
-        logger.info({ count: count }, `Count of fixtures: ${count}`);
-        logger.debug({ count: count });
+        console.log(`Count of fixtures:`, count);
+        // logger.debug({ count: count });
     } catch (err) {
         if (parentPort) {
             parentPort.postMessage('Something went wrong...');
             parentPort.postMessage(err);
             process.exit(1);
         } else {
-            logger.error({ error: err }, 'Something went wrong...');
-            logger.trace({ error: err });
+            console.error({ error: err }, 'Something went wrong...');
+            // logger.trace({ error: err });
             process.exit(1);
         }
     }
     if (parentPort) {
-        parentPort.postMessage(
-            `-----> Updated fixtures for gameweek ${gameWeekId}.`
-        );
+        parentPort.postMessage(`Updated fixtures for gameweek ${gameWeekId}.`);
         parentPort.postMessage('done');
     } else {
-        logger.info(`-----> Updated fixtures for gameweek ${gameWeekId}`);
-        logger.info('done');
+        console.log(`Updated fixtures for gameweek ${gameWeekId}`);
+        console.log('done');
         process.exit(0);
     }
 };

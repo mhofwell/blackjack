@@ -23,13 +23,17 @@ const getLogger = (name) => {
             break;
     }
     return pino(
-        { name, level: getLogLevel(name) },
+        {
+            name,
+            level: getLogLevel(name),
+        },
         pino.transport({
             targets: [
                 {
                     target: 'pino-pretty',
                     options: {
                         colorize: true,
+                        translateTime: 'yyyy-dd-mm, h:MM:ss TT',
                     },
                     level: 'info',
                 },
@@ -38,6 +42,7 @@ const getLogger = (name) => {
                     options: {
                         sourceToken: token,
                         colorize: true,
+                        translateTime: 'yyyy-dd-mm, h:MM:ss TT',
                     },
                     level: 'trace',
                 },
@@ -47,3 +52,6 @@ const getLogger = (name) => {
 };
 
 export default getLogger;
+
+const logger = getLogger('express');
+logger.fatal('test');
