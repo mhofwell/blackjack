@@ -1,9 +1,5 @@
-// import { parentPort } from 'worker_threads';
 import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
-// import getLogger from '../logging/logger.js';
-
-// const logger = getLogger('worker');
 
 const getWeeklyFixtures = async () => {
     await prisma.fixtures.deleteMany();
@@ -24,7 +20,6 @@ const getWeeklyFixtures = async () => {
         const data = await res.json();
 
         console.log('Success fetching future gameweek data.');
-        // logger.debug({ data: data }, 'Gameweek data');
 
         // get the gameweekId
         gameWeekId = data[0].event;
@@ -69,21 +64,17 @@ const getWeeklyFixtures = async () => {
             'Kickoff times fetched and sorted successfully:',
             kickoffTimes
         );
-        // logger.debug({ Kickoff_times: kickoffTimesToSave }, 'Kickoff Times');
 
         const count = await prisma.fixtures.createMany({
             data: kickoffTimesToSave,
         });
         console.log(`Count of fixtures:`, count);
-        // logger.debug({ count: count });
     } catch (err) {
         if (parentPort) {
-            parentPort.postMessage('Something went wrong...');
-            parentPort.postMessage(err);
+            parentPort.postMessage({ error: err }, 'Something went wrong...');
             process.exit(1);
         } else {
-            console.error({ error: err }, 'Something went wrong...');
-            // logger.trace({ error: err });
+            logger.error({ error: err }, 'Something went wrong...');
             process.exit(1);
         }
     }
@@ -91,8 +82,7 @@ const getWeeklyFixtures = async () => {
         parentPort.postMessage(`Updated fixtures for gameweek ${gameWeekId}.`);
         parentPort.postMessage('done');
     } else {
-        console.log(`Updated fixtures for gameweek ${gameWeekId}`);
-        console.log('done');
+        logger.info(`Updated fixtures for gameweek ${gameWeekId}`);
         process.exit(0);
     }
 };

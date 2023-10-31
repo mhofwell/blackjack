@@ -5,10 +5,10 @@ const logger = getLogger('api');
 
 const Query = {
     // return a user
-    user: async (parent, args, { prisma }) => {
+    user: async (parent, args, { prisma }, contextValue) => {
         try {
             const { id } = args;
-            console.log(`Fetching user ${id}`);
+            logger.info(`Fetching user ${id}`);
             const user = await prisma.user.findUnique({
                 where: {
                     id: id,
@@ -29,15 +29,16 @@ const Query = {
                     },
                 },
             });
-            console.log(`Fetched user ${id} successfully.`);
-            // logger.debug({ user: user }, 'User');
+            logger.info(`Fetched user ${id} successfully.`);
+            logger.debug({ user: user }, `User ${id}.`);
             return user;
         } catch (err) {
-            console.error(
-                { error: err },
+            logger.error(
+                {
+                    Error: err,
+                },
                 'Something went wrong fetching the user.'
             );
-            logger.trace({ error: err });
         }
     },
     // return an entry for a specific user in a particular pool
@@ -55,11 +56,11 @@ const Query = {
                     user: true,
                 },
             });
-            console.log(`Fetched entry ${id} successfully.`);
-            // logger.debug({ entry: entry }, 'Entry');
+            logger.info(`Fetched entry ${id} successfully.`);
+            logger.debug({ entry: entry }, 'Entry');
             return entry;
         } catch (err) {
-            console.error(`Error fetching entry ${id}.`, err);
+            logger.error({ error: err }, `Error fetching entry ${id}.`);
             // logger.trace({ error: err });
         }
     },

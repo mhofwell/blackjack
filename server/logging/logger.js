@@ -1,6 +1,5 @@
 import pino from 'pino';
 import 'dotenv/config';
-
 import logLevelData from './log-level.js';
 
 const logLevels = new Map(Object.entries(logLevelData));
@@ -28,6 +27,11 @@ const getLogger = (name) => {
             level: getLogLevel(name),
         },
         pino.transport({
+            // browser: {
+            //     transmit: {
+            //         send: send,
+            //     },
+            // },
             targets: [
                 {
                     target: 'pino-pretty',
@@ -53,5 +57,4 @@ const getLogger = (name) => {
 
 export default getLogger;
 
-const logger = getLogger('express');
-logger.fatal('test');
+
