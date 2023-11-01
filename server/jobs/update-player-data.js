@@ -71,9 +71,7 @@ const updateGoalData = async () => {
         try {
             // fetch gameweek players from EPL
             const res = await fetch(
-                `https://fantasy.premierleague.com/api/event/${
-                    gameWeekId - 1
-                }/live/`
+                `https://fantasy.premierleague.com/api/event/${gameWeekId}/live/`
             );
 
             if (parentPort) {
@@ -372,7 +370,7 @@ const updateGoalData = async () => {
 
                     const entryQueryVariables = {
                         id: player.id,
-                        kickoffTime: kickoffTime, 
+                        kickoffTime: kickoffTime,
                     };
 
                     const dbEntries = await fetchGQL(
@@ -465,7 +463,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 2) {
+        if (i === 180) {
             if (parentPort) {
                 parentPort.postMessage('done');
                 process.exit(0);
@@ -474,6 +472,6 @@ const updateGoalData = async () => {
                 process.exit(0);
             }
         }
-    }, 1000);
+    }, 120000);
 };
 updateGoalData();

@@ -1,7 +1,7 @@
 import prisma from '../prisma/client.js';
 import getLogger from '../logging/logger.js';
 
-const logger = getLogger('server');
+const logger = getLogger('express');
 
 const cleanUp = async () => {
     await prisma.entry.deleteMany();

@@ -26,8 +26,8 @@ const createGoalUpdateJobs = async () => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
             path: path.join(appDir + '/jobs', 'update-player-data.js'),
-            // date: new Date(fixture.kickoff_time),
-            interval: '10s',
+            date: new Date(fixture.kickoff_time),
+            // interval: '10s',
             outputWorkerMetadata: false,
             worker: {
                 workerData: {
@@ -37,7 +37,6 @@ const createGoalUpdateJobs = async () => {
                 },
             },
         });
-        // logger.debug({ newCronJobs: newCronJobs }, 'Kickoff cron jobs.');
         return newCronJobs;
     });
 
