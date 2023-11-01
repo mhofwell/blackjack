@@ -5,13 +5,17 @@ const logger = getLogger('api');
 
 const Query = {
     // return a user
-    user: async (parent, args, { prisma }, contextValue) => {
+    user: async (parent, args, { prisma, req }) => {
         try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'User query request.'
+            );
             const { id } = args;
             logger.info(`Fetching user ${id}`);
             const user = await prisma.user.findUnique({
                 where: {
-                    id: id,
+                    id: ids,
                 },
                 include: {
                     entries: {
@@ -29,21 +33,21 @@ const Query = {
                     },
                 },
             });
-            logger.info(`Fetched user ${id} successfully.`);
+            logger.info(`Fetched user successfully.`);
             logger.debug({ user: user }, `User ${id}.`);
             return user;
         } catch (err) {
-            logger.error(
-                {
-                    Error: err,
-                },
-                'Something went wrong fetching the user.'
-            );
+            logger.warn('Something went wrong fetching the user.');
+            logger.error(err);
         }
     },
     // return an entry for a specific user in a particular pool
-    entry: async (parent, args, { prisma }) => {
+    entry: async (parent, args, { prisma, req }) => {
         try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'Entry query request.'
+            );
             const { id } = args;
             console.log(`Fetching entry ${id}.`);
             const entry = await prisma.entry.findUnique({
@@ -56,18 +60,22 @@ const Query = {
                     user: true,
                 },
             });
-            logger.info(`Fetched entry ${id} successfully.`);
+            logger.info(`Fetched entry successfully.`);
             logger.debug({ entry: entry }, 'Entry');
             return entry;
         } catch (err) {
-            logger.error({ error: err }, `Error fetching entry ${id}.`);
-            // logger.trace({ error: err });
+            logger.warn(`Error fetching entry.`);
+            logger.error(err);
         }
     },
     // return all entries across all pools
-    allEntries: async (parent, args, { prisma }) => {
+    allEntries: async (parent, args, { prisma, req }) => {
         try {
-            console.log('Getting all entries.');
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'All entries query request.'
+            );
+            logger.info('Getting all entries.');
             const entries = await prisma.entry.findMany({
                 include: {
                     user: true,
@@ -75,17 +83,21 @@ const Query = {
                     pool: true,
                 },
             });
-            console.log('Fetched all entries successfully.');
-            // logger.debug({ entries: entries }, 'Entries');
+            logger.info('Fetched all entries successfully.');
+            logger.debug({ entries: entries }, 'Entries');
             return entries;
         } catch (err) {
-            console.error('Error fetching all entries.', err);
-            // logger.trace({ error: err });
+            logger.warn(`Error fetching all entries.`);
+            logger.error(err);
         }
     },
     // return all pools with all entries, players, users
-    pools: async (parent, args, { prisma }) => {
+    pools: async (parent, args, { prisma, req }) => {
         try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'All pools query request.'
+            );
             console.log('Fetching all pools.');
             const pools = await prisma.pool.findMany({
                 include: {
@@ -98,19 +110,23 @@ const Query = {
                     owner: true,
                 },
             });
-            console.log('Fetched all pools successfully.');
-            // logger.debug({ pools: pools }, 'Pools');
+            logger.info('Fetched all pools successfully.');
+            logger.debug({ pools: pools }, 'Pools');
             return pools;
         } catch (err) {
-            console.error('Something went wrong fetching all pools.', err);
-            // logger.trace({ error: err });
+            logger.warn(`Something went wrong fetching all pools.`);
+            logger.error(err);
         }
     },
     // return a single pool with all entries, players, users
-    pool: async (parent, args, { prisma }) => {
+    pool: async (parent, args, { prisma, req }) => {
         try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'Pool query request.'
+            );
             const { id } = args;
-            console.log(`Fetching pool ${id}.`);
+            logger.info(`Fetching pool ${id}.`);
             const pool = await prisma.pool.findUnique({
                 where: {
                     id: id,
@@ -125,45 +141,62 @@ const Query = {
                     owner: true,
                 },
             });
-            console.log(`Fetched pool ${id} successfully.`);
-            // logger.debug({ pool: pool }, 'Pool');
+            logger.info(`Fetched the pool successfully.`);
+            logger.debug({ pool: pool }, 'Pool');
             return pool;
         } catch (err) {
-            console.error('Something went wrong fetching a pool', err);
-            // logger.trace({ error: err });
+            logger.warn(`Something went wrong fetching a pool.`);
+            logger.error(err);
         }
     },
-    allPlayers: async (parent, args, { prisma }) => {
+    allPlayers: async (parent, args, { prisma, req }) => {
         try {
-            console.log('Fetching all players');
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'All players query request.'
+            );
+            logger.info('Fetching all players');
             const players = await prisma.player.findMany();
-            console.log('Fetched all players successfully.');
-            // logger.debug({ players: players }, 'Players');
+            logger.info('Fetched all players successfully.');
+            logger.debug({ players: players }, 'Players');
             return players;
         } catch (err) {
-            console.error("Something wen't wrong fetching all players.", err);
-            // logger.trace({ error: err });
+            logger.warn(`Something wen't wrong fetching all players.`);
+            logger.error(err);
         }
     },
-    player: async (parent, args, { prisma }) => {
+    player: async (parent, args, { prisma, req }) => {
         try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'Player query request.'
+            );
             const { id } = args;
-            console.log(`Fetching player ${id}`);
+            logger.info(`Fetching player ${id}`);
             const player = await prisma.player.findUnique({
                 where: {
                     id: parseInt(id),
                 },
             });
-            console.log(`Fetched player ${id} successfully.`, player);
+            logger.info(`Fetched player ${id} successfully.`, player);
+            logger.debug({ player: player }, `Player object.`);
             return player;
         } catch (err) {
-            console.error('Something went wrong getting a single player', err);
+            logger.warn(`Something went wrong fetching a player.`);
+            logger.error(err);
         }
     },
-    playerEntries: async (parent, args, { prisma }) => {
+    playerEntries: async (_, args, { prisma, req }) => {
+        const kt = args.kickoffTime;
         try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                `gw-worker-${kt} > Entries by player id query request.`
+            );
             const { id } = args;
-            console.log(`Fetching all entries by player id ${id}`);
+            logger.info(
+                `gw-worker-${kt} > Fetching all entries by player id ${id}`
+            );
             const entries = await prisma.entry.findMany({
                 where: {
                     players: {
@@ -174,59 +207,68 @@ const Query = {
                 },
             });
             if (entries !== null) {
-                console.log(
-                    `Fetched all entries by player id ${id} successfully.`
+                logger.info(
+                    `gw-worker-${kt} > Fetched all entries by player id ${id} successfully.`
+                );
+                logger.debug(
+                    { entries: entries },
+                    `gw-worker-${kt} > Entries.`
                 );
                 return entries;
             } else {
-                throw new Error(`No entries found!`);
+                throw new Error(`gw-worker-${kt} > No entries found!`);
             }
-            // logger.debug({ entries: entries }, 'Entries');
         } catch (err) {
-            console.error(
-                'Something went wrong getting all players by player id',
-                err
+            logger.warn(
+                `gw-worker-${kt} > Something went wrong getting all players by player id.`
             );
-            // logger.debug({ error: err });
+            logger.error(err);
         }
     },
-    getGameweekPlayers: async (parent, args, { prisma }) => {
+    getGameweekPlayers: async (_, args, { prisma, req }) => {
         const { input } = args;
-        const inputKT = input.kickoffTime;
+        const gw = input.gameWeeekId;
+        const kt = input.kickoffTime;
         const n = input.numberOfFixtures;
         const players = [];
         const teamIdArray = [];
 
         try {
-            console.log(
-                `Fetching all gameweek players for kickoff time ${inputKT}.`
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                `Get all gameweek ${gw} players query request..`
             );
+            logger.info(`gw-worker-${kt} > Fetching all gameweek players.`);
             let res = await fetch(
                 'https://fantasy.premierleague.com/api/fixtures?future=1'
             );
 
             if (!res) {
                 throw new Error(
-                    'Cannot fetch upcoming fixture information from EPL API, check connection.'
+                    `${kt} > Cannot fetch upcoming fixture information from EPL API, check connection.`
                 );
             }
 
             let data = await res.json();
-            // logger.debug({ data: data }, 'Fixture Data');
 
             const weeklyFixtures = data.slice(0, n - 1);
-            console.log(`${n} fixture(s) in this gameweek.`);
+
+            logger.debug(
+                { weeklyFixtures: weeklyFixtures },
+                `gw-worker-${kt} > Weekly fixture data from EPL.`
+            );
 
             await weeklyFixtures.forEach((fixture) => {
-                const fixtureKT = new Date(fixture.kickoff_time).toString();
-
-                if (fixtureKT === inputKT) {
+                if (fixture.kickoff_time === kt) {
                     teamIdArray.push(fixture.team_a);
                     teamIdArray.push(fixture.team_h);
                 }
             });
 
-            console.log(`Teams playing at ${inputKT}.`, teamIdArray);
+            logger.debug(
+                { teamIdArray: teamIdArray },
+                `gw-worker-${kt} > Teams playing.`
+            );
 
             for (const id in teamIdArray) {
                 const p = await prisma.player.findMany({
@@ -241,21 +283,31 @@ const Query = {
                     },
                 });
                 if (!p) {
-                    throw new Error('Cannot fetch player data from PRISMA.');
+                    throw new Error(
+                        `gw-worker-${kt} > Cannot fetch player data from PRISMA.`
+                    );
                 }
                 p.forEach((player) => {
                     players.push(player);
                 });
-                console.log(`Players fetched for club ${teamIdArray[id]}`);
+                logger.info(
+                    `gw-worker-${kt} > Players fetched for club ${teamIdArray[id]}`
+                );
             }
-            console.log(`All players fetched for kickoff time ${inputKT}`);
+            logger.info(`gw-worker-${kt} > All players fetched.`);
+            logger.debug({ players: players }, `gw-worker-${kt} > Players`);
             return players;
         } catch (err) {
-            console.error(`Error fetching club players`, err);
+            logger.warn(`gw-worker-${kt} > Error fetching club players`);
+            logger.error(err);
             process.exit(1);
         }
     },
-    login: async (parent, args, { prisma }) => {
+    login: async (parent, args, { prisma, req }) => {
+        logger.debug(
+            { headers: req.headers, body: req.body },
+            'Login request.'
+        );
         const { pw, fn, ln } = args;
         const user = await prisma.user.findFirst({
             where: {

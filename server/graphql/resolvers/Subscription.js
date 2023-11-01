@@ -12,6 +12,7 @@ const Subscription = {
     poolUpdated: {
         subscribe: (_, __, { pubsub }) =>
             // pubsub passed through contextValue to subscription
+
             pubsub.asyncIterator('POOL_UPDATED'),
     },
     hi: {

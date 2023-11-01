@@ -43,11 +43,11 @@ const createGoalUpdateJobs = async () => {
 
     if (parentPort) {
         parentPort.postMessage(
-            'Goal updated cron jobs created successfully 🚀'
+            'Jobs to update player goals created successfully 🚀'
         );
     } else {
-        logger.info('Goal updated jobs created successfully 🚀');
-        logger.debug({ newCronJobs: newCronJobs }, 'New Cron Jobs');
+        logger.info('Jobs to update player goals successfully 🚀');
+        logger.debug({ newCronJobs: newCronJobs }, 'New cron jobs');
     }
 
     let i = 0;

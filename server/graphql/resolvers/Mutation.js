@@ -4,41 +4,61 @@ import getLogger from '../../logging/logger.js';
 const logger = getLogger('api');
 
 const Mutation = {
-    updateEntry: async (parent, { input }, { prisma, pubsub }) => {
+    updateEntry: async (_, { input }, { prisma, pubsub, req }) => {
+        const kt = input.kickoffTime;
         try {
-            console.log(`Finding entry ${input.id} mutate.`);
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                `gw-worker-${kt} > Update entry mutation request.`
+            );
+            logger.info(`gw-worker-${kt} > Finding entry ${input.id} mutate.`);
             const entry = await prisma.entry.update({
                 where: {
                     id: input.id,
                 },
-                data: input,
+                data: {
+                    goals: input.goals,
+                    own_goals: input.own_goals,
+                    net_goals: input.net_goals,
+                },
                 include: {
                     players: true,
                 },
             });
 
             pubsub.publish('ENTRY_UPDATED', { entryUpdated: entry });
+            logger.info(`gw-worker-${kt} > ENTRY_UPDATED published.`);
             return entry;
         } catch (err) {
-            console.error({ error: err }, 'Error during mutation.');
-            // logger.trace({ error: err });
+            logger.warn(`Error during mutation of entry.`);
+            logger.error(err);
         }
     },
-    updatePool: async (parent, { input }, { prisma, pubsub }) => {
+    updatePool: async (_, { input }, { prisma, pubsub, req }) => {
+        const kt = input.kickoffTime;
         try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                `gw-worker-${kt} > Update pool mutation request.`
+            );
             const inputId = input.id;
-            // childLogger = logger.child({ inputId });
-            console.log(`Finding entry ${inputId} to mutate.`);
+            logger.info(
+                `gw-worker-${kt} > Finding entry ${inputId} to mutate.`
+            );
 
             const entry = await prisma.entry.update({
                 where: {
                     id: input.id,
                 },
-                data: input,
+                data: {
+                    goals: input.goals,
+                    own_goals: input.own_goals,
+                    net_goals: input.net_goals,
+                },
             });
 
             // Get and re-sort the pool
-            console.log(`Fetching pool ${entry.poolId}.`);
+            logger.info(`gw-worker-${kt} > Fetching pool ${entry.poolId}.`);
 
             const pool = await prisma.pool.findUnique({
                 where: {
@@ -51,7 +71,12 @@ const Mutation = {
             });
 
             const sortedEntries = pool.entries.sort(sortByNetGoalsDsc);
-            console.log('Sorting entries.');
+            logger.info(`gw-worker-${kt} > Finished sorting entries.`);
+            logger.debug(
+                { sortedEntries: sortedEntries },
+                `gw-worker-${kt} > Sorted entries.`
+            );
+
             // update the rank of each entry
             let i = 0;
 
@@ -70,43 +95,61 @@ const Mutation = {
                     },
                 });
                 sortedEntries[i - 1] = res;
-                // console.log('GQL: Refreshed standings');
             }
 
-            console.log('New standings stored.');
-            // childLogger.debug(
-            //     { sortedEntries: sortedEntries },
-            //     'Sorted entries.'
-            // );
+            logger.info(`gw-worker-${kt} > All new standings stored.`);
+            logger.debug(
+                { sortedEntries: sortedEntries },
+                `gw-worker-${kt} > Sorted entries array.`
+            );
 
             pool.entries = sortedEntries;
 
             pubsub.publish('POOL_UPDATED', { poolUpdated: pool });
+            logger.info(`gw-worker-${kt} > POOL_UPDATED published.`);
             return pool;
         } catch (err) {
-            console.error(
-                { error: err },
-                'Something went wrong during entry updating.'
+            logger.warn(
+                `gw-worker-${kt} > Something went wrong during entry updating.`
             );
-            // childLogger.trace({ error: err });
+            logger.error(err);
         }
     },
-    updatePlayer: async (parent, { input }, { prisma, pubsub }) => {
+    updatePlayer: async (_, { input }, { prisma, req }) => {
+        const kt = input.kickoffTime;
         try {
-            // const childLogger = logger.child(input.id);
-            console.log(`Updating player ${input.id}`);
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                `gw-worker-${kt} > Update player mutation request.`
+            );
+            logger.info(`gw-worker-${kt} > Updating player ${input.id}`);
+
             const player = await prisma.player.update({
                 where: {
                     id: input.id,
                 },
-                data: input,
+                data: {
+                    goals: input.goals,
+                    own_goals: input.own_goals,
+                    net_goals: input.net_goals,
+                },
             });
-            console.log('Player updated.');
-            // childLogger.debug({ player: player });
-            return player;
+
+            if (player.id !== input.id) {
+                throw new Error(
+                    `gw-worker-${kt} > Failed to update player in Prisma.`
+                );
+            } else {
+                logger.info(`gw-worker-${kt} > Player updated.`);
+                logger.debug(
+                    { player: player },
+                    `gw-worker-${kt} > Player object.`
+                );
+                return player;
+            }
         } catch (err) {
-            console.error({ error: err }, 'Error updating player.');
-            // childLogger.trace({ error: err });
+            logger.warn(`gw-worker-${kt} > Error updating player.`);
+            logger.error(err);
         }
     },
 };

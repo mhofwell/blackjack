@@ -30,8 +30,9 @@ const updateGoalData = async () => {
 
     const queryData = {
         input: {
-            kickoffTime: new Date(kickoffTime).toString(),
+            kickoffTime,
             numberOfFixtures,
+            gameWeekId,
         },
     };
 
@@ -62,12 +63,10 @@ const updateGoalData = async () => {
         i++;
         if (parentPort) {
             parentPort.postMessage(
-                `Fetched gameweek players in the database for iteration: ${i}`
+                `Fetched gameweek players in the database for i: ${i}`
             );
         } else {
-            logger.info(
-                `Fetched gameweek players in the database for Iteration: ${i}`
-            );
+            logger.info(`Fetched gameweek players in the database for i: ${i}`);
         }
         try {
             // fetch gameweek players from EPL
@@ -79,7 +78,7 @@ const updateGoalData = async () => {
 
             if (parentPort) {
                 parentPort.postMessage(
-                    `Fetched live player data from the EPL API for gameweek ${gameWeekId}.`
+                    `Fetched live data from the EPL API for gw ${gameWeekId}.`
                 );
             } else {
                 logger.info(
@@ -90,7 +89,7 @@ const updateGoalData = async () => {
             const data = await res.json();
             // const data = testData;
 
-            if (data.elements.length === 0) {
+            if (data.elements[0] === null) {
                 if (parentPort) {
                     parentPort.postMessage(
                         `Gameweek ${gameWeekId} has not started yet!`
@@ -107,6 +106,11 @@ const updateGoalData = async () => {
             for (const player of players) {
                 let isNew;
 
+                logger.debug(
+                    { player: player },
+                    `${player.id} > Player object.`
+                );
+
                 if (parentPort) {
                     parentPort.postMessage(
                         `${player.id} > Evaluating player from database.`
@@ -121,6 +125,8 @@ const updateGoalData = async () => {
                     (element) => element.id === player.id
                 );
 
+                const livePlayerData = data.elements[livePlayerIndex].stats;
+
                 if (livePlayerIndex >= 0) {
                     if (parentPort) {
                         parentPort.postMessage(
@@ -129,7 +135,7 @@ const updateGoalData = async () => {
                     } else {
                         logger.info(`${player.id} > Player in EPL data found.`);
                         logger.debug(
-                            { player: player },
+                            { livePlayerData: livePlayerData },
                             `${player.id} > Player in EPL data found.`
                         );
                     }
@@ -146,7 +152,13 @@ const updateGoalData = async () => {
                     process.exit(1);
                 }
 
-                const livePlayerData = data.elements[livePlayerIndex].stats;
+                logger.debug(
+                    {
+                        goals_scored: livePlayerData.goals_scored,
+                        own_goals: livePlayerData.own_goals,
+                    },
+                    `${player.id} > Live goals_scored & own_goals i: ${i}`
+                );
 
                 // see if the player exists in the cache.
                 const cachedPlayerData = await getRedisJSON(
@@ -183,10 +195,6 @@ const updateGoalData = async () => {
                         ? (updatePrisma = true)
                         : (updatePrisma = false);
 
-                    if (logger) {
-                        logger.debug(`Update prisma: ${updatePrisma}`);
-                    }
-
                     const newRedisData = {
                         id: data.elements[livePlayerIndex].id,
                         goals: livePlayerData.goals_scored,
@@ -195,6 +203,11 @@ const updateGoalData = async () => {
                             livePlayerData.goals_scored -
                             livePlayerData.own_goals,
                     };
+
+                    logger.debug(
+                        { newRedisData: newRedisData },
+                        'New redis data'
+                    );
 
                     // save player in redis cache.
                     const redisPlayer = await setRedisJSON(
@@ -289,6 +302,9 @@ const updateGoalData = async () => {
                         }
                     }
                 }
+
+                logger.debug(`Update Prisma ${updatePrisma}`);
+
                 if (updatePrisma) {
                     if (isNew) {
                         goalDiff = livePlayerData.goals_scored;
@@ -297,6 +313,16 @@ const updateGoalData = async () => {
                     }
 
                     player.net_goals = netGoalDiff + player.net_goals;
+                    player.kickoffTime = kickoffTime;
+
+                    logger.debug(
+                        {
+                            goalDiff: goalDiff,
+                            ownGoalDiff: ownGoalDiff,
+                            netGoalDiff: netGoalDiff,
+                        },
+                        `${player.id} > Goal differentials.`
+                    );
 
                     if (parentPort) {
                         parentPort.postMessage(
@@ -336,7 +362,7 @@ const updateGoalData = async () => {
                     }
 
                     const entryQuery = `query PlayerEntries($id: ID!) {
-                            playerEntries(id: $id) {
+                            playerEntries(id: $id, kickoffTime: $kickoffTime) {
                                 id
                                 goals
                                 own_goals
@@ -346,6 +372,7 @@ const updateGoalData = async () => {
 
                     const entryQueryVariables = {
                         id: player.id,
+                        kickoffTime: kickoffTime, 
                     };
 
                     const dbEntries = await fetchGQL(
@@ -370,11 +397,14 @@ const updateGoalData = async () => {
                     }
 
                     for (const entry of iteratableEntries) {
+                        logger.debug({ entry: entry }, 'Entry object');
+
                         const input = {
                             id: entry.id,
                             goals: entry.goals + goalDiff,
                             own_goals: entry.own_goals + ownGoalDiff,
                             net_goals: entry.net_goals + netGoalDiff,
+                            kickoffTime: kickoffTime,
                         };
                         const updatePoolInput = {
                             input,
@@ -393,13 +423,13 @@ const updateGoalData = async () => {
 
                         if (parentPort) {
                             parentPort.postMessage(
-                                `${player.id} > Entry & pool updated.`
+                                `${player.id} > Pool updated.`
                             );
                         } else {
-                            logger.info(`${player.id} > Entry & pool updated.`);
+                            logger.info(`${player.id} > Pool updated.`);
                             logger.debug(
                                 { updatedPool: updatedPool },
-                                'Updated Pool'
+                                'Updated Pool Object'
                             );
                         }
                     }
@@ -416,12 +446,10 @@ const updateGoalData = async () => {
                 }
                 if (parentPort) {
                     parentPort.postMessage(
-                        `${player.id} > Iteration ${i} complete for player ${player.id} ✅`
+                        `${player.id} > i: ${i} complete ✅`
                     );
                 } else {
-                    logger.info(
-                        `${player.id} > Iteration ${i} complete for player ${player.id} ✅`
-                    );
+                    logger.info(`${player.id} > i: ${i} complete ✅`);
                 }
             }
         } catch (err) {
