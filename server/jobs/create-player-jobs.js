@@ -2,14 +2,20 @@ import path from 'path';
 import Bree from 'bree';
 import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
-// import getLogger from '../logging/logger.js';
+import getLogger from '../logging/logger.js';
 
-// const logger = getLogger('worker');
+const logger = getLogger('worker');
 
 const createGoalUpdateJobs = async () => {
     const fixtures = await prisma.fixtures.findMany();
 
-    console.log('Starting goal update jobs...');
+    if (parentPort) {
+        parentPort.postMessage(
+            'Worker started to create goal update jobs...👷'
+        );
+    } else {
+        logger.info('Worker started to create goal update jobs...👷');
+    }
 
     const appDir =
         '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
@@ -35,42 +41,59 @@ const createGoalUpdateJobs = async () => {
         return newCronJobs;
     });
 
-    console.log('Kickoff time cron jobs created successfully.', newCronJobs);
+    if (parentPort) {
+        parentPort.postMessage(
+            'Goal updated cron jobs created successfully 🚀'
+        );
+    } else {
+        logger.info('Goal updated jobs created successfully 🚀');
+        logger.debug({ newCronJobs: newCronJobs }, 'New Cron Jobs');
+    }
 
+    let i = 0;
     async function workerMessageHandler(message) {
         setTimeout(() => {
-            console.log(
-                `Worker Name: ${message.name}, Message: ${message.message}`
-            );
+            logger.info(`${message.name} > ${message.message}`);
+            if (message.message === 'done') {
+                i++;
+            }
+            if (i === fixtures.length) {
+                i = 0;
+                logger.info(
+                    'Success! All gameweek jobs completed successfully 🚀 🚀 🚀'
+                );
+                cron.stop();
+            }
         }, 1000);
     }
 
     const cron = new Bree({
         root: false,
         jobs: newCronJobs,
+        logger: logger,
         outputWorkerMetadata: false,
         removeCompleted: true,
+        workerMetadata: true,
         workerMessageHandler: workerMessageHandler,
         errorHandler: (error, workerMetadata) => {
             // workerMetadata will be populated with extended worker information only if
             // Bree instance is initialized with parameter `workerMetadata: true
             if (workerMetadata.threadId) {
-                console.error(
-                    { error: error },
+                logger.info(
                     `There was an error while running a worker ${workerMetadata.name} with thread ID: ${workerMetadata.threadId}`
                 );
             } else {
-                console.error(
-                    { error: error },
-                    `There was an error while running a worker ${workerMetadata.name}`
+                logger.info(
+                    `There was an error while running worker [ ${workerMetadata.name} ]`
                 );
             }
+            logger.error(error);
         },
     });
     if (parentPort) {
         parentPort.postMessage('Jobs to update player data started...');
     } else {
-        console.log('Jobs to update player data started...');
+        logger.info('Jobs to update player data started...');
     }
     await cron.start();
 };

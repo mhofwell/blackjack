@@ -1,4 +1,7 @@
 import prisma from '../prisma/client.js';
+import getLogger from '../logging/logger.js';
+
+const logger = getLogger('server');
 
 const cleanUp = async () => {
     await prisma.entry.deleteMany();
@@ -7,7 +10,7 @@ const cleanUp = async () => {
     await prisma.player.deleteMany();
     await prisma.club.deleteMany();
     await prisma.fixtures.deleteMany();
-    console.log('Completed database cleanup');
+    logger.info('Completed database cleanup.');
 };
 
 cleanUp();

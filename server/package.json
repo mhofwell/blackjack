@@ -38,7 +38,7 @@
         "node": "^20.5.0",
         "node-schedule": "^2.1.1",
         "pino": "^8.16.1",
-        "pino-http": "^8.5.0",
+        "pino-http": "^8.5.1",
         "pino-pretty": "^10.2.3",
         "redis": "^4.6.10",
         "worker-threads": "^1.0.0",

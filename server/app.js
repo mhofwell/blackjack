@@ -108,8 +108,7 @@ const main = async () => {
         bodyParser.json(),
         expressMiddleware(server, {
             context: async ({ req }) => {
-                const request = req;
-                return { prisma, pubsub, request };
+                return { prisma, pubsub, req };
             },
         })
     );

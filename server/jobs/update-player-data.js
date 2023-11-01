@@ -1,5 +1,8 @@
 import { workerData, parentPort } from 'worker_threads';
 
+// test data
+// import testData from './test-data.js';
+
 // utils
 import fetchGQL from '../utils/graphql/fetch.js';
 import { getRedisJSON, setRedisJSON } from '../utils/redis/json.js';
@@ -8,19 +11,22 @@ import { getRedisJSON, setRedisJSON } from '../utils/redis/json.js';
 import PLAYER_KEY from '../utils/redis/keys/index.js';
 
 // logging
-// import getLogger from '../logging/logger.js';
+import getLogger from '../logging/logger.js';
 
-// const logger = getLogger('worker');
+const logger = getLogger('worker');
 
 const updateGoalData = async () => {
     let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
 
-    console.log(
-        'kickoffTime',
-        kickoffTime,
-        'numberOfFixtures',
-        numberOfFixtures
-    );
+    // const kickoffTime = '2023-11-04T15:00:00Z';
+    // const numberOfFixtures = 10;
+    // const gameWeekId = 10;
+
+    if (parentPort) {
+        parentPort.postMessage(`Worker starting...👷 `);
+    } else {
+        logger.info(`Worker starting...👷 `);
+    }
 
     const queryData = {
         input: {
@@ -40,9 +46,11 @@ const updateGoalData = async () => {
 
     const res = await fetchGQL(query, queryData);
 
-    let players = res.getGameweekPlayers;
+    if (!res) {
+        throw new Error('Could not fetch gameweek players from the database.');
+    }
 
-    console.log('Players', players);
+    let players = res.getGameweekPlayers;
 
     let goalDiff;
     let ownGoalDiff;
@@ -52,21 +60,35 @@ const updateGoalData = async () => {
 
     setInterval(async () => {
         i++;
-
-        console.log(`${kickoffTime} > Iteration: ${i}`);
-
+        if (parentPort) {
+            parentPort.postMessage(
+                `Fetched gameweek players in the database for iteration: ${i}`
+            );
+        } else {
+            logger.info(
+                `Fetched gameweek players in the database for Iteration: ${i}`
+            );
+        }
         try {
+            // fetch gameweek players from EPL
             const res = await fetch(
                 `https://fantasy.premierleague.com/api/event/${
                     gameWeekId - 1
                 }/live/`
             );
 
-            if (!res === 0) {
-                throw new Error('Cannot fetch data from EPL API.');
+            if (parentPort) {
+                parentPort.postMessage(
+                    `Fetched live player data from the EPL API for gameweek ${gameWeekId}.`
+                );
+            } else {
+                logger.info(
+                    `Fetched live player data from the EPL API for gameweek ${gameWeekId}.`
+                );
             }
 
             const data = await res.json();
+            // const data = testData;
 
             if (data.elements.length === 0) {
                 if (parentPort) {
@@ -76,48 +98,75 @@ const updateGoalData = async () => {
                     parentPort.postMessage('done');
                     process.exit(0);
                 } else {
-                    console.log(`Gameweek ${gameWeekId} has not started yet!`);
+                    logger.warn(`Gameweek ${gameWeekId} has not started yet!`);
                     process.exit(0);
                 }
             }
-            console.log(`${kickoffTime} > All live players fetched.`);
 
+            // for each player in our array of players
             for (const player of players) {
                 let isNew;
-                console.log(`${kickoffTime}: Player from DB: ${player.id} `);
-                // logger.debug({ player: player }, 'Player');
 
+                if (parentPort) {
+                    parentPort.postMessage(
+                        `${player.id} > Evaluating player from database.`
+                    );
+                } else {
+                    logger.info(
+                        `${player.id} > Evaluating player from database.`
+                    );
+                }
+                // get the index of the player in the EPL API data
                 const livePlayerIndex = data.elements.findIndex(
-                    // identify the element index [0] ? this is the error
                     (element) => element.id === player.id
                 );
 
                 if (livePlayerIndex >= 0) {
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Player in EPL data found.`
-                    );
-                    // logger.debug(
-                    //     {
-                    //         player: data.elements[livePlayerIndex].stats,
-                    //     },
-                    //     'EPL Player'
-                    // );
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > Player in EPL data found.`
+                        );
+                    } else {
+                        logger.info(`${player.id} > Player in EPL data found.`);
+                        logger.debug(
+                            { player: player },
+                            `${player.id} > Player in EPL data found.`
+                        );
+                    }
                 } else {
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Player in EPL data not found.`
-                    );
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > Player in EPL data not found.`
+                        );
+                    } else {
+                        logger.info(
+                            `${player.id} > Player in EPL data not found.`
+                        );
+                    }
                     process.exit(1);
                 }
 
                 const livePlayerData = data.elements[livePlayerIndex].stats;
 
+                // see if the player exists in the cache.
                 const cachedPlayerData = await getRedisJSON(
                     PLAYER_KEY,
                     data.elements[livePlayerIndex].id
                 );
 
+                // if player does not exist in redis
                 if (!cachedPlayerData) {
                     isNew = true;
+
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > No cached player data found.`
+                        );
+                    } else {
+                        logger.info(
+                            `${player.id} > No cached player data found.`
+                        );
+                    }
 
                     livePlayerData.goals_scored > 0
                         ? (player.goals =
@@ -134,6 +183,10 @@ const updateGoalData = async () => {
                         ? (updatePrisma = true)
                         : (updatePrisma = false);
 
+                    if (logger) {
+                        logger.debug(`Update prisma: ${updatePrisma}`);
+                    }
+
                     const newRedisData = {
                         id: data.elements[livePlayerIndex].id,
                         goals: livePlayerData.goals_scored,
@@ -143,22 +196,42 @@ const updateGoalData = async () => {
                             livePlayerData.own_goals,
                     };
 
+                    // save player in redis cache.
                     const redisPlayer = await setRedisJSON(
                         PLAYER_KEY,
                         player.id,
                         newRedisData
                     );
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Saved new player in redis cache successfully.`
-                    );
-                    // logger.debug(
-                    //     { newRedisData: newRedisData },
-                    //     'New redis data.'
-                    // );
-                    // logger.debug({ redisPlayer: redisPlayer }, 'Redis player');
+
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > Saved new player in Redis cache successfully.`
+                        );
+                    } else {
+                        logger.info(
+                            `${player.id} > Saved new player in Redis cache successfully.`
+                        );
+                        logger.debug(
+                            { redisPlayer: redisPlayer },
+                            `${player.id} > Redis player.`
+                        );
+                    }
                 } else {
+                    // player does exist in redis
                     isNew = false;
 
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > Cached player data found.`
+                        );
+                    } else {
+                        logger.info(`${player.id} > Cached player data found.`);
+                        logger.debug(
+                            { cachedPlayerData: cachedPlayerData },
+                            `${player.id} > Cached player.`
+                        );
+                    }
+                    // evaluate if there's a change in goal stats between live and cache.
                     if (
                         livePlayerData.goals_scored - cachedPlayerData.goals >
                             0 ||
@@ -186,19 +259,36 @@ const updateGoalData = async () => {
                             : (player.own_goals = player.own_goals);
 
                         netGoalDiff = goalDiff - ownGoalDiff;
+
                         updatePrisma = true;
-                        console.log(
-                            `${kickoffTime}: ${player.id} > Updated player in cache: `
-                        );
-                        // logger.debug({ player: player }, 'Player');
+
+                        if (parentPort) {
+                            parentPort.postMessage(
+                                `${player.id} > Updated player in cache`
+                            );
+                        } else {
+                            logger.info(
+                                `${player.id} > Updated player in cache`
+                            );
+                            logger.debug(
+                                { redisPlayer: redisPlayer },
+                                `${player.id} > Redis player.`
+                            );
+                        }
                     } else {
                         updatePrisma = false;
-                        console.log(
-                            `${kickoffTime}: ${player.id} > No cache update needed.`
-                        );
+
+                        if (parentPort) {
+                            parentPort.postMessage(
+                                `${player.id} > No cache update needed.`
+                            );
+                        } else {
+                            logger.info(
+                                `${player.id} > No cache update needed.`
+                            );
+                        }
                     }
                 }
-
                 if (updatePrisma) {
                     if (isNew) {
                         goalDiff = livePlayerData.goals_scored;
@@ -208,10 +298,16 @@ const updateGoalData = async () => {
 
                     player.net_goals = netGoalDiff + player.net_goals;
 
-                    console.log(
-                        `${kickoffTime}: ${player.id} > New player data object to save.`
-                    );
-                    // logger.debug({ player: player }, 'Player');
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > New player data object to save.`
+                        );
+                    } else {
+                        logger.info(
+                            `${player.id} > New player data object to save.`
+                        );
+                        logger.debug({ player: player }, `Player object.`);
+                    }
 
                     const updatePlayerQuery = `mutation Mutation($input: updatePlayerInput!) {
                         updatePlayer(input: $input) {
@@ -219,8 +315,8 @@ const updateGoalData = async () => {
                             goals
                             own_goals
                             net_goals
-                        }
-                    }`;
+                                }
+                            }`;
 
                     const updatedPlayerInput = {
                         input: player,
@@ -231,13 +327,13 @@ const updateGoalData = async () => {
                         updatedPlayerInput
                     );
 
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Updated player.`
-                    );
-                    // logger.debug(
-                    //     { updatedPlayer: updatedPlayer },
-                    //     'Updated player.'
-                    // );
+                    if (parentPort && updatedPlayer) {
+                        parentPort.postMessage(
+                            `${player.id} > Updated player.`
+                        );
+                    } else {
+                        logger.info(`${player.id} > Updated player.`);
+                    }
 
                     const entryQuery = `query PlayerEntries($id: ID!) {
                             playerEntries(id: $id) {
@@ -259,13 +355,19 @@ const updateGoalData = async () => {
 
                     const iteratableEntries = dbEntries.playerEntries;
 
-                    console.log(
-                        `${kickoffTime}: ${player.id} > Queried entries successfully.`
-                    );
-                    // logger.debug(
-                    //     { iteratableEntries: iteratableEntries },
-                    //     'Iterable entries.'
-                    // );
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > Queried entries successfully.`
+                        );
+                    } else {
+                        logger.info(
+                            `${player.id} > Queried entries successfully.`
+                        );
+                        logger.debug(
+                            { iteratableEntries: iteratableEntries },
+                            'Iterable Entries.'
+                        );
+                    }
 
                     for (const entry of iteratableEntries) {
                         const input = {
@@ -289,22 +391,38 @@ const updateGoalData = async () => {
                             updatePoolInput
                         );
 
-                        console.log(
-                            `${kickoffTime}: ${player.id} > Entry & pool updated.`
-                        );
-                        // logger.debug(
-                        //     { updatedPool: updatedPool },
-                        //     'Updated pool.'
-                        // );
+                        if (parentPort) {
+                            parentPort.postMessage(
+                                `${player.id} > Entry & pool updated.`
+                            );
+                        } else {
+                            logger.info(`${player.id} > Entry & pool updated.`);
+                            logger.debug(
+                                { updatedPool: updatedPool },
+                                'Updated Pool'
+                            );
+                        }
                     }
                 } else {
-                    console.log(
-                        `${kickoffTime}: ${player.id} > No changes in player goals.`
+                    if (parentPort) {
+                        parentPort.postMessage(
+                            `${player.id} > No changes in player goals.`
+                        );
+                    } else {
+                        logger.info(
+                            `${player.id} > No changes in player goals.`
+                        );
+                    }
+                }
+                if (parentPort) {
+                    parentPort.postMessage(
+                        `${player.id} > Iteration ${i} complete for player ${player.id} ✅`
+                    );
+                } else {
+                    logger.info(
+                        `${player.id} > Iteration ${i} complete for player ${player.id} ✅`
                     );
                 }
-                console.log(
-                    `${kickoffTime}: ${player.id} > Iteration complete for player ${player.id}`
-                );
             }
         } catch (err) {
             if (parentPort) {
@@ -314,20 +432,17 @@ const updateGoalData = async () => {
                 parentPort.postMessage(err);
                 process.exit(1);
             } else {
-                console.error(
-                    { error: err },
-                    `${kickoffTime} > Something went wrong...`
-                );
-                // logger.trace({ error: err });
+                logger.info(`${kickoffTime} > Something went wrong...`);
+                logger.error(err);
                 process.exit(1);
             }
         }
-        if (i === 1) {
+        if (i === 2) {
             if (parentPort) {
-                parentPort.postMessage(`${kickoffTime} > Process complete...`);
                 parentPort.postMessage('done');
+                process.exit(0);
             } else {
-                console.log(`${kickoffTime} > Process complete...`);
+                logger.info(`${kickoffTime} > Process complete...`);
                 process.exit(0);
             }
         }
@@ -335,5 +450,3 @@ const updateGoalData = async () => {
 };
 
 updateGoalData();
-
-// iterate for the whole match time and then save after the iterations are done if changes are needed to be saved. !!!!

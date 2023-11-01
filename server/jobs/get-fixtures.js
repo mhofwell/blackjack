@@ -1,8 +1,20 @@
 import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
+import getLogger from '../logging/logger.js';
+
+const logger = getLogger('worker');
 
 const getWeeklyFixtures = async () => {
     await prisma.fixtures.deleteMany();
+
+    if (parentPort) {
+        parentPort.postMessage(
+            'Starting worker to collect gameweek fixtures...👷'
+        );
+    } else {
+        logger.info('Starting worker to collect gameweek fixtures...👷');
+        logger.debug({ data: data }, 'Data');
+    }
 
     let gameWeekId;
 
@@ -13,13 +25,18 @@ const getWeeklyFixtures = async () => {
 
         if (!res) {
             throw new Error(
-                'Could not fetch upcoming fixtures for next gameweek from EPL'
+                'Could not fetch upcoming fixtures for next gameweek from EPL servers.'
             );
         }
 
         const data = await res.json();
 
-        console.log('Success fetching future gameweek data.');
+        if (parentPort) {
+            parentPort.postMessage('Success fetching future gameweek data.');
+        } else {
+            logger.info('Success fetching future gameweek data.');
+            logger.debug({ data: data }, 'Data');
+        }
 
         // get the gameweekId
         gameWeekId = data[0].event;
@@ -60,29 +77,44 @@ const getWeeklyFixtures = async () => {
 
             kickoffTimesToSave.push(newEntry);
         });
-        console.log(
-            'Kickoff times fetched and sorted successfully:',
-            kickoffTimes
-        );
+
+        if (parentPort) {
+            parentPort.postMessage([
+                'Kickoff times fetched and sorted successfully.',
+            ]);
+        } else {
+            logger.info('Kickoff times fetched and sorted successfully.');
+            logger.debug({
+                kickoffTimes: kickoffTimes,
+            });
+        }
 
         const count = await prisma.fixtures.createMany({
             data: kickoffTimesToSave,
         });
-        console.log(`Count of fixtures:`, count);
+
+        const n = count.count;
+
+        if (parentPort) {
+            parentPort.postMessage(`Count of fixtures: ${n}.`);
+        } else {
+            logger.info(`Count of fixtures: ${count}.`);
+        }
     } catch (err) {
         if (parentPort) {
-            parentPort.postMessage({ error: err }, 'Something went wrong...');
-            process.exit(1);
-        } else {
-            logger.error({ error: err }, 'Something went wrong...');
+            parentPort.postMessage('Something went wrong...');
             process.exit(1);
         }
+        logger.error(err);
+        process.exit(1);
     }
     if (parentPort) {
-        parentPort.postMessage(`Updated fixtures for gameweek ${gameWeekId}.`);
+        parentPort.postMessage(
+            `Saved new fixture times for gameweek ${gameWeekId} 🚀`
+        );
         parentPort.postMessage('done');
     } else {
-        logger.info(`Updated fixtures for gameweek ${gameWeekId}`);
+        logger.info(`Saved new fixture times for gameweek ${gameWeekId} 🚀`);
         process.exit(0);
     }
 };
