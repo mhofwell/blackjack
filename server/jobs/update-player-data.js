@@ -448,5 +448,4 @@ const updateGoalData = async () => {
         }
     }, 1000);
 };
-
 updateGoalData();
