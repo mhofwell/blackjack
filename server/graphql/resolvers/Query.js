@@ -98,7 +98,7 @@ const Query = {
                 { headers: req.headers, body: req.body },
                 'All pools query request.'
             );
-            console.log('Fetching all pools.');
+            logger.info('Fetching all pools.');
             const pools = await prisma.pool.findMany({
                 include: {
                     entries: {
@@ -227,12 +227,10 @@ const Query = {
     },
     getGameweekPlayers: async (_, args, { prisma, req }) => {
         const { input } = args;
-        const gw = input.gameWeeekId;
+        const gw = input.gameWeekId;
         const kt = input.kickoffTime;
-        const n = input.numberOfFixtures;
         const players = [];
         const teamIdArray = [];
-
         try {
             logger.debug(
                 { headers: req.headers, body: req.body },
@@ -240,25 +238,23 @@ const Query = {
             );
             logger.info(`gw-worker-${kt} > Fetching all gameweek players.`);
             let res = await fetch(
-                'https://fantasy.premierleague.com/api/fixtures?future=1'
+                `https://fantasy.premierleague.com/api/fixtures?event=${gw}`
             );
 
-            if (!res) {
+            if (res === undefined || null) {
                 throw new Error(
-                    `${kt} > Cannot fetch upcoming fixture information from EPL API, check connection.`
+                    `${kt} > Cannot fetch gameweek information from EPL API, check connection.`
                 );
             }
 
-            let data = await res.json();
-
-            const weeklyFixtures = data.slice(0, n - 1);
+            const data = await res.json();
 
             logger.debug(
-                { weeklyFixtures: weeklyFixtures },
+                { data: data },
                 `gw-worker-${kt} > Weekly fixture data from EPL.`
             );
 
-            await weeklyFixtures.forEach((fixture) => {
+            await data.forEach((fixture) => {
                 if (fixture.kickoff_time === kt) {
                     teamIdArray.push(fixture.team_a);
                     teamIdArray.push(fixture.team_h);

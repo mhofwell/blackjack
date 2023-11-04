@@ -20,7 +20,8 @@ const getWeeklyFixtures = async () => {
 
     try {
         const res = await fetch(
-            `https://fantasy.premierleague.com/api/fixtures?future=1`
+            // this should be future = 1
+            `https://fantasy.premierleague.com/api/fixtures?event=11`
         );
 
         if (!res) {
@@ -96,7 +97,7 @@ const getWeeklyFixtures = async () => {
         const n = count.count;
 
         if (parentPort) {
-            parentPort.postMessage(`Count of fixtures: ${n}.`);
+            parentPort.postMessage(`Count of match times: ${n}.`);
         } else {
             logger.info(`Count of fixtures: ${count}.`);
         }

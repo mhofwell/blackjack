@@ -19,8 +19,7 @@ const updateGoalData = async () => {
     let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
 
     // const kickoffTime = '2023-11-04T15:00:00Z';
-    // const numberOfFixtures = 10;
-    // const gameWeekId = 10;
+    // const gameWeekId = 11;
 
     if (parentPort) {
         parentPort.postMessage(`Worker starting...👷 `);
@@ -31,7 +30,6 @@ const updateGoalData = async () => {
     const queryData = {
         input: {
             kickoffTime,
-            numberOfFixtures,
             gameWeekId,
         },
     };
@@ -71,6 +69,7 @@ const updateGoalData = async () => {
         try {
             // fetch gameweek players from EPL
             const res = await fetch(
+                // event {gw} live. This gets players for the gameweek
                 `https://fantasy.premierleague.com/api/event/${gameWeekId}/live/`
             );
 
@@ -271,7 +270,15 @@ const updateGoalData = async () => {
 
                         netGoalDiff = goalDiff - ownGoalDiff;
 
+                        player.net_goals = player.goals - player.own_goals;
+
                         updatePrisma = true;
+
+                        const redisPlayer = await setRedisJSON(
+                            PLAYER_KEY,
+                            player.id,
+                            player
+                        );
 
                         if (parentPort) {
                             parentPort.postMessage(
@@ -359,17 +366,20 @@ const updateGoalData = async () => {
                         logger.info(`${player.id} > Updated player.`);
                     }
 
-                    const entryQuery = `query PlayerEntries($id: ID!) {
-                            playerEntries(id: $id, kickoffTime: $kickoffTime) {
-                                id
-                                goals
-                                own_goals
-                                net_goals
-                            }
-                        }`;
+                    const entryQuery = `query PlayerEntries($playerEntriesId: Int!, $kickoffTime: String) {
+                        playerEntries(id: $playerEntriesId, kickoffTime: $kickoffTime) {
+                          id
+                          goals
+                          net_goals
+                          own_goals
+                        }
+                      }`;
+
+                    console.log('player id:', player.id);
+                    console.log('kt:', kickoffTime);
 
                     const entryQueryVariables = {
-                        id: player.id,
+                        playerEntriesId: player.id,
                         kickoffTime: kickoffTime,
                     };
 
@@ -377,6 +387,8 @@ const updateGoalData = async () => {
                         entryQuery,
                         entryQueryVariables
                     );
+
+                    console.log('dbEntries', dbEntries);
 
                     const iteratableEntries = dbEntries.playerEntries;
 
@@ -466,7 +478,6 @@ const updateGoalData = async () => {
         if (i === 180) {
             if (parentPort) {
                 parentPort.postMessage('done');
-                process.exit(0);
             } else {
                 logger.info(`${kickoffTime} > Process complete...`);
                 process.exit(0);

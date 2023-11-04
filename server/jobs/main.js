@@ -12,7 +12,7 @@ const logger = getLogger('worker');
 async function workerMessageHandler(message) {
     setTimeout(() => {
         logger.info(`${message.name} > ${message.message}`);
-    }, 1000);
+    }, 500);
 }
 
 const main = async () => {

@@ -22484,7 +22484,7 @@ const testData = {
             id: 526,
             stats: {
                 minutes: 90,
-                goals_scored: 0,
+                goals_scored: 1,
                 assists: 0,
                 clean_sheets: 0,
                 goals_conceded: 1,

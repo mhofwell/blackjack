@@ -2,12 +2,17 @@ import path from 'path';
 import Bree from 'bree';
 import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
-import getLogger from '../logging/logger.js';
+import dayjs from 'dayjs';
 
+import getLogger from '../logging/logger.js';
 const logger = getLogger('worker');
 
 const createGoalUpdateJobs = async () => {
     const fixtures = await prisma.fixtures.findMany();
+
+    if (fixtures.length < 0) {
+        throw new Error('No fixtures found.');
+    }
 
     if (parentPort) {
         parentPort.postMessage(
@@ -21,12 +26,12 @@ const createGoalUpdateJobs = async () => {
         '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
 
     let newCronJobs = [];
-
+    // could you return this forEach into a variable? Maybe use .map instead.
     fixtures.forEach((fixture) => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
             path: path.join(appDir + '/jobs', 'update-player-data.js'),
-            date: new Date(fixture.kickoff_time),
+            date: dayjs(fixture.kickoff_time).toDate(),
             // interval: '10s',
             outputWorkerMetadata: false,
             worker: {
@@ -37,8 +42,13 @@ const createGoalUpdateJobs = async () => {
                 },
             },
         });
+        // you don't have to return this value here. Edit for next.
         return newCronJobs;
     });
+
+    if (newCronJobs.length !== fixtures.length) {
+        throw new Error('Something went wrong creating cron jobs.');
+    }
 
     if (parentPort) {
         parentPort.postMessage(
@@ -63,7 +73,7 @@ const createGoalUpdateJobs = async () => {
                 );
                 cron.stop();
             }
-        }, 1000);
+        }, 500);
     }
 
     const cron = new Bree({
@@ -78,21 +88,26 @@ const createGoalUpdateJobs = async () => {
             // workerMetadata will be populated with extended worker information only if
             // Bree instance is initialized with parameter `workerMetadata: true
             if (workerMetadata.threadId) {
-                logger.info(
-                    `There was an error while running a worker ${workerMetadata.name} with thread ID: ${workerMetadata.threadId}`
+                logger.warn(
+                    `There was an warn while running a worker ${workerMetadata.name} with thread ID: ${workerMetadata.threadId}`
                 );
             } else {
-                logger.info(
+                logger.warn(
                     `There was an error while running worker [ ${workerMetadata.name} ]`
                 );
             }
             logger.error(error);
         },
     });
+
     if (parentPort) {
-        parentPort.postMessage('Jobs to update player data started...');
+        parentPort.postMessage(
+            `${newCronJobs.length} jobs to update player data queued...`
+        );
     } else {
-        logger.info('Jobs to update player data started...');
+        logger.info(
+            `${newCronJobs.length} jobs to update player data queued...`
+        );
     }
     await cron.start();
 };

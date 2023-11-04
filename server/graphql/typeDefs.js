@@ -6,7 +6,7 @@ export const typeDefs = gql`
         login(pw: String!, fn: String!, ln: String!): User!
         allEntries: [Entry!]!
         entry(id: ID!): Entry!
-        playerEntries(id: ID!, kickoffTime: String): [Entry!]!
+        playerEntries(id: Int!, kickoffTime: String): [Entry!]!
         pools: [Pool!]!
         pool(id: ID!): Pool!
         allPlayers: [Player!]!
@@ -44,7 +44,6 @@ export const typeDefs = gql`
 
     input getGameweekPlayers {
         kickoffTime: String!
-        numberOfFixtures: Int!
         gameWeekId: Int!
     }
 
