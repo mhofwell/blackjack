@@ -282,15 +282,15 @@ const updateGoalData = async () => {
 
                         if (parentPort) {
                             parentPort.postMessage(
-                                `${player.id} > Updated player in cache`
+                                `${player.id} > Goal stats changed, player updated in cache.`
                             );
                         } else {
                             logger.info(
-                                `${player.id} > Updated player in cache`
+                                `${player.id} > Goal stats changed, player updated in cache.`
                             );
                             logger.debug(
                                 { redisPlayer: redisPlayer },
-                                `${player.id} > Redis player.`
+                                `${player.id} > Redis cache player.`
                             );
                         }
                     } else {
@@ -331,12 +331,13 @@ const updateGoalData = async () => {
 
                     if (parentPort) {
                         parentPort.postMessage(
-                            `${player.id} > New player data object to save.`
+                            `${player.id} > Change in goals detected during the match.`
                         );
                     } else {
                         logger.info(
-                            `${player.id} > New player data object to save.`
+                            `${player.id} > Change in goals detected during the match.`
                         );
+
                         logger.debug({ player: player }, `Player object.`);
                     }
 
@@ -360,7 +361,7 @@ const updateGoalData = async () => {
 
                     if (parentPort && updatedPlayer) {
                         parentPort.postMessage(
-                            `${player.id} > Updated player.`
+                            `${player.id} > Updated player with new goal data in db.`
                         );
                     } else {
                         logger.info(`${player.id} > Updated player.`);
@@ -375,9 +376,6 @@ const updateGoalData = async () => {
                         }
                       }`;
 
-                    console.log('player id:', player.id);
-                    console.log('kt:', kickoffTime);
-
                     const entryQueryVariables = {
                         playerEntriesId: player.id,
                         kickoffTime: kickoffTime,
@@ -388,17 +386,15 @@ const updateGoalData = async () => {
                         entryQueryVariables
                     );
 
-                    console.log('dbEntries', dbEntries);
-
                     const iteratableEntries = dbEntries.playerEntries;
 
                     if (parentPort) {
                         parentPort.postMessage(
-                            `${player.id} > Queried entries successfully.`
+                            `${player.id} > Queried for entries the player is in successfully.`
                         );
                     } else {
                         logger.info(
-                            `${player.id} > Queried entries successfully.`
+                            `${player.id} > Queried for entries the player is in successfully.`
                         );
                         logger.debug(
                             { iteratableEntries: iteratableEntries },
@@ -433,10 +429,12 @@ const updateGoalData = async () => {
 
                         if (parentPort) {
                             parentPort.postMessage(
-                                `${player.id} > Pool updated.`
+                                `${player.id} > Pool standings and entries updated.`
                             );
                         } else {
-                            logger.info(`${player.id} > Pool updated.`);
+                            logger.info(
+                                `${player.id} > Pool standings and entries updated.`
+                            );
                             logger.debug(
                                 { updatedPool: updatedPool },
                                 'Updated Pool Object'
@@ -475,7 +473,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 180) {
+        if (i === 70) {
             if (parentPort) {
                 parentPort.postMessage('done');
             } else {

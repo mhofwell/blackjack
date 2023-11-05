@@ -40,7 +40,11 @@ const main = async () => {
         },
     });
 
-    const graceful = new Graceful({ brees: [cron] });
+    const graceful = new Graceful({
+        brees: [cron],
+        logger: logger,
+        hideMeta: false,
+    });
     graceful.listen();
 
     cron.start();
