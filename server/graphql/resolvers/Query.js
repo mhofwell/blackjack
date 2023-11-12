@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import getLogger from '../../logging/logger.js';
+import sortByNetGoalsDsc from '../../utils/sort-net-goals.js';
 
 const logger = getLogger('api');
 
@@ -112,6 +113,12 @@ const Query = {
             });
             logger.info('Fetched all pools successfully.');
             logger.debug({ pools: pools }, 'Pools');
+
+            // pools.forEach((pool) => {
+            //     pool.entries.sort(sortByNetGoalsDsc);
+            //     console.log(pool.entries);
+            // });
+
             return pools;
         } catch (err) {
             logger.warn(`Something went wrong fetching all pools.`);

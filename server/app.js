@@ -52,7 +52,7 @@ const port = process.env.NODE_PORT || '8090';
 // Create WebSocket server using the HTTP server we just set up.
 const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/subscription',
+    path: '/graphql',
 });
 
 // Save returned server's info so we can shutdown this server later

@@ -1,6 +1,40 @@
 import prisma from './client.js';
 
+import sortByNetGoalsDsc from '../utils/sort-net-goals.js';
 import { fnln, picks, users } from './seed-data.js';
+
+async function sortPools() {
+    const poolsToSort = await prisma.pool.findMany({
+        include: {
+            entries: true,
+        },
+    });
+    console.log('PTS', poolsToSort);
+
+    for (const pool of poolsToSort) {
+        const sortedEntries = pool.entries.sort(sortByNetGoalsDsc);
+
+        // update the rank of each entry
+        let i = 0;
+
+        for (const entry of sortedEntries) {
+            i = i + 1;
+            const res = await prisma.entry.update({
+                where: {
+                    id: entry.id,
+                },
+                data: {
+                    standing: i,
+                },
+                include: {
+                    players: true,
+                    user: true,
+                },
+            });
+            console.log(res);
+        }
+    }
+}
 
 async function main() {
     // setup the players array
@@ -226,9 +260,6 @@ async function main() {
 
         // Entry data
         const data = {
-            // season: user.entry.season,
-            // league: user.entry.league,
-            // region: user.entry.region,
             pool: {
                 connect: {
                     id: poolId.id,
@@ -302,6 +333,8 @@ async function main() {
 }
 main()
     .then(async () => {
+        await sortPools();
+        console.log('Sorted.');
         await prisma.$disconnect();
     })
     .catch(async (e) => {
