@@ -53,14 +53,9 @@ export default function Pool({ pool, logger }) {
 
     useEffect(() => {
         if (data) {
-            // logger.info('POOL_SUBSCRIPTION data recieved in Pool component.');
             data.poolUpdated.id === poolState.id
                 ? setPoolState(data.poolUpdated)
                 : null;
-            // logger.debug(
-            //     { data: data },
-            //     'Updated pool with POOL_SUBSCRIPTION data.'
-            // );
         }
     }, [data]);
 

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 export default function Entry({ entry, logger }) {
     const [entryState, setEntryState] = useState(entry);
     const name = `${entryState.user.fn} ${entryState.user.ln}`;
-    const rankString = `Rank: ${entryState.standing}`;
+    const rank = `Rank: ${entryState.standing}`;
 
     useEffect(() => {
         setEntryState(entry);
@@ -15,7 +15,7 @@ export default function Entry({ entry, logger }) {
         <>
             <div className="grid grid-cols-6 gap-4 h-30 bg-orange py-4">
                 <div className="flex flex-row items-center justify-center">
-                    <div>{rankString}</div>
+                    <div>{rank}</div>
                 </div>
                 <div className="flex flex-row items-center justify-start col-start-2 col-span-2">
                     <div>{name}</div>
