@@ -10,6 +10,8 @@ import { WebSocketServer } from 'ws';
 import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 // redis
 import pubsub from './utils/redis/pubsub.js';
@@ -41,6 +43,11 @@ const schema = makeExecutableSchema({
         Mutation,
         Subscription,
     },
+});
+
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 20,
 });
 
 // Create an Express app and HTTP server; attach both the WebSocket
@@ -92,6 +99,8 @@ const main = async () => {
     // Apollo/GraphQL server start.
     await server.start();
 
+    console.log(process.env.NODE_ENV.toUpperCase());
+
     if (server) {
         logger.info(
             `Apollo/GraphQL API is now live on endpoint: ${port}/graphql`
@@ -105,6 +114,8 @@ const main = async () => {
     app.use(
         '/graphql',
         cors(),
+        helmet(),
+        limiter,
         bodyParser.json(),
         expressMiddleware(server, {
             context: async ({ req }) => {
@@ -112,6 +123,7 @@ const main = async () => {
             },
         })
     );
+
     // WS server start
     httpServer.listen(port, () => {
         logger.info(

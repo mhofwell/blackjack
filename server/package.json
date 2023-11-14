@@ -9,8 +9,8 @@
     "type": "module",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon app.js",
-        "eplApi": "node testing/epl-api.js"
+        "dev": "NODE_ENV=development nodemon app.js",
+        "prod": "NODE_ENV=produdction node app.js"
     },
     "author": "",
     "license": "ISC",
@@ -29,11 +29,13 @@
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "express-pino-logger": "^7.0.0",
+        "express-rate-limit": "^7.1.4",
         "fs": "^0.0.1-security",
         "graphql": "^16.8.0",
         "graphql-redis-subscriptions": "^2.6.0",
         "graphql-subscriptions": "^2.0.0",
         "graphql-ws": "^5.14.0",
+        "helmet": "^7.1.0",
         "ms": "^2.1.3",
         "multer": "^1.4.5-lts.1",
         "node": "^20.5.0",

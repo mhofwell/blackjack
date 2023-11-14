@@ -1,0 +1,25 @@
+version: '3'
+services: 
+  # db: 
+  #   container_name: epostgres
+  #   image: postgres
+  #   environment:
+  #     - POSTGRES_PASSWORD=test1
+  #     - POSTGRES_USER=admin
+  #     - POSTGRES_DB=eplbj
+  #   ports:
+  #     - 9000:5432
+  # cache: 
+  #   container_name: eplbj-redis
+  #   image: redis/redis-stack-server
+  #   ports: 
+  #     - 6379:6379
+  #   environment:
+  #     - REDIS_HOST=cache
+  app: 
+    image: eserver
+    ports: 
+    # LOCAL PORT:DOCKER CONTAINER PORT
+      - 8080:8080
+    # depends_on:
+    #   - db
