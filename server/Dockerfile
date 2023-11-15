@@ -13,11 +13,8 @@ COPY . .
 
 # Install node packages, install serve, build the app, and remove dependencies at the end
 RUN npm install 
-    # && npm install -g serve \
-    # && npm run build \
-    # && rm -fr node_modules
 
 EXPOSE 8080
 
 # Start the app using serve command
-CMD [ "node", "app.js" ]
+CMD [ "npm", "run", "prod" ]

@@ -29,7 +29,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { ApolloServer } from '@apollo/server';
 
 // utils
-import { pingPrisma, pingEpl } from './utils/services.js';
+import { pingEpl } from './utils/services.js';
 
 // logger
 import getLogger from './logging/logger.js';
@@ -132,13 +132,13 @@ const main = async () => {
     });
 
     // Prisma ping.
-    const data = await pingPrisma();
+    // const data = await pingPrisma();
 
-    if (data.name !== 'prisma') {
-        logger.error('Cannot connect to PRISMA');
-    } else {
-        logger.info('Connected to PRISMA!');
-    }
+    // if (data.name !== 'prisma') {
+    //     logger.error('Cannot connect to PRISMA');
+    // } else {
+    //     logger.info('Connected to PRISMA!');
+    // }
 
     // EPL ping.
     const payload = await pingEpl();
