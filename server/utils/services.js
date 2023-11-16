@@ -19,10 +19,10 @@ const pingEpl = async () => {
 // const pingPrisma = async () => {
 //     const prisma = new PrismaClient();
 //     try {
-//      const data = await prisma.players.findFirst(); 
-//      if (data){
-//          return data;
-//      }
+//         const data = await prisma.players.findFirst();
+//         if (data) {
+//             return data;
+//         }
 //     } catch (err) {
 //         console.error(err);
 //     }

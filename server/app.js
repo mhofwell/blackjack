@@ -98,7 +98,7 @@ const server = new ApolloServer({
 const main = async () => {
     // Apollo/GraphQL server start.
     await server.start();
-
+  
     console.log(process.env.NODE_ENV.toUpperCase());
 
     if (server) {
@@ -124,21 +124,16 @@ const main = async () => {
         })
     );
 
+    app.get('/health', (req, res) => {
+        res.status(200).send('Okay!');
+    });
+
     // WS server start
     httpServer.listen(port, () => {
         logger.info(
             `Apollo/GraphQL websocket service is live on endpoint: ${port}/graphql`
         );
     });
-
-    // Prisma ping.
-    // const data = await pingPrisma();
-
-    // if (data.name !== 'prisma') {
-    //     logger.error('Cannot connect to PRISMA');
-    // } else {
-    //     logger.info('Connected to PRISMA!');
-    // }
 
     // EPL ping.
     const payload = await pingEpl();

@@ -16,5 +16,5 @@ RUN npm install
 
 EXPOSE 8080
 
-# Start the app using serve command
-CMD [ "npm", "run", "prod" ]
+# Start the container
+CMD [ "npm", "run", "prod"]

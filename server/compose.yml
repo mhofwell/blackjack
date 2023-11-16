@@ -1,9 +1,8 @@
 version: '3.8'
 services: 
   db: 
-    # container_name: db-postgres
     container_name: docker-postgres
-    hostname: postgres
+    # hostname: postgres
     image: postgres:16
     ports:
       - 5433:5432
@@ -38,8 +37,15 @@ services:
     environment:
       - REDIS_HOST=redis-stack-server
 
+  migrate:
+    image: server
+    command: npx prisma migrate dev --name init
+    depends_on: 
+      db: 
+        condition: service_healthy
+
   api:
-    container_name: express_api 
+    container_name: express-api 
     image: server
     ports: 
     # LOCAL PORT:DOCKER CONTAINER PORT
@@ -49,4 +55,22 @@ services:
       db: 
         condition: service_healthy
       redis: 
+        condition: service_healthy
+      migrate: 
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "utils/healthcheck-express.js"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+      start_period: 5s
+    
+  client:
+    # containter_name: next_client
+    image: client
+    ports: 
+      - ${CLIENT_PORT}:3000
+    restart: always
+    depends_on: 
+      api: 
         condition: service_healthy

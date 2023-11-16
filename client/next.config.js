@@ -6,7 +6,7 @@ const nextConfig = {
         serverComponentsExternalPackages: ['@logtail/pino', 'pino'],
     },
     env: {
-        GQL_SERVER: 'http://localhost:8080/graphql',
+        GQL_SERVER: 'http://express-api:8080/graphql',
         LOGFLARE_ACCESS_TOKEN: 'wmg0R5_uFwzq',
         BETTERSTACK_TOKEN_CLIENT: 'psgFFB17v9xfYhUYw7EKGGzt',
     },

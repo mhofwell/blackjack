@@ -46,6 +46,7 @@ const POOL_QUERY = gql`
 
 export default async function Home() {
     const { data, error } = await getClient().query({ query: POOL_QUERY });
+    
     if (error) {
         console.error('POOL_QUERY failed.', error);
     }

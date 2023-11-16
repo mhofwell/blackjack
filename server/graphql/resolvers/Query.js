@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import getLogger from '../../logging/logger.js';
-import sortByNetGoalsDsc from '../../utils/sort-net-goals.js';
 
 const logger = getLogger('api');
 
@@ -16,7 +15,7 @@ const Query = {
             logger.info(`Fetching user ${id}`);
             const user = await prisma.user.findUnique({
                 where: {
-                    id: ids,
+                    id: id,
                 },
                 include: {
                     entries: {
@@ -113,11 +112,6 @@ const Query = {
             });
             logger.info('Fetched all pools successfully.');
             logger.debug({ pools: pools }, 'Pools');
-
-            // pools.forEach((pool) => {
-            //     pool.entries.sort(sortByNetGoalsDsc);
-            //     console.log(pool.entries);
-            // });
 
             return pools;
         } catch (err) {
