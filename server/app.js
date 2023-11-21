@@ -29,7 +29,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { ApolloServer } from '@apollo/server';
 
 // utils
-import { pingEpl } from './utils/services.js';
+// import { pingEpl } from './utils/services.js';
 
 // logger
 import getLogger from './logging/logger.js';
@@ -136,13 +136,13 @@ const main = async () => {
     });
 
     // EPL ping.
-    const payload = await pingEpl();
-    if (payload.status !== 200) {
-        logger.info(`EPL API connection status: ${payload.status}`);
-        logger.warn('Cannot access EPL servers.');
-    } else {
-        logger.info(`EPL API connection status: ${payload.status}`);
-    }
+    // const payload = await pingEpl();
+    // if (payload.status !== 200) {
+    //     logger.info(`EPL API connection status: ${payload.status}`);
+    //     logger.warn('Cannot access EPL servers.');
+    // } else {
+    //     logger.info(`EPL API connection status: ${payload.status}`);
+    // }
 };
 
 main();

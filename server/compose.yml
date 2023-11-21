@@ -38,7 +38,7 @@ services:
       - REDIS_HOST=redis-stack-server
 
   migrate:
-    image: server
+    image: server:m1
     command: npx prisma migrate dev --name init
     depends_on: 
       db: 
@@ -46,7 +46,7 @@ services:
 
   api:
     container_name: express-api 
-    image: server
+    image: server:m1
     ports: 
     # LOCAL PORT:DOCKER CONTAINER PORT
       - ${NODE_PORT}:8080
@@ -67,10 +67,11 @@ services:
     
   client:
     # containter_name: next_client
-    image: client
+    image: client:m1
     ports: 
       - ${CLIENT_PORT}:3000
     restart: always
     depends_on: 
       api: 
         condition: service_healthy
+
