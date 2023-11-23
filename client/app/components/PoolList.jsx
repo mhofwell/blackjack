@@ -1,6 +1,8 @@
 import Pool from './Pool';
 
 export default function PoolList({ pools, logger }) {
+
+    
     return (
         <div>
             {pools.map((pool) => {

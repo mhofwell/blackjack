@@ -11,12 +11,12 @@ import { createClient } from 'graphql-ws';
 
 const wsLink = new GraphQLWsLink(
     createClient({
-        url: 'http://express-api:8080/graphql',
+        url: 'http://localhost:8080/graphql',
     })
 );
 
 const httpLink = new HttpLink({
-    uri: 'http://express-api:8080/graphql',
+    uri: 'http://localhost:8080/graphql',
 });
 
 const splitLink = split(
