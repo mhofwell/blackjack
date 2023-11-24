@@ -47,9 +47,11 @@ const POOL_QUERY = gql`
 export default async function Home() {
     let pools;
 
-    const { data, error } = await getClient().query({ query: POOL_QUERY });
+    const { data, error, loading } = await getClient().query({
+        query: POOL_QUERY,
+    });
 
-    if (error || !pools) {
+    if (error || !data) {
         pools = [];
         console.error('POOL_QUERY failed.', error);
     }
@@ -63,6 +65,15 @@ export default async function Home() {
 
     return (
         <main>
+            {loading ? (
+                <p>Loading</p>
+            ) : error ? (
+                <p>Something happened!</p>
+            ) : data ? (
+                <p>You've got mail!</p>
+            ) : (
+                <p>No</p>
+            )}
             <PoolList pools={pools} />
         </main>
     );
