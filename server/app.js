@@ -13,6 +13,9 @@ import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
+// test services
+import { pingRedis } from './utils/services.js';
+
 // redis
 import pubsub from './utils/redis/pubsub.js';
 
@@ -29,7 +32,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { ApolloServer } from '@apollo/server';
 
 // Constants
-import { NODE_PORT } from './config.js';
+import { NODE_PORT, REDIS_HOST, REDIS_PORT } from './config.js';
 
 // env
 import 'dotenv/config.js';
@@ -136,6 +139,10 @@ const main = async () => {
             `Apollo/GraphQL websocket service is live on endpoint: ${NODE_PORT}/graphql`
         );
     });
+
+    setTimeout(() => {
+        pingRedis();
+    }, 1000);
 };
 
 main();

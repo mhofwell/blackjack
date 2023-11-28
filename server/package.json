@@ -9,8 +9,8 @@
     "type": "module",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "export NODE_ENV=development node app.js",
-        "prod": "export NODE_ENV=production && node app.js",
+        "dev": "NODE_ENV=development node app.js",
+        "prod": "export NODE_ENV=production && prisma generate && node app.js",
         "railway": "sleep 3 && npm run prod",
         "healthcheck": "node utils/healthcheck-express.js"
     },

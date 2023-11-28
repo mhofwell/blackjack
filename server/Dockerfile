@@ -1,4 +1,4 @@
-# Start your image with a node base image
+# Start with a node base image
 FROM node:21
 
 ENV NPM_CONFIG_UPDATE_NOTIFIER false

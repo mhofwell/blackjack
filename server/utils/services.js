@@ -1,4 +1,8 @@
+import client from './redis/client.js';
 import { PrismaClient } from '@prisma/client';
+import getLogger from '../logging/logger.js';
+
+const logger = getLogger('express');
 
 const pingEpl = async () => {
     try {
@@ -28,4 +32,12 @@ const pingEpl = async () => {
 //     }
 // };
 
-export { pingEpl };
+const pingRedis = async () => {
+    await client.connect();
+    const res = await client.ping();
+    res === 'PONG'
+        ? logger.info(`Redis connected! ${res}`)
+        : logger.warn('Redis not connected.');
+};
+
+export { pingEpl, pingRedis };
