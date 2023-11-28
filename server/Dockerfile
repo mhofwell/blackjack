@@ -11,10 +11,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install node packages
-RUN npm install 
+RUN npm ci  
 
 # Copy local directories to the current local directory of our docker image (/app)
-COPY . ./
+COPY . .
 
 # Expose the server port
 EXPOSE 8080
