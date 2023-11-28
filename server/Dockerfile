@@ -20,4 +20,4 @@ COPY . ./
 EXPOSE 8080
 
 # Start the container
-CMD [ "sleep", "3", "&&", "npm", "run", "prod"]
+CMD [ "npm", "run", "prod"]
