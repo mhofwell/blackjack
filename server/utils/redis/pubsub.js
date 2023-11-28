@@ -12,8 +12,9 @@ import {
 const options = {
     host: REDIS_HOST,
     port: REDIS_PORT,
-    // username: REDIS_USER,
-    // password: REDIS_PASSWORD,
+    username: REDIS_USER,
+    password: REDIS_PASSWORD,
+    family: 0, 
     retryStrategy: (times) => {
         // reconnect after
         return Math.min(times * 50, 2000);
