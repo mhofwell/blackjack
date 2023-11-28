@@ -16,6 +16,8 @@ RUN npm ci
 # Copy local directories to the current local directory of our docker image (/app)
 COPY . .
 
+RUN npx prisma generate
+
 # Expose the server port
 EXPOSE 8080
 
