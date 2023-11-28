@@ -34,6 +34,8 @@ import { ApolloServer } from '@apollo/server';
 // Constants
 import { NODE_PORT, REDIS_HOST, REDIS_PORT } from './config.js';
 
+console.log(REDIS_HOST, REDIS_PORT);
+
 // env
 import 'dotenv/config.js';
 
