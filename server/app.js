@@ -40,10 +40,10 @@ logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
 
 if (process.env.NODE_ENV === 'production') {
     process.env.DATABASE_URL = process.env.DATABASE_URL_PROD;
-    process.env.REDISHOST = process.env.REDIS_HOST_PROD;
+    process.env.REDIS_HOST = process.env.REDIS_HOST_PROD;
 } else {
     process.env.DATABASE_URL = process.env.DATABASE_URL_DEV;
-    process.env.REDISHOST = process.env.REDIS_HOST_DEV;
+    process.env.REDIS_HOST = process.env.REDIS_HOST_DEV;
 }
 
 const schema = makeExecutableSchema({
