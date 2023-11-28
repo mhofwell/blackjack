@@ -1,6 +1,13 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { Redis } from 'ioredis';
 
+import {
+    REDIS_USER,
+    REDIS_PASSWORD,
+    REDIS_HOST,
+    REDIS_PORT,
+} from '../../config.js';
+
 // Constants
 import { REDIS_HOST, REDIS_PORT } from '../../config.js';
 
