@@ -4,10 +4,11 @@ import { Redis } from 'ioredis';
 // Constants
 import { REDIS_HOST, REDIS_PORT } from '../../config.js';
 
-
 const options = {
     host: REDIS_HOST,
     port: REDIS_PORT,
+    username: REDIS_USER,
+    password: REDIS_PASSWORD,
     retryStrategy: (times) => {
         // reconnect after
         return Math.min(times * 50, 2000);
