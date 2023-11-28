@@ -2,11 +2,13 @@ import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
 
+import { REDIS_HOST, REDIS_PORT } from '../../config';
+
 dotenv.config();
 
 const options = {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
+    host: REDIS_HOST,
+    port: REDIS_PORT,
     retryStrategy: (times) => {
         // reconnect after
         return Math.min(times * 50, 2000);
