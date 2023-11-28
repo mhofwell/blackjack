@@ -28,13 +28,23 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { ApolloServer } from '@apollo/server';
 
-// utils
-// import { pingEpl } from './utils/services.js';
+// env
+import 'dotenv/config.js';
 
 // logger
 import getLogger from './logging/logger.js';
 
 const logger = getLogger('express');
+
+logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
+
+if (process.env.NODE_ENV === 'production') {
+    process.env.DATABASE_URL = process.env.DATABASE_URL_PROD;
+    process.env.REDIS_HOST = process.env.REDIS_HOST_PROD;
+} else {
+    process.env.DATABASE_URL = process.env.DATABASE_URL_PROD;
+    process.env.REDIS_HOST = process.env.REDIS_HOST_PROD;
+}
 
 const schema = makeExecutableSchema({
     typeDefs,
@@ -54,6 +64,7 @@ const limiter = rateLimit({
 // server and the ApolloServer to this HTTP server.
 const app = express();
 const httpServer = createServer(app);
+
 const port = process.env.NODE_PORT || '8090';
 
 // Create WebSocket server using the HTTP server we just set up.
@@ -98,8 +109,6 @@ const server = new ApolloServer({
 const main = async () => {
     // Apollo/GraphQL server start.
     await server.start();
-  
-    console.log(process.env.NODE_ENV.toUpperCase());
 
     if (server) {
         logger.info(
@@ -134,15 +143,6 @@ const main = async () => {
             `Apollo/GraphQL websocket service is live on endpoint: ${port}/graphql`
         );
     });
-
-    // EPL ping.
-    // const payload = await pingEpl();
-    // if (payload.status !== 200) {
-    //     logger.info(`EPL API connection status: ${payload.status}`);
-    //     logger.warn('Cannot access EPL servers.');
-    // } else {
-    //     logger.info(`EPL API connection status: ${payload.status}`);
-    // }
 };
 
 main();

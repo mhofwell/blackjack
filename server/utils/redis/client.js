@@ -1,7 +1,7 @@
 import redis from 'redis';
 import 'dotenv/config';
 
-doteng.config();
+dotenv.config();
 
 let port = process.env.REDIS_PORT;
 let host = process.env.REDIS_HOST;
