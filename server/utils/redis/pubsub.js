@@ -3,8 +3,8 @@ import { Redis } from 'ioredis';
 
 // Constants
 import {
-    // REDIS_USER,
-    // REDIS_PASSWORD,
+    REDIS_USER,
+    REDIS_PASSWORD,
     REDIS_HOST,
     REDIS_PORT,
 } from '../../config.js';
