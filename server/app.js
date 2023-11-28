@@ -46,8 +46,6 @@ if (process.env.NODE_ENV === 'production') {
     process.env.REDISHOST = process.env.REDIS_HOST_DEV;
 }
 
-console.log(text);
-
 const schema = makeExecutableSchema({
     typeDefs,
     resolvers: {
