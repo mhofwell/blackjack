@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install node packages
-RUN npm ci 
+RUN npm install 
 
 # Copy local directories to the current local directory of our docker image (/app)
 COPY . ./
