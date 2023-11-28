@@ -1,10 +1,9 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { Redis } from 'ioredis';
-import dotenv from 'dotenv';
 
+// Constants
 import { REDIS_HOST, REDIS_PORT } from '../../config.js';
 
-dotenv.config();
 
 const options = {
     host: REDIS_HOST,
