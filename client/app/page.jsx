@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { getClient } from './apollo/client';
 import getLogger from './logger/logger.js';
 
-export const revalidate = 1;
+// export const revalidate = 1;
 
 const logger = getLogger('client');
 
@@ -45,36 +45,41 @@ const POOL_QUERY = gql`
 `;
 
 export default async function Home() {
-    let pools;
+    let pools = [];
 
-    const { data, error, loading } = await getClient().query({
+    const { data, loading } = await getClient().query({
         query: POOL_QUERY,
+        context: {
+            fetchOptions: {
+                next: { revalidate: 1 },
+            },
+        },
     });
 
-    if (error || !data) {
-        pools = [];
-        console.error('POOL_QUERY failed.', error);
-    }
-
-    if (data) {
-        console.log('POOL_QUERY executed successfully.');
+    if (data.pools) {
+        logger.info('Data:', data);
         pools = data.pools;
+    } else {
+        logger.info('Could not reach server.');
     }
 
-    logger.error({ error: error }, 'error!');
+    // if (errors || !data) {
+    //     pools = [];
+    //     console.error('POOL_QUERY failed.', errors);
+    // }
+
+    // if (data) {
+    //     logger.info('POOL_QUERY executed successfully.');
+    //     console.log('data', data);
+    //     logger.info('POOL_QUERY executed successfully.');
+    //     pools = data.pools;
+    // }
+
+    if (loading) return <span>loading...</span>;
 
     return (
         <main>
-            {loading ? (
-                <p>Loading</p>
-            ) : error ? (
-                <p>Something happened!</p>
-            ) : data ? (
-                <p>You've got mail!</p>
-            ) : (
-                <p>No</p>
-            )}
-            <PoolList pools={pools} />
+            {data ? <PoolList pools={pools} /> : <p>Something went wrong.</p>}
         </main>
     );
 }

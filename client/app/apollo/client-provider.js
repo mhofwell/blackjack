@@ -1,5 +1,4 @@
 'use client';
-import { setVerbosity } from 'ts-invariant';
 import { HttpLink, split, ApolloLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import {
@@ -13,12 +12,12 @@ import { createClient } from 'graphql-ws';
 
 const wsLink = new GraphQLWsLink(
     createClient({
-        url: 'ws://express-api:8080/graphql',
+        url: 'ws://localhost:8080/graphql',
     })
 );
 
 const httpLink = new HttpLink({
-    uri: 'http://express-api:8080/graphql',
+    uri: 'http://localhost:8080/graphql',
 });
 
 const splitLink = split(
