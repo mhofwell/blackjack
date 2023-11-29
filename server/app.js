@@ -102,11 +102,10 @@ const server = new ApolloServer({
     ],
 });
 
-logger.info('DB URL', process.env.DATABASE_URL);
-
 const main = async () => {
     // Apollo/GraphQL server start.
     await server.start();
+    logger.info('DB URL', process.env.DATABASE_URL);
 
     if (server) {
         logger.info(
