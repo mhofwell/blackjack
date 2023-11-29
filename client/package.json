@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "export API_URL=http://localhost:8080/graphql && next dev",
         "build:production": "export API_URL=process.env.API_URL_PUBLIC && next build",
-        "start": "export API_URL=process.env.process.eng.API_PRIVATE_URL && next start",
+        "start": "export API_URL=process.env.process.eng.API_URL_PRIVATE && next start",
         "lint": "next lint"
     },
     "dependencies": {
