@@ -1,5 +1,4 @@
 import client from './redis/client.js';
-import { PrismaClient } from '@prisma/client';
 import getLogger from '../logging/logger.js';
 
 const logger = getLogger('express');
@@ -20,26 +19,14 @@ const pingEpl = async () => {
     }
 };
 
-// const pingPrisma = async () => {
-//     const prisma = new PrismaClient();
-//     try {
-//         const data = await prisma.players.findFirst();
-//         if (data) {
-//             return data;
-//         }
-//     } catch (err) {
-//         console.error(err);
-//     }
-// };
-
 const pingRedis = async () => {
-    try {
+    // try {
         await client.connect();
         const res = await client.ping();
         logger.info(`Redis connected! ${res}`);
-    } catch (err) {
-        logger.error({ error: err }, 'Redis failed to connect.');
-    }
+    // } catch (err) {
+    //     logger.error({ error: err }, 'Redis failed to connect.');
+    // }
     client.quit();
 };
 
