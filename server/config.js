@@ -1,5 +1,5 @@
-const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
-const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const REDIS_HOST = process.env.REDIS_HOST 
+const REDIS_PORT = process.env.REDIS_PORT 
 const REDIS_USER = process.env.REDIS_USER || '';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
 const CLIENT_PORT = process.env.CLIENT_PORT || 3000;

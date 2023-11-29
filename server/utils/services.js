@@ -33,11 +33,14 @@ const pingEpl = async () => {
 // };
 
 const pingRedis = async () => {
-    await client.connect();
-    const res = await client.ping();
-    res === 'PONG'
-        ? logger.info(`Redis connected! ${res}`)
-        : logger.warn('Redis not connected.');
+    try {
+        await client.connect();
+        const res = await client.ping();
+        logger.info(`Redis connected! ${res}`);
+    } catch (err) {
+        logger.error({ error: err }, 'Redis failed to connect.');
+    }
+    client.quit();
 };
 
 export { pingEpl, pingRedis };
