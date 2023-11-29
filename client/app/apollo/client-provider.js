@@ -14,13 +14,6 @@ import { createClient } from 'graphql-ws';
 
 import { API_URL_STRING, WS_URL_STRING } from '@/config.js';
 
-console.log(process.env.API_HOST);
-console.log(process.env.API_URL_PRIVATE);
-
-console.log('NODE', process.env.NODE_ENV);
-console.log('NODE', process.env.API_URL_STRING);
-console.log('NODE', process.env.NODE_ENV);
-
 const wsLink = new GraphQLWsLink(
     createClient({
         url: WS_URL_STRING,

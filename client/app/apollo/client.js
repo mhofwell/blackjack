@@ -13,7 +13,8 @@ import { createClient } from 'graphql-ws';
 
 import { API_URL_STRING, WS_URL_STRING } from '@/config';
 
-console.log(API_URL_STRING, WS_URL_STRING);
+console.log('API', API_URL_STRING);
+console.log('WS', WS_URL_STRING);
 
 const wsLink = new GraphQLWsLink(
     createClient({
