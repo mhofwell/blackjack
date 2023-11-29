@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "build:production": "export API_URL=$API_PUBLIC_URL && next build",
+    "start": "export API_URL=$API_PRIVATE_URL && next start",
     "lint": "next lint"
   },
   "dependencies": {

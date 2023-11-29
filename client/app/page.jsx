@@ -56,6 +56,8 @@ export default async function Home() {
         },
     });
 
+    console.log(process.env.NODE_ENV);
+
     if (data.pools) {
         logger.info('Data:', data);
         pools = data.pools;
