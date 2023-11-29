@@ -1,6 +1,6 @@
 // const API_HOST = process.env.API_HOST
 const API_PORT = process.env.API_PORT;
-// const WS_HOST = $WS_HOST
+// const WS_HOST = $WS_HOST A
 const WS_PORT = process.env.WS_PORT;
 const API_URL = process.env.API_URL_PUBLIC;
 
