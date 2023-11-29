@@ -9,14 +9,18 @@ import { registerApolloClient } from '@apollo/experimental-nextjs-app-support/rs
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 
+// Global constants.
+
+import { API_URL, WS_URL } from '@/config';
+
 const wsLink = new GraphQLWsLink(
     createClient({
-        url: 'http://localhost:8080/graphql',
+        url: WS_URL,
     })
 );
 
 const httpLink = new HttpLink({
-    uri: 'http://localhost:8080/graphql',
+    uri: API_URL,
 });
 
 const splitLink = split(
