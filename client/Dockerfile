@@ -1,11 +1,16 @@
 
 FROM node:21
 
+# turn off extra external api calls
+ENV NPM_CONFIG_UPDATE_NOTIFIER false
+ENV NPM_CONFIG_FUND false
+
+# needed to bring this variable into the build
+ARG API_PUBLIC_URL
+
 WORKDIR /app
 
-COPY package*.json ./
-COPY package-lock.json package-lock.json 
-COPY next.config.js ./
+COPY next.config.js package*.json ./
 
 RUN npm ci
 

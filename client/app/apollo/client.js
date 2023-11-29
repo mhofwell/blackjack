@@ -11,18 +11,18 @@ import { createClient } from 'graphql-ws';
 
 // Global constants.
 
-import { API_URL, WS_URL } from '@/config';
+import { API_URL_STRING, WS_URL_STRING } from '@/config';
 
-console.log(API_URL, WS_URL);
+console.log(API_URL_STRING, WS_URL_STRING);
 
 const wsLink = new GraphQLWsLink(
     createClient({
-        url: WS_URL,
+        url: WS_URL_STRING,
     })
 );
 
 const httpLink = new HttpLink({
-    uri: API_URL,
+    uri: API_URL_STRING,
 });
 
 const splitLink = split(

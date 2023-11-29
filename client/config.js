@@ -1,9 +1,9 @@
-const API_HOST = process.env.API_HOST 
+// const API_HOST = process.env.API_HOST 
 const API_PORT = process.env.API_PORT 
-const WS_HOST = process.env.WS_HOST
+// const WS_HOST = $WS_HOST
 const WS_PORT = process.env.WS_PORT 
 
-const API_URL = `http://${API_HOST}:${API_PORT}/graphql`;
-const WS_URL = `ws://${WS_HOST}:${WS_PORT}/graphql`;
+const API_URL_STRING = `http://${API_URL}:${API_PORT}/graphql`;
+const WS_URL_STRING = `ws://${API_URL}:${WS_PORT}/graphql`;
 
-export { API_URL, WS_URL };
+export { API_URL_STRING, WS_URL_STRING };
