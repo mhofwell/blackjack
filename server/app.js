@@ -133,8 +133,10 @@ const main = async () => {
         res.status(200).send('Okay!');
     });
 
-    // WS server start
-    httpServer.listen(NODE_PORT, () => {
+    const hostname = '::';
+
+    // http server start
+    httpServer.listen(NODE_PORT, hostname, () => {
         logger.info(
             `Apollo/GraphQL websocket service is live on endpoint: ${NODE_PORT}/graphql`
         );
