@@ -11,7 +11,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build
+RUN npm run build:production
 
 EXPOSE 3000
 
