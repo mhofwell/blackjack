@@ -5,8 +5,7 @@ FROM node:21
 ENV NPM_CONFIG_UPDATE_NOTIFIER false
 ENV NPM_CONFIG_FUND false
 
-# needed to bring this variable into the build
-ARG API_PUBLIC_URL
+ARG API_URL_PUBLIC
 
 WORKDIR /app
 
