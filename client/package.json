@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "sleer 3 && next start",
+    "start": "sleep 3 && next start",
     "lint": "next lint"
   },
   "dependencies": {
