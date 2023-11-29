@@ -36,15 +36,15 @@ const getLogger = (name) => {
                     },
                     level: 'info',
                 },
-                {
-                    target: '@logtail/pino',
-                    options: {
-                        sourceToken: token,
-                        colorize: true,
-                        translateTime: 'UTC:yyyy-mm-dd HH:MM:ss.l',
-                    },
-                    level: 'trace',
-                },
+                // {
+                //     target: '@logtail/pino',
+                //     options: {
+                //         sourceToken: token,
+                //         colorize: true,
+                //         translateTime: 'UTC:yyyy-mm-dd HH:MM:ss.l',
+                //     },
+                //     level: 'trace',
+                // },
             ],
         })
     );
