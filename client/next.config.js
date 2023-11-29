@@ -6,10 +6,10 @@ const nextConfig = {
         serverComponentsExternalPackages: ['@logtail/pino', 'pino'],
     },
     env: {
-        // API_HOST_DEV: 'localhost',
-        // API_PORT_DEV: '8080',
-        // WS_HOST_DEV: 'localhost',
-        // WS_PORT_DEV: '8080',
+        API_HOST: 'api.railway.internal',
+        API_PORT: '8080',
+        WS_HOST: 'api.railway.internal',
+        WS_PORT: '8080',
         BETTERSTACK_TOKEN_CLIENT: 'psgFFB17v9xfYhUYw7EKGGzt',
     },
 };
