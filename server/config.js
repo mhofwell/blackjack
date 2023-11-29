@@ -6,7 +6,7 @@ const CLIENT_PORT = process.env.CLIENT_PORT || 3000;
 const NODE_PORT = process.env.NODE_PORT || 8080 || 8090;
 
 process.env.DATABASE_URL =
-    process.env.DATABASE_URL_PROD || process.env.DATABASE_URL_DEV;
+    process.env.DATABASE_URL || process.env.DATABASE_URL_DEV;
 
 export {
     REDIS_HOST,
@@ -16,3 +16,4 @@ export {
     REDIS_USER,
     REDIS_PASSWORD,
 };
+
