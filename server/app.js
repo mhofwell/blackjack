@@ -64,7 +64,11 @@ const app = express();
 
 app.set('trust proxy', 1)
 
+// Proxy test endpoint.
+app.get('/ip', (request, response) => response.send(request.ip))
+
 const httpServer = createServer(app);
+
 
 // Create WebSocket server using the HTTP server we just set up.
 const wsServer = new WebSocketServer({

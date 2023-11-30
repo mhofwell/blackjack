@@ -16,8 +16,7 @@ if ((process.env.NODE_ENV === 'development')) {
     NODE_PORT = process.env.PORT;
 }
 
-process.env.DATABASE_URL =
-    process.env.DATABASE_URL || process.env.DATABASE_URL_DEV;
+process.env.DATABASE_URL = process.env.DATABASE_URL || process.env.DATABASE_URL_DEV;
 
 export {
     REDIS_HOST,
