@@ -45,9 +45,7 @@ const POOL_QUERY = gql`
 `;
 
 export default async function Home() {
-    let pools = [];
-
-    const { data, loading } = await getClient().query({
+    const { data, loading, error } = await getClient().query({
         query: POOL_QUERY,
         context: {
             fetchOptions: {
@@ -56,32 +54,27 @@ export default async function Home() {
         },
     });
 
-    console.log(process.env.NODE_ENV);
+    let pools;
 
     if (data.pools) {
         logger.info('Data:', data);
         pools = data.pools;
     } else {
-        logger.info('Could not reach server.');
+        logger.warn('Could not reach server.');
+        pools = [];
     }
-
-    // if (errors || !data) {
-    //     pools = [];
-    //     console.error('POOL_QUERY failed.', errors);
-    // }
-
-    // if (data) {
-    //     logger.info('POOL_QUERY executed successfully.');
-    //     console.log('data', data);
-    //     logger.info('POOL_QUERY executed successfully.');
-    //     pools = data.pools;
-    // }
-
-    if (loading) return <span>loading...</span>;
 
     return (
         <main>
-            {data ? <PoolList pools={pools} /> : <p>Something went wrong.</p>}
+            {data.pools ? (
+                <PoolList pools={pools} />
+            ) : loading ? (
+                <h2>Loading...</h2>
+            ) : error ? (
+                <h2>Error</h2>
+            ) : (
+                <h2>Cannot discover API.</h2>
+            )}
         </main>
     );
 }
