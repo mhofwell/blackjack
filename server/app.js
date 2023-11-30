@@ -63,6 +63,9 @@ const limiter = rateLimit({
 const app = express();
 const httpServer = createServer(app);
 
+app.set('trust proxy', 1)
+app.get('/ip', (request, response) => response.send(request.ip))
+
 // Create WebSocket server using the HTTP server we just set up.
 const wsServer = new WebSocketServer({
     server: httpServer,
