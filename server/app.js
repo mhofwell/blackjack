@@ -103,12 +103,12 @@ const server = new ApolloServer({
 });
 
 const main = async () => {
-    // Apollo/GraphQL server start yes
+    // Apollo/GraphQL server start
     await server.start();
 
     if (server) {
         logger.info(
-            `Apollo/GraphQL API is now live on endpoint: ${process.env.PORT}/graphql`
+            `Apollo/GraphQL API is now live on endpoint: ${NODE_PORT}/graphql`
         );
     } else {
         logger.fatal(`Could not start Apollo/GraphQL API`);
@@ -133,9 +133,9 @@ const main = async () => {
     });
 
     // http server start
-    httpServer.listen(process.env.PORT, '0.0.0.0', () => {
+    httpServer.listen(NODE_PORT, '0.0.0.0', () => {
         logger.info(
-            `Apollo/GraphQL websocket service is live on endpoint: ${process.env.PORT}/graphql`
+            `Apollo/GraphQL websocket service is live on endpoint: ${NODE_PORT}/graphql`
         );
     });
 
