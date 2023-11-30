@@ -3,7 +3,7 @@ const REDIS_PORT = process.env.REDIS_PORT || 6379;
 const REDIS_USER = process.env.REDIS_USER || '';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
 const CLIENT_PORT = process.env.CLIENT_PORT || 3000;
-const NODE_PORT = process.env.NODE_PORT || 8080 || 8090;
+const NODE_PORT = process.env.PORT || 8080 || 8090;
 
 process.env.DATABASE_URL =
     process.env.DATABASE_URL || process.env.DATABASE_URL_DEV;
