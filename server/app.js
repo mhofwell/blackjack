@@ -61,10 +61,10 @@ const limiter = rateLimit({
 // Create an Express app and HTTP server; attach both the WebSocket
 // server and the ApolloServer to this HTTP server.
 const app = express();
-const httpServer = createServer(app);
 
 app.set('trust proxy', 1)
-app.get('/ip', (request, response) => response.send(request.ip))
+
+const httpServer = createServer(app);
 
 // Create WebSocket server using the HTTP server we just set up.
 const wsServer = new WebSocketServer({
