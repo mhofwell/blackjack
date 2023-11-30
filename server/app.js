@@ -103,7 +103,7 @@ const server = new ApolloServer({
 });
 
 const main = async () => {
-    // Apollo/GraphQL server start
+    // Apollo/GraphQL server start yes
     await server.start();
 
     if (server) {
