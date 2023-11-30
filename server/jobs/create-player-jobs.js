@@ -4,6 +4,7 @@ import prisma from '../prisma/client.js';
 import { parentPort } from 'worker_threads';
 import dayjs from 'dayjs';
 
+// Logger setup
 import getLogger from '../logging/logger.js';
 const logger = getLogger('worker');
 
@@ -22,8 +23,10 @@ const createGoalUpdateJobs = async () => {
         logger.info('Worker started to create goal update jobs...👷');
     }
 
-    const appDir =
-        '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
+    // const appDir =
+    //     '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
+
+    const jobPath = path.resolve('./jobs/update-player-data.js');
 
     let newCronJobs = [];
     // could you return this forEach into a variable? Maybe use .map instead.
@@ -31,6 +34,7 @@ const createGoalUpdateJobs = async () => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
             path: path.join(appDir + '/jobs', 'update-player-data.js'),
+            path: jobPath,
             date: dayjs(fixture.kickoff_time).toDate(),
             // interval: '10s',
             outputWorkerMetadata: false,

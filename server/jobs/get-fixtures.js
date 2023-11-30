@@ -21,7 +21,7 @@ const getWeeklyFixtures = async () => {
     try {
         const res = await fetch(
             // this should be future = 1
-            `https://fantasy.premierleague.com/api/fixtures?event=11`
+            `https://fantasy.premierleague.com/api/fixtures?future=1`
         );
 
         if (!res) {

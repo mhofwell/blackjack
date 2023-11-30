@@ -35,14 +35,20 @@
 //   console.log(errorValue) // string[] of error messages
 // }
 
-const d = new Date('2023-11-04T12:30:00Z');
+// const d = new Date('2023-11-04T12:30:00Z');
 
-// import moment from 'moment';
+// // import moment from 'moment';
 
-// const a = moment('2023-11-04T12:30:00Z').toDate();
+// // const a = moment('2023-11-04T12:30:00Z').toDate();
 
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
 
-const a = dayjs('2023-11-04T12:30:00Z').toDate();
-console.log(a);
+// const a = dayjs('2023-11-04T12:30:00Z').toDate();
+// console.log(a);
 // console.log(d);
+
+import path from 'path';
+
+const basePath = path.resolve('./jobs/update-player-data.js');
+
+console.log(basePath);
