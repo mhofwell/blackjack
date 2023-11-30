@@ -33,7 +33,7 @@ const createGoalUpdateJobs = async () => {
     fixtures.forEach((fixture) => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
-            path: path.join(appDir + '/jobs', 'update-player-data.js'),
+            // path: path.join(appDir + '/jobs', 'update-player-data.js'),
             path: jobPath,
             date: dayjs(fixture.kickoff_time).toDate(),
             // interval: '10s',

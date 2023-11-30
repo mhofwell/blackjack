@@ -11,3 +11,5 @@ db-data
 .DS_Store
 
 /docker
+
+/playground
