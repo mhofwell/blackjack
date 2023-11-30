@@ -154,7 +154,7 @@ const main = async () => {
 
     setTimeout(() => {
         startGameweekUpdates();
-    }, 60000);
+    }, 2000);
 };
 
 main();
