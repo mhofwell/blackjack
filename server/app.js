@@ -41,7 +41,7 @@ import 'dotenv/config.js';
 import getLogger from './logging/logger.js';
 
 // cron launcher
-import cron from './jobs/main.js';
+import startGameweekUpdates from './jobs/main.js';
 
 const logger = getLogger('express');
 
@@ -153,7 +153,7 @@ const main = async () => {
     }, 1000);
 
     setTimeout(() => {
-        cron();
+        startGameweekUpdates();
     }, 60000);
 };
 

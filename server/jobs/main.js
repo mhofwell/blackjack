@@ -15,7 +15,7 @@ async function workerMessageHandler(message) {
     }, 500);
 }
 
-const main = async () => {
+const startGameweekUpdates = async () => {
     logger.info('Starting weekly cron jobs...');
     const cron = new Bree({
         logger: logger,
@@ -50,4 +50,4 @@ const main = async () => {
     cron.start();
 };
 
-export default main();
+export default startGameweekUpdates();
