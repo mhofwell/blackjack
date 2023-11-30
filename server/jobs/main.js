@@ -50,4 +50,4 @@ const startGameweekUpdates = async () => {
     cron.start();
 };
 
-export default startGameweekUpdates();
+export default startGameweekUpdates;
