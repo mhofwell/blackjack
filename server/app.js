@@ -40,6 +40,9 @@ import 'dotenv/config.js';
 // logger
 import getLogger from './logging/logger.js';
 
+// cron launcher
+import cron from './jobs/main.js';
+
 const logger = getLogger('express');
 
 logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
@@ -62,13 +65,12 @@ const limiter = rateLimit({
 // server and the ApolloServer to this HTTP server.
 const app = express();
 
-app.set('trust proxy', 1)
+app.set('trust proxy', 1);
 
 // Proxy test endpoint.
-app.get('/ip', (request, response) => response.send(request.ip))
+app.get('/ip', (request, response) => response.send(request.ip));
 
 const httpServer = createServer(app);
-
 
 // Create WebSocket server using the HTTP server we just set up.
 const wsServer = new WebSocketServer({
@@ -149,6 +151,10 @@ const main = async () => {
     setTimeout(() => {
         pingRedis();
     }, 1000);
+
+    setTimeout(() => {
+        cron();
+    }, 60000);
 };
 
 main();

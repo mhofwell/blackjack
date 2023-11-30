@@ -50,4 +50,4 @@ const main = async () => {
     cron.start();
 };
 
-main();
+export default main();
