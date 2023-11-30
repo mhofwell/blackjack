@@ -57,7 +57,7 @@ export default async function Home() {
     let pools;
 
     if (data.pools) {
-        logger.info('Data:', data);
+        logger.info('Pool data received.');
         pools = data.pools;
     } else {
         logger.warn('Could not reach server.');
