@@ -1,12 +1,12 @@
 const jobs = [
     {
         name: 'get-fixtures',
-        cron: '05 16 * * 4',
+        cron: '10 16 * * 4',
         // timeout: '5s',
     },
     {
         name: 'create-player-jobs',
-        cron: '07 16 * * 4',
+        cron: '12 16 * * 4',
         // timeout: '15s',
     },
 ];
