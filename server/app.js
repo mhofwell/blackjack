@@ -152,9 +152,9 @@ const main = async () => {
         pingRedis();
     }, 1000);
 
-    setTimeout(() => {
-        startGameweekUpdates();
-    }, 5000);
+    // setTimeout(() => {
+    //     startGameweekUpdates();
+    // }, 5000);
 };
 
 main();
