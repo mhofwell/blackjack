@@ -45,6 +45,7 @@ const startGameweekUpdates = async () => {
         logger: logger,
         hideMeta: false,
     });
+
     graceful.listen();
 
     cron.start();
