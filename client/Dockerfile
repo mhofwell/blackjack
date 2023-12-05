@@ -11,7 +11,7 @@ WORKDIR /app
 
 COPY next.config.js package*.json ./
 
-RUN npm ci
+RUN npm ci --omit=dev
 
 COPY . .
 
