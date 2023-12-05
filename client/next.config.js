@@ -13,5 +13,4 @@ const nextConfig = {
         BETTERSTACK_TOKEN_CLIENT: 'psgFFB17v9xfYhUYw7EKGGzt' 
     },
 };
-
 module.exports = nextConfig;
