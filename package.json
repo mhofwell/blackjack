@@ -1,0 +1,11 @@
+{
+  "name": "blackjack",
+  "version": "1.0.0",
+  "main": "app.js",
+  "repository": "https://github.com/mhofwell/blackjack.git",
+  "author": "<michael.hofweller@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
