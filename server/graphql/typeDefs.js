@@ -4,7 +4,7 @@ export const typeDefs = gql`
     type Query {
         user(id: ID!): User!
         login(pw: String!, fn: String!, ln: String!): User!
-        allEntries: [Entry!]!
+        allEntries: [Entry]
         entry(id: ID!): Entry!
         playerEntries(id: Int!, kickoffTime: String): [Entry!]!
         pools: [Pool!]!
@@ -12,12 +12,14 @@ export const typeDefs = gql`
         allPlayers: [Player!]!
         getGameweekPlayers(input: getGameweekPlayers): [Player!]!
         player(id: ID!): Player!
+        allKickoffTimes: [Kickoff!]!
     }
 
     type Mutation {
         updateEntry(input: updateEntryInput!): Entry!
         updatePlayer(input: updatePlayerInput!): Player!
         updatePool(input: updateEntryInput!): Pool!
+        updateKickoffTimes(input: [kickoffTimeInput!]!): Boolean
     }
 
     type Subscription {
@@ -27,6 +29,13 @@ export const typeDefs = gql`
         hi: String
     }
 
+    input kickoffTimeInput {
+        game_week_id: Int!
+        number_of_fixtures: Int!
+        kickoff_time: String!
+        ms_kickoff_time: Float!
+    }
+
     input updateEntryInput {
         id: String!
         goals: Int!
@@ -34,6 +43,7 @@ export const typeDefs = gql`
         net_goals: Int!
         kickoffTime: String!
     }
+
     input updatePlayerInput {
         id: Int!
         goals: Int!
@@ -45,6 +55,14 @@ export const typeDefs = gql`
     input getGameweekPlayers {
         kickoffTime: String!
         gameWeekId: Int!
+    }
+ 
+    type Kickoff {
+        id: Int!
+        game_week_id: Int!
+        number_of_fixtures: Int!
+        kickoff_time: String!
+        ms_kickoff_time: Float!
     }
 
     type Entry {

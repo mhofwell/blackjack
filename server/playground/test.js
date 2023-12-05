@@ -47,8 +47,20 @@
 // console.log(a);
 // console.log(d);
 
-import path from 'path';
+// import path from 'path';
 
-const basePath = path.resolve('./jobs/update-player-data.js');
+// const basePath = path.resolve('./jobs/update-player-data.js');
 
-console.log(basePath);
+// console.log(basePath);
+
+import prisma from '../prisma/client.js';
+
+console.log(process.env.DATABASE_URL)
+
+const res = await prisma.user.count();
+
+console.log(res);
+
+const res2 = await prisma.kickoff.count();
+
+console.log(res2);

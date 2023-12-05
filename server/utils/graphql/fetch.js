@@ -1,6 +1,8 @@
+const API_URL = require('../../config.js');
+
 const fetchGQL = async (query, variables) => {
     try {
-        const res = await fetch("http://localhost:8080/graphql", {
+        const res = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -17,4 +19,4 @@ const fetchGQL = async (query, variables) => {
     }
 };
 
-export default fetchGQL;
+module.exports = fetchGQL;

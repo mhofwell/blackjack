@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 
 // Logger setup
 import getLogger from '../logging/logger.js';
+
 const logger = getLogger('worker');
 
 const createGoalUpdateJobs = async () => {

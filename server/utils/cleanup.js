@@ -9,7 +9,7 @@ const cleanUp = async () => {
     await prisma.user.deleteMany();
     await prisma.player.deleteMany();
     await prisma.club.deleteMany();
-    await prisma.fixtures.deleteMany();
+    await prisma.kickoff.deleteMany();
     logger.info('Completed database cleanup.');
 };
 

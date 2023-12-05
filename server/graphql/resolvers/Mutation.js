@@ -1,6 +1,5 @@
 import sortByNetGoalsDsc from '../../utils/sort-net-goals.js';
 import getLogger from '../../logging/logger.js';
-
 const logger = getLogger('api');
 
 const Mutation = {
@@ -11,7 +10,9 @@ const Mutation = {
                 { headers: req.headers, body: req.body },
                 `gw-worker-${kt} > Update entry mutation request.`
             );
-            logger.info(`gw-worker-${kt} > Finding entry ${input.id} mutate.`);
+            logger.info(
+                `gw-worker-${kt} > Finding entry ${input.id} to mutate.`
+            );
             const entry = await prisma.entry.update({
                 where: {
                     id: input.id,
@@ -32,6 +33,43 @@ const Mutation = {
         } catch (err) {
             logger.warn(`Error during mutation of entry.`);
             logger.error(err);
+        }
+    },
+    updateKickoffTimes: async (_, { input }, { prisma, pubsub, req }) => {
+        try {
+            logger.debug(
+                { headers: req.rawHeaders, body: req.body },
+                `gw-worker-fixtures > Update fixtures mutation request.`
+            );
+            logger.info(
+                `gw-worker-fixtures > Updating fixtures for the next gameweek.`
+            );
+
+            // const kickoffTimeCount = await prisma.kickoff.count();
+            // kickoffTimeCount > 0 ? await prisma.kickoff.deleteMany() : '';
+
+            const c = await prisma.kickoff.createMany({
+                data: input,
+            });
+
+            logger.info({ count: c }, 'C');
+
+            if (c.count > 0) {
+                logger.info(
+                    `gw-worker-fixtures > Updated ${c.count} fixtures successfully.`
+                );
+                return true;
+            } else {
+                throw new Error(
+                    `gw-worker-fixtures > Error saving entries to Prisma.`
+                );
+            }
+        } catch (err) {
+            logger.warn(
+                `gw-worker-fixtures > Something went wrong during entry updating.`
+            );
+            logger.error(err);
+            return 1;
         }
     },
     updatePool: async (_, { input }, { prisma, pubsub, req }) => {

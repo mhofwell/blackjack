@@ -300,6 +300,34 @@ const Query = {
             process.exit(1);
         }
     },
+    allKickoffTimes: async (parent, args, { prisma, req }) => {
+        try {
+            logger.debug(
+                { headers: req.headers, body: req.body },
+                'Login request.'
+            );
+            logger.info(
+                `gw-worker-kickoffTimes > Fetching gameweek kickoff times.`
+            );
+
+            const kickoffTimes = await prisma.kickoff.findMany();
+
+            if (kickoffTimes.length > 0) {
+                logger.info(
+                    'gw-worker-kickoffTimes > Fetched all kickoffTimes successfully.'
+                );
+                logger.debug({ kickoffTimes: kickoffTimes }, 'Kickoff times.');
+                return kickoffTimes;
+            } else {
+                throw new Error(
+                    `gw-worker-kickoffTimes > Fetched all kickoffTimes successfully.`
+                );
+            }
+        } catch (err) {
+            logger.warn(`gw-worker-kickoffTimes > Error fetching club players`);
+            logger.error(err);
+        }
+    },
     login: async (parent, args, { prisma, req }) => {
         logger.debug(
             { headers: req.headers, body: req.body },

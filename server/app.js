@@ -34,16 +34,13 @@ import { ApolloServer } from '@apollo/server';
 // Constants
 import { NODE_PORT } from './config.js';
 
-// env
-import 'dotenv/config.js';
-
 // logger
 import getLogger from './logging/logger.js';
-
-// cron launcher
-import startGameweekUpdates from './jobs/main.js';
-
 const logger = getLogger('express');
+
+// env
+import dotenv from 'dotenv';
+dotenv.config();
 
 logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
 
@@ -56,10 +53,10 @@ const schema = makeExecutableSchema({
     },
 });
 
-const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 20,
-});
+// const limiter = rateLimit({
+//     windowMs: 1 * 60 * 1000, // 1 minute
+//     max: 20,
+// });
 
 // Create an Express app and HTTP server; attach both the WebSocket
 // server and the ApolloServer to this HTTP server.
@@ -129,7 +126,7 @@ const main = async () => {
         '/graphql',
         cors(),
         helmet(),
-        limiter,
+        // limiter,
         bodyParser.json(),
         expressMiddleware(server, {
             context: async ({ req }) => {
@@ -150,11 +147,7 @@ const main = async () => {
 
     setTimeout(() => {
         pingRedis();
-    }, 1000);
-
-    // setTimeout(() => {
-    //     startGameweekUpdates();
-    // }, 5000);
+    }, 500);
 };
 
 main();
