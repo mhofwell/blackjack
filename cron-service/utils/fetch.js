@@ -18,7 +18,6 @@ const fetchGQL = async (query, variables) => {
             }
         );
         const obj = await res.json();
-        console.log('fetch', obj);
         return obj.data;
     } catch (err) {
         logger.error({ error: err }, 'GraphQL fetch failed.');
