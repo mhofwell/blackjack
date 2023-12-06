@@ -41,6 +41,7 @@ const createGoalUpdateJobs = async () => {
 
     let newCronJobs = [];
 
+    
     fixtures.forEach((fixture) => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
