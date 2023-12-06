@@ -322,7 +322,7 @@ const Query = {
                 return kickoffTimes;
             } else {
                 throw new Error(
-                    `gw-worker-kickoffTimes > Fetched all kickoffTimes successfully.`
+                    `gw-worker-kickoffTimes > Kickoff fetch failed.`
                 );
             }
         } catch (err) {
