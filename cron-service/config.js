@@ -6,7 +6,8 @@ let HOST,
     REDIS_PASSWORD,
     REDIS_URL,
     ITERATION_LENGTH,
-    ITERATIONS;
+    ITERATIONS,
+    EPL_API;
 
 if (process.env.NODE_ENV === 'development') {
     PORT = 9000;
@@ -20,6 +21,7 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_URL = 'NONE';
     ITERATION_LENGTH = 1000;
     ITERATIONS = 2;
+    EPL_API = process.env.EPL_API_11;
 } else if (process.env.NODE_ENV === 'production') {
     PORT = process.env.PORT;
     HOST = process.env.HOST;
@@ -32,6 +34,7 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_URL = process.env.REDIS_URL;
     ITERATION_LENGTH = 120000;
     ITERATIONS = 60;
+    EPL_API = process.env.EPL_API_FUTURE;
 }
 
 module.exports = {
@@ -46,4 +49,5 @@ module.exports = {
     REDIS_URL,
     ITERATION_LENGTH,
     ITERATIONS,
+    EPL_API,
 };

@@ -12,6 +12,10 @@ const fetchGQL = require('../utils/fetch.js');
 const getLogger = require('../logging/logger.js');
 const logger = getLogger('worker');
 
+// constants
+
+const { EPL_API } = require('../config.js');
+
 const getWeeklyFixtures = async () => {
     if (parentPort) {
         parentPort.postMessage(
@@ -24,7 +28,7 @@ const getWeeklyFixtures = async () => {
     let gameWeekId;
 
     try {
-        const res = await fetch(process.env.EPL_API_FUTURE);
+        const res = await fetch(EPL_API);
 
         if (!res) {
             throw new Error(
