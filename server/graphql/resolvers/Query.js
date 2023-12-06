@@ -302,6 +302,7 @@ const Query = {
             process.exit(1);
         }
     },
+    
     allKickoffTimes: async (parent, args, { prisma, req }) => {
         try {
             logger.debug(
