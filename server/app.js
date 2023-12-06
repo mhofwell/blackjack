@@ -39,6 +39,8 @@ const logger = getLogger('express');
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { PORT } from './config.js';
+
 logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
 
 const schema = makeExecutableSchema({
@@ -55,10 +57,10 @@ const schema = makeExecutableSchema({
 //     max: 20,
 // });
 
-// create the express application. 
+// create the express application.
 const app = express();
 
-// set the number of proxies between server and user. 
+// set the number of proxies between server and user.
 app.set('trust proxy', 1);
 
 // Proxy test endpoint.
@@ -111,7 +113,7 @@ const main = async () => {
 
     if (server) {
         logger.info(
-            `Apollo/GraphQL API is now live on endpoint: ${process.env.PORT}/graphql`
+            `Apollo/GraphQL API is now live on endpoint: ${PORT}/graphql`
         );
     } else {
         logger.fatal(`Could not start Apollo/GraphQL API`);
@@ -136,9 +138,9 @@ const main = async () => {
     });
 
     // http server start
-    httpServer.listen(process.env.PORT, '0.0.0.0', () => {
+    httpServer.listen(PORT, '0.0.0.0', () => {
         logger.info(
-            `Apollo/GraphQL websocket service is live on endpoint: ${process.env.PORT}/graphql`
+            `Apollo/GraphQL websocket service is live on endpoint: ${PORT}/graphql`
         );
     });
 
