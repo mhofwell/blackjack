@@ -24,7 +24,7 @@ const getWeeklyFixtures = async () => {
     let gameWeekId;
 
     try {
-        const res = await fetch(process.env.EPL_API_FUTURE);
+        const res = await fetch(process.env.EPL_API_15);
 
         if (!res) {
             throw new Error(
