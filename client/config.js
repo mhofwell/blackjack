@@ -3,8 +3,10 @@ let API_URL;
 
 if (process.env.NODE_ENV === 'development') {
     API_URL = 'localhost:8080';
-} else if (process.env.NODE_ENV === 'production') {
-    API_URL = 'api-production-9332.up.railway.app';
+} else if (process.env.NODE_ENV === 'build') {
+    API_URL = process.env.API_PUBLIC_URL;
+} else if (process.env.NODE_ENG === 'production') {
+    API_URL = process.env.API_PRIVATE_URL;
 }
 
 const API_URL_STRING = `http://${API_URL}/graphql`;

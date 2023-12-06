@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "sleep 3 && next build",
+        "build": "export NODE_ENV=production sleep 3 && next build",
         "start": "next start",
         "lint": "next lint"
     },
