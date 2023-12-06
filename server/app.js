@@ -146,6 +146,7 @@ const main = async () => {
         );
     });
 
+    
     setTimeout(() => {
         pingRedis();
     }, 500);
