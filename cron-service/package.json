@@ -4,10 +4,10 @@
     "description": "",
     "main": "app.js",
     "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "export NODE_ENV=development && node app.js",
         "prod": "export NODE_ENV=production && node app.js",
-        "railway": "sleep 3 && npm run prod",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "railway": "sleep 3 && npm run prod"
     },
     "author": "",
     "license": "ISC",
