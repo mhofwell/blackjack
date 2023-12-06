@@ -489,7 +489,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 2) {
+        if (i === 60) {
             if (parentPort) {
                 parentPort.postMessage('done');
             } else {
@@ -497,6 +497,6 @@ const updateGoalData = async () => {
                 process.exit(0);
             }
         }
-    }, 1000);
+    }, 120000);
 };
 updateGoalData();
