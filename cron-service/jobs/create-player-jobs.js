@@ -27,7 +27,7 @@ const createGoalUpdateJobs = async () => {
 
     console.log("response", res)
 
-    const fixtures = res.data.allKickoffTimes;
+    const fixtures = res.allKickoffTimes;
 
     if (parentPort) {
         parentPort.postMessage(
@@ -41,7 +41,7 @@ const createGoalUpdateJobs = async () => {
 
     let newCronJobs = [];
 
-    
+
     fixtures.forEach((fixture) => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
