@@ -4,8 +4,8 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "export NODE_ENV=build && sleep 3 && next build",
-        "start": "export NODE_ENV=production && next start",
+        "build": "sleep 3 && next build",
+        "start": "next start",
         "lint": "next lint"
     },
     "dependencies": {
