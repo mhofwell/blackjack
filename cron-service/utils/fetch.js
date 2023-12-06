@@ -5,7 +5,7 @@ const logger = getLogger('express');
 
 const fetchGQL = async (query, variables) => {
     try {
-        const res = await fetch('http://api-production-9332.up.railway.app:8080/graphql',
+        const res = await fetch('https://api-production-9332.up.railway.app:8080/graphql',
             {
                 method: 'POST',
                 headers: {
