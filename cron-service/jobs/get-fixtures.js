@@ -19,13 +19,12 @@ const getWeeklyFixtures = async () => {
         );
     } else {
         logger.info('Starting worker to collect gameweek fixtures...👷');
-        logger.debug({ data: data }, 'Data');
     }
 
     let gameWeekId;
 
     try {
-        const res = await fetch(process.env.EPL_API_FUTURE);
+        const res = await fetch(process.env.EPL_API_11);
 
         if (!res) {
             throw new Error(
@@ -104,13 +103,13 @@ const getWeeklyFixtures = async () => {
 
         if (parentPort) {
             parentPort.postMessage(
-                `Saved new fixture times for gameweek ${gameWeekId} ${result} 🚀`
+                `Saved new fixture times for gameweek ${gameWeekId} 🚀`
             );
             parentPort.postMessage('done');
             process.exit(0);
         } else {
             logger.info(
-                `Saved new fixture times for gameweek ${gameWeekId} ${result} 🚀`
+                `Saved new fixture times for gameweek ${gameWeekId} 🚀`
             );
             process.exit(0);
         }

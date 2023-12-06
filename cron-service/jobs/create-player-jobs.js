@@ -4,12 +4,15 @@ const { parentPort } = require('worker_threads');
 const dayjs = require('dayjs');
 const fetchGQL = require('../utils/fetch.js');
 
+// env
+const dotenv = require('dotenv');
+dotenv.config();
+
 // Logger setup
 const getLogger = require('../logging/logger.js');
 const logger = getLogger('worker');
 
 const createGoalUpdateJobs = async () => {
-
     const query = `query Query {
         allKickoffTimes {
           id
@@ -19,12 +22,10 @@ const createGoalUpdateJobs = async () => {
           number_of_fixtures
         }
       }`;
-    const fixtures = fetchGQL(query, '');
-    // const fixtures = await prisma.fixtures.findMany();
 
-    if (fixtures.length < 0) {
-        throw new Error('No fixtures found.');
-    }
+    const res = await fetchGQL(query, {});
+
+    const fixtures = res.allKickoffTimes;
 
     if (parentPort) {
         parentPort.postMessage(
@@ -34,19 +35,13 @@ const createGoalUpdateJobs = async () => {
         logger.info('Worker started to create goal update jobs...👷');
     }
 
-    // const appDir =
-    //     '/Users/bigviking/Documents/GitHub/Projects/blackjack/server/';
-
     const jobPath = path.resolve('./jobs/update-player-data.js');
 
-    logger.info(jobPath);
-
     let newCronJobs = [];
-    // could you return this forEach into a variable? Maybe use .map instead.
+
     fixtures.forEach((fixture) => {
         newCronJobs.push({
             name: `gw-worker-${fixture.kickoff_time}`,
-            // path: path.join(appDir + '/jobs', 'update-player-data.js'),
             path: jobPath,
             date: dayjs(fixture.kickoff_time).toDate(),
             // interval: '10s',
@@ -59,8 +54,6 @@ const createGoalUpdateJobs = async () => {
                 },
             },
         });
-        // you don't have to return this value here. Edit for next.
-        return newCronJobs;
     });
 
     if (newCronJobs.length !== fixtures.length) {
@@ -102,8 +95,6 @@ const createGoalUpdateJobs = async () => {
         workerMetadata: true,
         workerMessageHandler: workerMessageHandler,
         errorHandler: (error, workerMetadata) => {
-            // workerMetadata will be populated with extended worker information only if
-            // Bree instance is initialized with parameter `workerMetadata: true
             if (workerMetadata.threadId) {
                 logger.warn(
                     `There was an warn while running a worker ${workerMetadata.name} with thread ID: ${workerMetadata.threadId}`

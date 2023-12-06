@@ -1,5 +1,8 @@
 const { API_URL } = require('../config.js');
 
+const getLogger = require('../logging/logger.js');
+const logger = getLogger('express');
+
 const fetchGQL = async (query, variables) => {
     try {
         const res = await fetch(API_URL, {
@@ -15,7 +18,7 @@ const fetchGQL = async (query, variables) => {
         const obj = await res.json();
         return obj.data;
     } catch (err) {
-        console.error(err);
+        logger.error({ error: err }, 'GraphQL fetch failed.');
     }
 };
 

@@ -1,10 +1,10 @@
 const testData = {
     elements: [
         {
-            id: 1,
+            id: 6,
             stats: {
                 minutes: 0,
-                goals_scored: 0,
+                goals_scored: 1,
                 assists: 0,
                 clean_sheets: 0,
                 goals_conceded: 0,
@@ -31151,7 +31151,48 @@ const testData = {
                 },
             ],
         },
+        {
+            id: 746,
+            stats: {
+                minutes: 0,
+                goals_scored: 1,
+                assists: 0,
+                clean_sheets: 0,
+                goals_conceded: 0,
+                own_goals: 0,
+                penalties_saved: 0,
+                penalties_missed: 0,
+                yellow_cards: 0,
+                red_cards: 0,
+                saves: 0,
+                bonus: 0,
+                bps: 0,
+                influence: '0.0',
+                creativity: '0.0',
+                threat: '0.0',
+                ict_index: '0.0',
+                starts: 0,
+                expected_goals: '0.00',
+                expected_assists: '0.00',
+                expected_goal_involvements: '0.00',
+                expected_goals_conceded: '0.00',
+                total_points: 0,
+                in_dreamteam: false,
+            },
+            explain: [
+                {
+                    fixture: 94,
+                    stats: [
+                        {
+                            identifier: 'minutes',
+                            points: 0,
+                            value: 0,
+                        },
+                    ],
+                },
+            ],
+        },
     ],
 };
 
-export default testData;
+module.exports = testData;

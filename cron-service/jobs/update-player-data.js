@@ -5,24 +5,24 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // test data
-// const testData = require( './test-data.js';
+const testData = require('./test-data.js');
 
 // utils
-const fetchGQL = require('../utils/graphql/fetch.js');
+const fetchGQL = require('../utils/fetch.js');
 const { getRedisJSON, setRedisJSON } = require('../utils/redis/json.js');
 
 // keys
-import PLAYER_KEY from '../utils/redis/keys/index.js';
+const PLAYER_KEY = require('../utils/redis/keys/index.js');
 
 // logging
-import getLogger from '../logging/logger.js';
+const getLogger = require('../logging/logger.js');
 
 const logger = getLogger('worker');
 
 const updateGoalData = async () => {
-    // let { kickoffTime, numberOfFixtures, gameWeekId } = workerData;
+    // let { kickoffTime, gameWeekId } = workerData;
 
-    const kickoffTime = '2023-11-04T15:00:00Z';
+    const kickoffTime = '2023-11-04T17:30:00Z';
     const gameWeekId = 11;
 
     if (parentPort) {
@@ -55,20 +55,19 @@ const updateGoalData = async () => {
 
     let players = res.getGameweekPlayers;
 
-    let goalDiff;
-    let ownGoalDiff;
-    let netGoalDiff;
-    let updatePrisma = false;
     let i = 0;
 
     setInterval(async () => {
         i++;
+
         if (parentPort) {
             parentPort.postMessage(
-                `Fetched gameweek players in the database for i: ${i}`
+                `Fetching gameweek players in the database for i: ${i}`
             );
         } else {
-            logger.info(`Fetched gameweek players in the database for i: ${i}`);
+            logger.info(
+                `Fetching gameweek players in the database for i: ${i}`
+            );
         }
         try {
             // fetch gameweek players from EPL
@@ -105,6 +104,11 @@ const updateGoalData = async () => {
 
             // for each player in our array of players
             for (const player of players) {
+                let goalDiff = 0;
+                let ownGoalDiff = 0;
+                let netGoalDiff = 0;
+                let updatePrisma = false;
+
                 let isNew;
 
                 logger.debug(
@@ -246,42 +250,50 @@ const updateGoalData = async () => {
                         );
                     }
                     // evaluate if there's a change in goal stats between live and cache.
+
                     if (
                         livePlayerData.goals_scored - cachedPlayerData.goals >
-                            0 ||
-                        livePlayerData.own_goals - cachedPlayerData.own_goals >
-                            0
+                        0
                     ) {
                         goalDiff =
                             livePlayerData.goals_scored -
                             cachedPlayerData.goals;
 
-                        livePlayerData.goals_scored > cachedPlayerData.goals
-                            ? (player.goals =
-                                  livePlayerData.goals_scored -
-                                  cachedPlayerData.goals)
-                            : (player.goals = player.goals);
+                        player.goals = player.goals + goalDiff;
 
+                        cachedPlayerData.goals =
+                            cachedPlayerData.goals + goalDiff;
+                    }
+
+                    if (
+                        livePlayerData.own_goals - cachedPlayerData.own_goals >
+                        0
+                    ) {
                         ownGoalDiff =
                             livePlayerData.own_goals -
                             cachedPlayerData.own_goals;
 
-                        livePlayerData.own_goals > cachedPlayerData.own_goals
-                            ? (player.own_goals =
-                                  livePlayerData.own_goals -
-                                  cachedPlayerData.own_goals)
-                            : (player.own_goals = player.own_goals);
+                        // add goal diff to cached goals
+                        cachedPlayerData.own_goals =
+                            cachedPlayerData.own_goals + ownGoalDiff;
 
-                        netGoalDiff = goalDiff - ownGoalDiff;
+                        // add goal diff to player goals to save in db
+                        player.own_goals = player.own_goals + ownGoalDiff;
+                    }
 
-                        player.net_goals = player.goals - player.own_goals;
+                    netGoalDiff = goalDiff - ownGoalDiff;
+
+                    if (goalDiff > 0 || ownGoalDiff > 0) {
+                        player.net_goals = player.net_goals + netGoalDiff;
+                        cachedPlayerData.net_goals =
+                            cachedPlayerData.net_goals + netGoalDiff;
 
                         updatePrisma = true;
 
                         const redisPlayer = await setRedisJSON(
                             PLAYER_KEY,
                             player.id,
-                            player
+                            cachedPlayerData
                         );
 
                         if (parentPort) {
@@ -477,7 +489,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 70) {
+        if (i === 2) {
             if (parentPort) {
                 parentPort.postMessage('done');
             } else {
@@ -485,6 +497,6 @@ const updateGoalData = async () => {
                 process.exit(0);
             }
         }
-    }, 120000);
+    }, 2000);
 };
 updateGoalData();

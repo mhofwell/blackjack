@@ -7,7 +7,7 @@ const jobs = [
     {
         name: 'create-player-jobs',
         // cron: '02 16 * * 5',
-        timeout: '132s',
+        timeout: '10s',
     },
 ];
 
