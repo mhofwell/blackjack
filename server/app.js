@@ -90,6 +90,7 @@ const server = new ApolloServer({
     schema,
     // just added could cause errors
     csrfPrevention: true,
+    introspection: true,
     plugins: [
         // Proper shutdown for the HTTP server.
         ApolloServerPluginDrainHttpServer({ httpServer }),
@@ -150,6 +151,5 @@ const main = async () => {
         pingRedis();
     }, 500);
 };
-
 
 main();
