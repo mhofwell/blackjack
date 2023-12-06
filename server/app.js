@@ -137,8 +137,10 @@ const main = async () => {
         res.status(200).send('API is healthy!');
     });
 
+    const hostname = '::';
+
     // http server start
-    httpServer.listen(PORT, '0.0.0.0', () => {
+    httpServer.listen(PORT, hostname, () => {
         logger.info(
             `Apollo/GraphQL websocket service is live on endpoint: ${PORT}/graphql`
         );
