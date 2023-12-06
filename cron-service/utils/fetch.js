@@ -5,18 +5,16 @@ const logger = getLogger('express');
 
 const fetchGQL = async (query, variables) => {
     try {
-        const res = await fetch('https://api-production-9332.up.railway.app/graphql',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    query: query,
-                    variables: variables,
-                }),
-            }
-        );
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: query,
+                variables: variables,
+            }),
+        });
         const obj = await res.json();
         return obj.data;
     } catch (err) {
