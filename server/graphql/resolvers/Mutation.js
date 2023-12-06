@@ -44,6 +44,10 @@ const Mutation = {
                 `gw-worker-kickoffTimes > Updating fixtures for the next gameweek.`
             );
 
+            const kickoffTimeCount = await prisma.kickoff.count();
+
+            kickoffTimeCount > 0 ? await prisma.kickoff.deleteMany() : '';
+
             const c = await prisma.kickoff.createMany({
                 data: input,
             });

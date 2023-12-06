@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_USER = '';
     REDIS_PASSWORD = '';
     CLIENT_PORT = 3000;
-    process.env.PORT = 8080;
+    PORT = 8080;
     process.env.DATABASE_URL = process.env.LOCAL_DB || process.env.DATABASE_URL;
 } else if (process.env.NODE_ENV === 'production') {
     PORT = process.env.PORT;
