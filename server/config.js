@@ -25,6 +25,7 @@ if (process.env.NODE_ENV === 'development') {
     process.env.PORT = 8080; 
 }
 
+
 export {
     REDIS_HOST,
     REDIS_PORT,
