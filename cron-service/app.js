@@ -50,7 +50,7 @@ const main = async () => {
     });
 
     // http server start
-    app.listen(CRON_PORT, '0.0.0.0', () => {
+    app.listen(PORT, '0.0.0.0', () => {
         logger.info(`Cron service is listening at: ${HOST}:${PORT}`);
     });
 
