@@ -27,7 +27,7 @@ const createGoalUpdateJobs = async () => {
 
     console.log("response", res)
 
-    const fixtures = res.allKickoffTimes;
+    const fixtures = res.data.allKickoffTimes;
 
     if (parentPort) {
         parentPort.postMessage(
