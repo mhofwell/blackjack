@@ -100,7 +100,6 @@ const getWeeklyFixtures = async () => {
         };
 
         console.log('KickoffTimes', kickoffTimesToSave);
-
         const result = await fetchGQL(query, queryData);
 
         console.log('result of query', result);
