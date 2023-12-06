@@ -11,7 +11,7 @@ import { createClient } from 'graphql-ws';
 
 // Global constants.
 
-import { API_URL_STRING, WS_URL_STRING } from '@/config';
+import { API_URL_STRING, WS_URL_STRING } from '@/config.js';
 
 console.log('API', API_URL_STRING);
 console.log('WS', WS_URL_STRING);
