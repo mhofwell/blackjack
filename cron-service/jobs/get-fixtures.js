@@ -101,8 +101,9 @@ const getWeeklyFixtures = async () => {
 
         const result = await fetchGQL(query, queryData);
 
-        logger.info({result: result}, "Result from the query.")
-
+        if (result === undefined) {
+            throw new Error('Fetch failed, cannot access API.');
+        }
 
         if (parentPort) {
             parentPort.postMessage(
