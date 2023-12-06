@@ -1,7 +1,7 @@
 // worker messaging
 const { parentPort } = require('worker_threads');
 
-// env 
+// env
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -98,6 +98,8 @@ const getWeeklyFixtures = async () => {
         const queryData = {
             input: kickoffTimesToSave,
         };
+
+        console.log('KickoffTimes', kickoffTimesToSave);
 
         const result = await fetchGQL(query, queryData);
 
