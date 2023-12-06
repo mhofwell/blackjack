@@ -5,7 +5,7 @@ const logger = getLogger('express');
 
 const fetchGQL = async (query, variables) => {
     try {
-        const res = await fetch(API_URL, {
+        const res = await fetch(`https://${API_URL}/graphql`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

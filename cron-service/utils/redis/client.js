@@ -9,7 +9,7 @@ const client = redis.createClient({
     //     port: REDIS_PORT,
     //     host: REDIS_HOST,
     // },
-    REDIS_URL,
+    url: REDIS_URL,
 });
 
 module.exports = client;
