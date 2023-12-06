@@ -4,7 +4,7 @@ let PORT,
     CLIENT_PORT,
     REDIS_USER,
     REDIS_PASSWORD,
-    API_LOCAL_URL = `http://localhost:${NODE_PORT}/graphql`;
+    API_LOCAL_URL = `http://localhost:${PORT}/graphql`;
 
 if (process.env.NODE_ENV === 'development') {
     REDIS_HOST = 'localhost';
