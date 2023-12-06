@@ -114,7 +114,7 @@ const main = async () => {
 
     if (server) {
         logger.info(
-            `Apollo/GraphQL API is now live on endpoint: ${NODE_PORT}/graphql`
+            `Apollo/GraphQL API is now live on endpoint: ${process.env.PORT}/graphql`
         );
     } else {
         logger.fatal(`Could not start Apollo/GraphQL API`);

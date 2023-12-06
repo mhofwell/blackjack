@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_USER = '';
     REDIS_PASSWORD = '';
     CLIENT_PORT = 3000;
-    NODE_PORT = 8080;
+    process.env.PORT = 8080;
     process.env.DATABASE_URL = process.env.LOCAL_DB || process.env.DATABASE_URL;
 } else if (process.env.NODE_ENV === 'production') {
     REDIS_HOST = process.env.REDIS_HOST;
@@ -20,11 +20,9 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_USER = process.env.REDIS_USER;
     REDIS_PASSWORD = process.env.REDIS_PASSWORD;
     CLIENT_PORT = process.env.CLIENT_PORT;
-    NODE_PORT = process.env.PORT;
+    process.env.PORT = 8080;
     process.env.DATABASE_URL = process.env.LOCAL_DB || process.env.DATABASE_URL;
-    process.env.PORT = 8080; 
 }
-
 
 export {
     REDIS_HOST,
