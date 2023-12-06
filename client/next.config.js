@@ -6,7 +6,7 @@ const nextConfig = {
         serverComponentsExternalPackages: ['@logtail/pino', 'pino'],
     },
     env: {
-        API_URL_PUBLIC: 'api-production-9332.up.railway.app',
+        API_PUBLIC_URL: 'api-production-9332.up.railway.app',
         // API_PORT: '8080',
         // WS_PORT: '8080',
         API_PATH: '/graphql',
