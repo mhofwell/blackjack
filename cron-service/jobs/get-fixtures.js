@@ -103,6 +103,8 @@ const getWeeklyFixtures = async () => {
 
         const result = await fetchGQL(query, queryData);
 
+        console.log('result of query', result);
+
         if (parentPort) {
             parentPort.postMessage(
                 `Saved new fixture times for gameweek ${gameWeekId} 🚀`
