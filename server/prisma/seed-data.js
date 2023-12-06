@@ -234,7 +234,7 @@ const users = [
             pool: 'UK',
             suit: 'SPADES',
             p1: 290,
-            p2: 372,
+            p2: 14,
             p3: 354,
             p4: 416,
         },
@@ -364,7 +364,7 @@ const users = [
 const picks = [
     'Alexander-Arnold',
     'Antonio', // *
-    'dos Santos', //Antony,
+    'Ødegaard', 
     'Aurier', // *
     'Calvert-Lewin', // *
     'Chilwell', // *
