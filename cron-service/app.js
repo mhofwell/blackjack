@@ -51,7 +51,7 @@ const main = async () => {
 
     // http server start
     app.listen(CRON_PORT, '0.0.0.0', () => {
-        logger.info(`Cron service is listening at: ${HOST}:${CRON_PORT}`);
+        logger.info(`Cron service is listening at: ${HOST}:${PORT}`);
     });
 
     setTimeout(() => {
