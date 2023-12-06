@@ -6,6 +6,7 @@ if (process.env.NODE_ENV === 'development') {
     API_URL = process.env.API_PUBLIC_URL;
 }
 
+
 const API_URL_STRING = `https://${API_URL}/graphql`;
 const WS_URL_STRING = `wss://${API_URL}/graphql`;
 
