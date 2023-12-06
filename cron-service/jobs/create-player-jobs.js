@@ -25,6 +25,8 @@ const createGoalUpdateJobs = async () => {
 
     const res = await fetchGQL(query, null);
 
+    console.log("response", res)
+
     const fixtures = res.allKickoffTimes;
 
     if (parentPort) {
