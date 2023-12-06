@@ -31,9 +31,6 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { ApolloServer } from '@apollo/server';
 
-// Constants
-import { NODE_PORT } from './config.js';
-
 // logger
 import getLogger from './logging/logger.js';
 const logger = getLogger('express');
@@ -139,7 +136,7 @@ const main = async () => {
     });
 
     // http server start
-    httpServer.listen(NODE_PORT, '0.0.0.0', () => {
+    httpServer.listen(proess.env.PORT, '0.0.0.0', () => {
         logger.info(
             `Apollo/GraphQL websocket service is live on endpoint: ${process.env.PORT}/graphql`
         );
