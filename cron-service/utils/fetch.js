@@ -1,12 +1,11 @@
-// const { API_URL } = require('../config.js');
+const { API_URL } = require('../config.js');
 
 const getLogger = require('../logging/logger.js');
 const logger = getLogger('express');
 
 const fetchGQL = async (query, variables) => {
     try {
-        const res = await fetch(
-            'https://api-production-9332.up.railway.app/graphql',
+        const res = await fetch(API_URL,
             {
                 method: 'POST',
                 headers: {
