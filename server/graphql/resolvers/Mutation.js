@@ -26,7 +26,6 @@ const Mutation = {
                     players: true,
                 },
             });
-
             pubsub.publish('ENTRY_UPDATED', { entryUpdated: entry });
             logger.info(`gw-worker-${kt} > ENTRY_UPDATED published.`);
             return entry;
