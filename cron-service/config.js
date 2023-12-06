@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'development') {
     PORT = process.env.PORT;
     HOST = process.env.HOST;
     API_PORT = process.env.API_PORT;
-    API_URL = `http://${process.env.API_PRIVATE_URL}:${API_PORT}/graphql`;
+    API_URL = `http://${process.env.API_PRIVATE_URL}/graphql`;
     REDIS_HOST = process.env.REDIS_HOST;
     REDIS_PORT = process.env.REDIS_PORT;
     REDIS_USER = process.env.REDIS_USER;

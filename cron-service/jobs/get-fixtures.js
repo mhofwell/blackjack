@@ -101,7 +101,8 @@ const getWeeklyFixtures = async () => {
 
         const result = await fetchGQL(query, queryData);
 
-        console.log('result of query', result);
+        logger.info({result: result}, "Result from the query.")
+
 
         if (parentPort) {
             parentPort.postMessage(
