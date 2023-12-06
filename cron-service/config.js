@@ -1,7 +1,6 @@
 let HOST,
     REDIS_PORT,
     CRON_PORT,
-    API_PORT,
     REDIS_USER,
     REDIS_PASSWORD,
     API_PUBLIC_URL,
@@ -19,19 +18,17 @@ if (process.env.NODE_ENV === 'development') {
         `http://api-production-9332.up.railway.app/graphql`;
     API_URL = `http://${HOST}:8080/graphql`;
 } else if (process.env.NODE_ENV === 'production') {
-    HOST = process.env.HOST;
+    CRON_PORT = process.env.PORT;
+    REDIS_HOST = process.env.REDIS_HOST;
     REDIS_PORT = process.env.REDIS_PORT;
     REDIS_USER = process.env.REDIS_USER;
     REDIS_PASSWORD = process.env.REDIS_PASSWORD;
-    API_PORT = process.env.PORT;
-    API_PUBLIC_URL = process.env.API_PUBLIC_URL;
-    API_URL = process.env.API_PRIVATE_URL;
+    API_PRIVATE_URL = process.env.API_PRIVATE_URL;
 }
 
 module.exports = {
     HOST,
     REDIS_PORT,
-    API_PORT,
     REDIS_USER,
     REDIS_PASSWORD,
     API_PUBLIC_URL,

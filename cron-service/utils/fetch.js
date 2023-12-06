@@ -1,11 +1,11 @@
-const { API_URL } = require('../config.js');
+const { API_PRIVATE_URL } = require('../config.js');
 
 const getLogger = require('../logging/logger.js');
 const logger = getLogger('express');
 
 const fetchGQL = async (query, variables) => {
     try {
-        const res = await fetch(API_URL, {
+        const res = await fetch(API_PRIVATE_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

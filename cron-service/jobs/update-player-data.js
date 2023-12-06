@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // test data
-const testData = require('./test-data.js');
+// const testData = require('./test-data.js');
 
 // utils
 const fetchGQL = require('../utils/fetch.js');
@@ -20,10 +20,10 @@ const getLogger = require('../logging/logger.js');
 const logger = getLogger('worker');
 
 const updateGoalData = async () => {
-    // let { kickoffTime, gameWeekId } = workerData;
+    let { kickoffTime, gameWeekId } = workerData;
 
-    const kickoffTime = '2023-11-04T17:30:00Z';
-    const gameWeekId = 11;
+    // const kickoffTime = '2023-11-04T17:30:00Z';
+    // const gameWeekId = 11;
 
     if (parentPort) {
         parentPort.postMessage(`Worker starting...👷 `);
@@ -86,8 +86,8 @@ const updateGoalData = async () => {
                 );
             }
 
-            // const data = await res.json();
-            const data = testData;
+            const data = await res.json();
+            // const data = testData;
 
             if (data.elements[0] === null) {
                 if (parentPort) {
@@ -489,7 +489,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 2) {
+        if (i === 60) {
             if (parentPort) {
                 parentPort.postMessage('done');
             } else {
@@ -497,6 +497,6 @@ const updateGoalData = async () => {
                 process.exit(0);
             }
         }
-    }, 2000);
+    }, 120000);
 };
 updateGoalData();
