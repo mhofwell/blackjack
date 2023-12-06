@@ -55,10 +55,10 @@ const schema = makeExecutableSchema({
 //     max: 20,
 // });
 
-// Create an Express app and HTTP server; attach both the WebSocket
-// server and the ApolloServer to this HTTP server.
+// create the express application. 
 const app = express();
 
+// set the number of proxies between server and user. 
 app.set('trust proxy', 1);
 
 // Proxy test endpoint.
@@ -66,13 +66,13 @@ app.get('/ip', (request, response) => response.send(request.ip));
 
 const httpServer = createServer(app);
 
-// Create WebSocket server using the HTTP server we just set up.
+// Create WebSocket server.
 const wsServer = new WebSocketServer({
     server: httpServer,
     path: '/graphql',
 });
 
-// Save returned server's info so we can shutdown this server later
+// Save returned server's info so we can shutdown this server later.
 const wsServerCleanup = useServer(
     {
         schema,
@@ -136,7 +136,7 @@ const main = async () => {
     });
 
     // http server start
-    httpServer.listen(proess.env.PORT, '0.0.0.0', () => {
+    httpServer.listen(process.env.PORT, '0.0.0.0', () => {
         logger.info(
             `Apollo/GraphQL websocket service is live on endpoint: ${process.env.PORT}/graphql`
         );
