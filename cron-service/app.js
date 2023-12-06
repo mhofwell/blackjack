@@ -40,7 +40,6 @@ const main = async () => {
         pingRedis();
     }, 500);
 
-    console.log('API URL', API_URL);
     // Middleware for the express application.
     app.use(cors(), helmet(), limiter, bodyParser.json());
 
