@@ -28,6 +28,7 @@ if (process.env.NODE_ENV === 'development') {
     API_URL = `https://${process.env.API_PRIVATE_URL}:5647/graphql`;
 }
 
+
 module.exports = {
     HOST,
     REDIS_PORT,
