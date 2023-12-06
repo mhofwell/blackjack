@@ -23,7 +23,7 @@ const logger = getLogger('cron_service');
 const startGameweekUpdates = require('./jobs/main.js');
 
 // constants
-const { CRON_PORT, HOST, API_URL } = require('./config.js');
+const { PORT, HOST, API_URL } = require('./config.js');
 
 // rate limiter
 const limiter = rateLimit({
