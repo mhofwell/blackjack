@@ -12,7 +12,8 @@
         "dev": "export NODE_ENV=development && node app.js",
         "prod": "export NODE_ENV=production && node app.js",
         "railway": "sleep 3 && npm run prod",
-        "healthcheck": "node utils/healthcheck-express.js"
+        "healthcheck": "node utils/healthcheck-express.js",
+        "cleanup": "node utils/cleanup.js"
     },
     "author": "",
     "license": "ISC",

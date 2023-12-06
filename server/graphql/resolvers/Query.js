@@ -288,14 +288,16 @@ const Query = {
                     players.push(player);
                 });
                 logger.info(
-                    `gw-worker-${kt} > Players fetched for club ${teamIdArray[id]}`
+                    `gw-worker-${kt} > Players fetched from EPL for club ${teamIdArray[id]}`
                 );
             }
             logger.info(`gw-worker-${kt} > All players fetched.`);
+
             logger.debug({ players: players }, `gw-worker-${kt} > Players`);
+
             return players;
         } catch (err) {
-            logger.warn(`gw-worker-${kt} > Error fetching club players`);
+            logger.warn(`gw-worker-${kt} > Error fetching club players from EPL.`);
             logger.error(err);
             process.exit(1);
         }

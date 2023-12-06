@@ -39,34 +39,31 @@ const Mutation = {
         try {
             logger.debug(
                 { headers: req.rawHeaders, body: req.body },
-                `gw-worker-fixtures > Update fixtures mutation request.`
+                `gw-worker-kickoffTimes > Update fixtures mutation request.`
             );
             logger.info(
-                `gw-worker-fixtures > Updating fixtures for the next gameweek.`
+                `gw-worker-kickoffTimes > Updating fixtures for the next gameweek.`
             );
-
-            // const kickoffTimeCount = await prisma.kickoff.count();
-            // kickoffTimeCount > 0 ? await prisma.kickoff.deleteMany() : '';
 
             const c = await prisma.kickoff.createMany({
                 data: input,
             });
 
-            logger.info({ count: c }, 'C');
+            logger.debug({ count: c }, 'Count.');
 
             if (c.count > 0) {
                 logger.info(
-                    `gw-worker-fixtures > Updated ${c.count} fixtures successfully.`
+                    `gw-worker-kickoffTimes > Updated ${c.count} fixtures successfully.`
                 );
                 return true;
             } else {
                 throw new Error(
-                    `gw-worker-fixtures > Error saving entries to Prisma.`
+                    `gw-worker-kickoffTimes > Error saving entries to Prisma.`
                 );
             }
         } catch (err) {
             logger.warn(
-                `gw-worker-fixtures > Something went wrong during entry updating.`
+                `gw-worker-kickoffTimes > Something went wrong during entry updating.`
             );
             logger.error(err);
             return 1;
