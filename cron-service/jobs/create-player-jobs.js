@@ -23,7 +23,7 @@ const createGoalUpdateJobs = async () => {
         }
       }`;
 
-    const res = await fetchGQL(query, null);
+    const res = await fetchGQL(query, {});
 
     console.log("response", res)
 
@@ -40,7 +40,6 @@ const createGoalUpdateJobs = async () => {
     const jobPath = path.resolve('./jobs/update-player-data.js');
 
     let newCronJobs = [];
-
 
     fixtures.forEach((fixture) => {
         newCronJobs.push({
