@@ -23,7 +23,7 @@ const createGoalUpdateJobs = async () => {
         }
       }`;
 
-    const res = await fetchGQL(query, {});
+    const res = await fetchGQL(query, null);
 
     const fixtures = res.allKickoffTimes;
 
