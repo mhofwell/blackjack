@@ -2,9 +2,11 @@ let HOST,
     REDIS_PORT,
     CRON_PORT,
     REDIS_USER,
+    REDIS_HOST,
     REDIS_PASSWORD,
     API_PUBLIC_URL,
-    API_PRIVATE_URL;
+    API_PRIVATE_URL,
+    REDIS_URL;
 
 if (process.env.NODE_ENV === 'development') {
     HOST = 'localhost';
@@ -18,7 +20,7 @@ if (process.env.NODE_ENV === 'development') {
         process.env.API_PUBLIC_URL ||
         `http://api-production-9332.up.railway.app/graphql`;
     API_URL = `http://${HOST}:8080/graphql`;
-    REDIS_URL = '';
+    REDIS_URL = 'NONE';
 } else if (process.env.NODE_ENV === 'production') {
     HOST = process.env.HOST;
     CRON_PORT = process.env.PORT;

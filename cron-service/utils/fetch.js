@@ -1,4 +1,4 @@
-const { API_PRIVATE_URL } = require('../config.js');
+const { API_URL } = require('../config.js');
 
 const getLogger = require('../logging/logger.js');
 const logger = getLogger('express');

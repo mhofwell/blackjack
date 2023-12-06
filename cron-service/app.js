@@ -23,7 +23,7 @@ const logger = getLogger('cron_service');
 const startGameweekUpdates = require('./jobs/main.js');
 
 // constants
-const { CRON_PORT, HOST } = require('./config.js');
+const { CRON_PORT, HOST, REDIS_URL } = require('./config.js');
 
 // rate limiter
 const limiter = rateLimit({
@@ -34,12 +34,14 @@ const limiter = rateLimit({
 // Init the web server
 const app = express();
 
+
 const main = async () => {
     setTimeout(() => {
         pingEpl();
         pingRedis();
     }, 500);
-
+    
+    console.log(REDIS_URL);
     // Middleware for the express application.
     app.use(cors(), helmet(), limiter, bodyParser.json());
 
