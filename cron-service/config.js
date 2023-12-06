@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_USER = process.env.REDIS_USER;
     REDIS_PASSWORD = process.env.REDIS_PASSWORD;
     REDIS_URL = process.env.REDIS_URL;
-    API_URL = `${process.env.API_PRIVATE_URL}:8080/graphql`;
+    API_URL = `${process.env.API_PRIVATE_URL}`;
 }
 
 module.exports = {
