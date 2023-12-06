@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { getClient } from './apollo/client';
 import getLogger from './logger/logger.js';
 
-// export const revalidate = 1;
+export const revalidate = 1;
 
 const logger = getLogger('client');
 
