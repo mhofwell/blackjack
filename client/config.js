@@ -7,6 +7,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const API_URL_STRING = `https://${API_URL}/graphql`;
-const WS_URL_STRING = `ws://${API_URL}/graphql`;
+const WS_URL_STRING = `wss://${API_URL}/graphql`;
 
 export { API_URL_STRING, WS_URL_STRING };
