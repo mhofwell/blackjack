@@ -22,6 +22,7 @@ if (process.env.NODE_ENV === 'development') {
     CLIENT_PORT = process.env.CLIENT_PORT;
     NODE_PORT = process.env.PORT;
     process.env.DATABASE_URL = process.env.LOCAL_DB || process.env.DATABASE_URL;
+    process.env.PORT = 8080; 
 }
 
 export {
