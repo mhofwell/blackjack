@@ -1,4 +1,12 @@
-let HOST, REDIS_PORT, PORT, REDIS_USER, REDIS_HOST, REDIS_PASSWORD, REDIS_URL;
+let HOST,
+    REDIS_PORT,
+    PORT,
+    REDIS_USER,
+    REDIS_HOST,
+    REDIS_PASSWORD,
+    REDIS_URL,
+    ITERATION_LENGTH,
+    ITERATIONS;
 
 if (process.env.NODE_ENV === 'development') {
     PORT = 9000;
@@ -10,6 +18,8 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_USER = '';
     REDIS_PASSWORD = '';
     REDIS_URL = 'NONE';
+    ITERATION_LENGTH = 1000;
+    ITERATIONS = 2;
 } else if (process.env.NODE_ENV === 'production') {
     PORT = process.env.PORT;
     HOST = process.env.HOST;
@@ -20,6 +30,8 @@ if (process.env.NODE_ENV === 'development') {
     REDIS_USER = process.env.REDIS_USER;
     REDIS_PASSWORD = process.env.REDIS_PASSWORD;
     REDIS_URL = process.env.REDIS_URL;
+    ITERATION_LENGTH = 120000;
+    ITERATIONS = 60;
 }
 
 module.exports = {
@@ -32,4 +44,6 @@ module.exports = {
     REDIS_USER,
     REDIS_PASSWORD,
     REDIS_URL,
+    ITERATION_LENGTH,
+    ITERATIONS,
 };
