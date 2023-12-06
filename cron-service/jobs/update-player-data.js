@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // test data
-// const testData = require('./test-data.js');
+const testData = require('./test-data.js');
 
 // utils
 const fetchGQL = require('../utils/fetch.js');
@@ -20,10 +20,10 @@ const getLogger = require('../logging/logger.js');
 const logger = getLogger('worker');
 
 const updateGoalData = async () => {
-    let { kickoffTime, gameWeekId } = workerData;
+    // let { kickoffTime, gameWeekId } = workerData;
 
-    // const kickoffTime = '2023-11-04T17:30:00Z';
-    // const gameWeekId = 11;
+    const kickoffTime = '2023-11-04T17:30:00Z';
+    const gameWeekId = 11;
 
     if (parentPort) {
         parentPort.postMessage(`Worker starting...👷 `);
@@ -55,9 +55,11 @@ const updateGoalData = async () => {
 
     let players = res.getGameweekPlayers;
 
+    
     let i = 0;
-
+    
     setInterval(async () => {
+        console.log('test');
         i++;
 
         if (parentPort) {
@@ -73,7 +75,7 @@ const updateGoalData = async () => {
             // fetch gameweek players from EPL
             const res = await fetch(
                 // event {gw} live. This gets players for the gameweek
-                `https://fantasy.premierleague.com/api/event/${gameWeekId}/live/`
+                `https://fantasy.premierleague.com/api/event/${gameWeekId}/live`
             );
 
             if (parentPort) {
@@ -86,8 +88,8 @@ const updateGoalData = async () => {
                 );
             }
 
-            const data = await res.json();
-            // const data = testData;
+            // const data = await res.json();
+            const data = testData;
 
             if (data.elements[0] === null) {
                 if (parentPort) {
@@ -333,7 +335,6 @@ const updateGoalData = async () => {
                         netGoalDiff = goalDiff - ownGoalDiff;
                     }
 
-                    player.net_goals = netGoalDiff + player.net_goals;
                     player.kickoffTime = kickoffTime;
 
                     logger.debug(
@@ -489,7 +490,7 @@ const updateGoalData = async () => {
                 process.exit(1);
             }
         }
-        if (i === 60) {
+        if (i === 2) {
             if (parentPort) {
                 parentPort.postMessage('done');
             } else {
@@ -497,6 +498,6 @@ const updateGoalData = async () => {
                 process.exit(0);
             }
         }
-    }, 120000);
+    }, 1000);
 };
 updateGoalData();

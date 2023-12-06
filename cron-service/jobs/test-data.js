@@ -4,7 +4,7 @@ const testData = {
             id: 6,
             stats: {
                 minutes: 0,
-                goals_scored: 1,
+                goals_scored: 2,
                 assists: 0,
                 clean_sheets: 0,
                 goals_conceded: 0,
