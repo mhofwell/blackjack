@@ -146,10 +146,10 @@ const main = async () => {
         );
     });
 
-    
     setTimeout(() => {
         pingRedis();
     }, 500);
 };
+
 
 main();
