@@ -90,8 +90,6 @@ const getWeeklyFixtures = async () => {
                 kickoffTimes: kickoffTimes,
             });
         }
-        console.log(kickoffTimesToSave);
-        // IF THERE ARE FIXTURES DELETE ALL FIXTURES BEFORE maybe do it in the gql Mutation.
 
         const query = `mutation Mutation($input: [kickoffTimeInput!]!) {
             updateKickoffTimes(input: $input)
