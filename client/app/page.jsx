@@ -3,9 +3,9 @@ import { gql } from '@apollo/client';
 import { getClient } from './apollo/client';
 import getLogger from './logger/logger.js';
 
-export const revalidate = 1;
-
 const logger = getLogger('client');
+
+export const revalidate = 5;
 
 const POOL_QUERY = gql`
     query Pools {
@@ -47,11 +47,11 @@ const POOL_QUERY = gql`
 export default async function Home() {
     const { data, loading, error } = await getClient().query({
         query: POOL_QUERY,
-        context: {
-            fetchOptions: {
-                next: { revalidate: 1 },
-            },
-        },
+        // context: {
+        //     fetchOptions: {
+        //         next: { revalidate: 5 },
+        //     },
+        // },
     });
 
     let pools;
