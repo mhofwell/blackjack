@@ -30,7 +30,5 @@
         "react-dom": "^18",
         "tailwindcss": "^3.3.6"
     },
-    "devDependencies": {
-        "tailwindcss": "^3.3.6"
-    }
+    "devDependencies": {}
 }
