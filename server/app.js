@@ -85,6 +85,8 @@ const wsServerCleanup = useServer(
     wsServer
 );
 
+console.log(process.env.DATABASE_URL);
+
 // Create ApolloServer.
 const server = new ApolloServer({
     schema,
