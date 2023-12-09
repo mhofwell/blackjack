@@ -127,7 +127,7 @@ const main = async () => {
     app.use(
         '/graphql',
         // cors(),
-        helmet(),
+        // helmet(),
         // limiter,
         bodyParser.json(),
         expressMiddleware(server, {
