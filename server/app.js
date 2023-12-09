@@ -126,7 +126,7 @@ const main = async () => {
     // Middleware for the express application.
     app.use(
         '/graphql',
-        cors(),
+        // cors(),
         helmet(),
         // limiter,
         bodyParser.json(),
