@@ -39,7 +39,14 @@ const logger = getLogger('express');
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { PORT } from './config.js';
+// constants
+
+import {
+    CLIENT_PRIVATE_URL,
+    DB_PRIVATE_URL,
+    MS_PRIVATE_URL,
+    PORT,
+} from './config.js';
 
 logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
 
@@ -51,6 +58,10 @@ const schema = makeExecutableSchema({
         Subscription,
     },
 });
+
+const corsArray = [CLIENT_PRIVATE_URL, MS_PRIVATE_URL, DB_PRIVATE_URL];
+
+console.log(corsArray);
 
 // const limiter = rateLimit({
 //     windowMs: 1 * 60 * 1000, // 1 minute
@@ -84,8 +95,6 @@ const wsServerCleanup = useServer(
     },
     wsServer
 );
-
-console.log(process.env.DATABASE_URL);
 
 // Create ApolloServer.
 const server = new ApolloServer({
@@ -126,7 +135,7 @@ const main = async () => {
     // Middleware for the express application.
     app.use(
         '/graphql',
-        // cors(),
+        cors(corsArray),
         // helmet(),
         // limiter,
         bodyParser.json(),
