@@ -41,12 +41,12 @@ dotenv.config();
 
 // constants
 
-import {
-    CLIENT_PRIVATE_URL,
-    DB_PRIVATE_URL,
-    MS_PRIVATE_URL,
-    PORT,
-} from './config.js';
+// import {
+//     CLIENT_PRIVATE_URL,
+//     DB_PRIVATE_URL,
+//     MS_PRIVATE_URL,
+//     PORT,
+// } from './config.js';
 
 logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
 
@@ -135,7 +135,7 @@ const main = async () => {
     // Middleware for the express application.
     app.use(
         '/graphql',
-        cors(corsArray),
+        // cors(),
         // helmet(),
         // limiter,
         bodyParser.json(),
