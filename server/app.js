@@ -39,15 +39,6 @@ const logger = getLogger('express');
 import dotenv from 'dotenv';
 dotenv.config();
 
-// constants
-
-// import {
-//     CLIENT_PRIVATE_URL,
-//     DB_PRIVATE_URL,
-//     MS_PRIVATE_URL,
-//     PORT,
-// } from './config.js';
-
 logger.warn(`Launching in ${process.env.NODE_ENV.toUpperCase()}`);
 
 const schema = makeExecutableSchema({
@@ -58,10 +49,6 @@ const schema = makeExecutableSchema({
         Subscription,
     },
 });
-
-const corsArray = [CLIENT_PRIVATE_URL, MS_PRIVATE_URL, DB_PRIVATE_URL];
-
-console.log(corsArray);
 
 // const limiter = rateLimit({
 //     windowMs: 1 * 60 * 1000, // 1 minute
