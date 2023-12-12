@@ -3,7 +3,7 @@ let PORT,
     REDIS_PORT,
     CLIENT_PORT,
     REDIS_USER,
-    REDIS_PASSWORD,
+    REDIS_PASSWORD
 
 
 if (process.env.NODE_ENV === 'development') {
