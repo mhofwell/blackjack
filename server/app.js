@@ -8,10 +8,10 @@ import { WebSocketServer } from 'ws';
 
 // middleware
 import { expressMiddleware } from '@apollo/server/express4';
-import cors from 'cors';
+// import cors from 'cors';
 import bodyParser from 'body-parser';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+// import helmet from 'helmet';
+// import rateLimit from 'express-rate-limit';
 
 // test services
 import { pingRedis } from './utils/services.js';
