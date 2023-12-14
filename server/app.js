@@ -35,6 +35,9 @@ import { ApolloServer } from '@apollo/server';
 import getLogger from './logging/logger.js';
 const logger = getLogger('express');
 
+// constants
+import { PORT } from './config.js';
+
 // env
 import dotenv from 'dotenv';
 dotenv.config();
