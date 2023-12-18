@@ -5,6 +5,7 @@ import getLogger from './logger/logger.js';
 
 const logger = getLogger('client');
 
+
 // export const revalidate = 5;
 export const dynamic = 'force-dynamic';
 
