@@ -1,4 +1,4 @@
-let API_URL, WS_URL;
+let API_URL, WS_URL, API_BASE;
 
 if (process.env.NODE_ENV === 'development') {
     API_URL = process.env.API_URL;
@@ -9,4 +9,4 @@ if (process.env.NODE_ENV === 'development') {
     WS_URL = `wss://${API_BASE}/graphql`;
 }
 
-export { API_URL, WS_URL };
+export { API_URL, WS_URL, API_BASE };
