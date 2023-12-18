@@ -1,12 +1,12 @@
 import PoolList from './components/PoolList';
 import { gql } from '@apollo/client';
-import { getClient } from './apollo/client';
+import { getClient } from './apollo/client.js';
 import getLogger from './logger/logger.js';
 
 const logger = getLogger('client');
 
-
-export const revalidate = 5;
+// export const revalidate = 5;
+export const dynamic = 'force-dynamic';
 
 const POOL_QUERY = gql`
     query Pools {

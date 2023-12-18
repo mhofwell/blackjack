@@ -3,7 +3,9 @@ import Entry from './Entry';
 import Card from './Card';
 import { useState, useEffect } from 'react';
 import { gql, useSubscription } from '@apollo/client';
-import sortByNetGoals from '../utils/sort';
+import sortByNetGoals from '../utils/sort.js';
+
+export const revalidate = 5;
 
 const POOL_SUBSCRIPTION = gql`
     subscription Subscription {
