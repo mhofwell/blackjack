@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "sleep 3 && next build",
-        "start": "export API_URL=process.env.API_PRIVATE_URL && next start",
+        "start": "export API_BASE=process.env.API_PRIVATE_URL && next start",
         "lint": "next lint"
     },
     "dependencies": {

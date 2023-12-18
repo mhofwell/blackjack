@@ -3,8 +3,8 @@ import { gql } from '@apollo/client';
 import { getClient } from './apollo/client.js';
 import getLogger from './logger/logger.js';
 
+import API_BASE from '../config.js';
 const logger = getLogger('client');
-
 
 // export const revalidate = 5;
 export const dynamic = 'force-dynamic';
@@ -65,6 +65,8 @@ export default async function Home() {
         logger.warn('Could not reach server.');
         pools = [];
     }
+
+    console.log('API_BASE', API_BASE);
 
     return (
         <main>
