@@ -36,7 +36,7 @@ import getLogger from './logging/logger.js';
 const logger = getLogger('express');
 
 // constants
-import { PORT } from './config.js';
+import { PORT, REDIS_HOST } from './config.js';
 
 // env
 import dotenv from 'dotenv';
