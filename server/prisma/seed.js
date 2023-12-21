@@ -154,7 +154,7 @@ async function main() {
             data,
             select: {
                 id: true,
-                fn: true,
+                ln: true,
                 club: { select: { name: true } },
             },
         });

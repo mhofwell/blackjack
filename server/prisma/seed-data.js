@@ -71,7 +71,7 @@ const users = [
             p1: 303,
             p2: 225,
             p3: 354,
-            p4: 552,
+            p4: 344,
         },
     },
     {
@@ -114,7 +114,7 @@ const users = [
             pool: 'CANADA',
             suit: 'HEARTS',
             p1: 354,
-            p2: 376,
+            p2: 450,
             p3: 140,
             p4: 20,
         },
@@ -310,7 +310,7 @@ const users = [
             suit: 'DIAMONDS',
             p1: 290,
             p2: 140,
-            p3: 568,
+            p3: 664,
             p4: 20,
         },
     },
@@ -362,14 +362,14 @@ const users = [
 ];
 
 const picks = [
-    'Alexander-Arnold',
-    'Antonio', // *
-    'Ødegaard', 
-    'Aurier', // *
-    'Calvert-Lewin', // *
-    'Chilwell', // *
-    'dos Santos de Oliveira', //Danilo
-    'Dasilva', // *
+    'Alexander-Arnold', // OK
+    'Antonio', // * OK
+    'Ødegaard', // OK
+    'Aurier', // * OK
+    'Calvert-Lewin', // * OK
+    'Chilwell', // * OK
+    'dos Santos de Oliveira', //Danilo // OK
+    'Dasilva', // * OK
     'Fernández', // *
     'Gakpo', // *
     'Gibbs-White', // *
@@ -387,7 +387,8 @@ const picks = [
     'Mount', // *
     'Mudryk', // *
     'Junqueira de Jesus', // João Pedro
-    'Castelo Podence',
+    // 'Castelo Podence',
+    'Ward-Prowse',
     'Rice', // *
     'Saliba', // *
     'Solanke', // *
@@ -402,7 +403,7 @@ const picks = [
     'Bowen', // *
     'Watkins', // *
     'Casimiro', //Casemiro
-    'Silva', // *
+    'Veiga de Carvalho e Silva', // * *****
     'Díaz', // *
     'Foden', // *
     'Eze', // *
@@ -411,6 +412,7 @@ const picks = [
     'De Cordova-Reid', // *
     'Palhinha Gonçalves', // Palhinha
     'Hoelgebaum Pereira',
+    // 'James',
 ];
 const fnln = [
     { fn: 'Reece', ln: 'James' },
