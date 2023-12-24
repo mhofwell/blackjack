@@ -4,14 +4,34 @@ import sortByNetGoalsDsc from '../utils/sort-net-goals.js';
 import { fnln, picks, users } from './seed-data.js';
 
 async function sortPools() {
+
     const poolsToSort = await prisma.pool.findMany({
         include: {
             entries: true,
         },
     });
+
     console.log('PTS', poolsToSort);
 
     for (const pool of poolsToSort) {
+
+            // do the check to see if +21 and/or A4S case applies here. 
+
+            //  // use push() method to add to the end of the array
+
+            // if over 21 WON = False
+
+            // if A4S and < 22 total goals get into an array. 
+
+            // Otherwise rank them with a "-"
+
+            // if thats the case ^^ we can update the "WON" category here. 
+
+            // we should do an "if" check when we want to rank entries to see: 
+            
+            // // if each entry has all 4 players that score, then put them into an array to rank. 
+        
+
         const sortedEntries = pool.entries.sort(sortByNetGoalsDsc);
 
         // update the rank of each entry

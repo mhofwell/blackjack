@@ -84,6 +84,20 @@ const Mutation = {
                 `gw-worker-${kt} > Finding entry ${inputId} to mutate.`
             );
 
+            // do the check to see if +21 and/or A4S case applies here. 
+
+            // if over 21 WON = False
+
+            // if A4S and < 22 total goals get into an array. 
+
+            // Otherwise rank them with a "-"
+
+            // if thats the case ^^ we can update the "WON" category here. 
+
+            // we should do an "if" check when we want to rank entries to see: 
+            
+            // // if each entry has all 4 players that score, then put them into an array to rank. 
+
             const entry = await prisma.entry.update({
                 where: {
                     id: input.id,
@@ -108,7 +122,10 @@ const Mutation = {
                 },
             });
 
+            // 
+
             const sortedEntries = pool.entries.sort(sortByNetGoalsDsc);
+
             logger.info(`gw-worker-${kt} > Finished sorting entries.`);
             logger.debug(
                 { sortedEntries: sortedEntries },
