@@ -10,8 +10,8 @@ const rateLimit = require('express-rate-limit');
 // test services
 const { pingRedis, pingEpl } = require('./utils/services.js');
 
-// env
-const dotenv = require('dotenv');
+
+
 
 // logger
 const getLogger = require('./logging/logger.js');
@@ -23,7 +23,7 @@ const logger = getLogger('cron_service');
 const startGameweekUpdates = require('./jobs/main.js');
 
 // constants
-const { PORT, HOST, API_URL } = require('./config.js');
+const { PORT, HOST } = require('./config.js');
 
 // rate limiter
 const limiter = rateLimit({
@@ -39,6 +39,8 @@ const main = async () => {
         pingEpl();
         pingRedis();
     }, 500);
+
+    console.log(process.env.EPL_API_FUTURE);
 
     // Middleware for the express application.
     app.use(cors(), helmet(), limiter, bodyParser.json());
