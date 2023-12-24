@@ -3,7 +3,6 @@ import { gql } from '@apollo/client';
 import { getClient } from './apollo/client.js';
 import getLogger from './logger/logger.js';
 
-import { API_BASE } from '../config.js';
 const logger = getLogger('client');
 
 // export const revalidate = 5;
