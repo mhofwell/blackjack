@@ -134,7 +134,7 @@ const main = async () => {
         // cors(),
         // helmet(),
         '/graphql',
-        limiter,
+        // limiter,
         bodyParser.json(),
         expressMiddleware(server, {
             context: async ({ req }) => {
