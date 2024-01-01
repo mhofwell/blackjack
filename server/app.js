@@ -8,7 +8,7 @@ import { WebSocketServer } from 'ws';
 
 // middleware
 import { expressMiddleware } from '@apollo/server/express4';
-// import cors from 'cors';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 // import helmet from 'helmet';
 // import rateLimit from 'express-rate-limit';
@@ -111,8 +111,9 @@ const server = new ApolloServer({
 
 const corsConfig = {
     origin: [
-        'http://client.railway.internal',
-        'http://epl-blackjack.up.railway.app',
+        'https://client.railway.internal',
+        'https://client-development.up.railway.app',
+        'https://epl-blackjack.up.railway.app',
     ],
 };
 
@@ -131,9 +132,9 @@ const main = async () => {
 
     // Middleware for the express application.
     app.use(
-        // cors(),
-        // helmet(),
         '/graphql',
+        // helmet(),
+        cors(corsConfig),
         // limiter,
         bodyParser.json(),
         expressMiddleware(server, {
