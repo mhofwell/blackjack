@@ -119,6 +119,7 @@ const corsConfig = {
 
 const main = async () => {
     // Apollo/GraphQL server start
+    
     await server.start();
 
     if (server) {
