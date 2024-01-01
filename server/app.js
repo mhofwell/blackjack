@@ -36,7 +36,7 @@ import getLogger from './logging/logger.js';
 const logger = getLogger('express');
 
 // constants
-import { PORT, REDIS_HOST } from './config.js';
+import { PORT } from './config.js';
 
 // env
 import dotenv from 'dotenv';
@@ -53,10 +53,10 @@ const schema = makeExecutableSchema({
     },
 });
 
-// const limiter = rateLimit({
-//     windowMs: 1 * 60 * 1000, // 1 minute
-//     max: 20,
-// });
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 20,
+});
 
 // create the express application.
 const app = express();
@@ -109,6 +109,13 @@ const server = new ApolloServer({
     ],
 });
 
+const corsConfig = {
+    origin: [
+        'http://client.railway.internal',
+        'http://epl-blackjack.up.railway.app',
+    ],
+};
+
 const main = async () => {
     // Apollo/GraphQL server start
     await server.start();
@@ -124,10 +131,10 @@ const main = async () => {
 
     // Middleware for the express application.
     app.use(
-        '/graphql',
         // cors(),
         // helmet(),
-        // limiter,
+        '/graphql',
+        limiter,
         bodyParser.json(),
         expressMiddleware(server, {
             context: async ({ req }) => {
