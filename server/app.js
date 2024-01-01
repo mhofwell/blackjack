@@ -53,10 +53,10 @@ const schema = makeExecutableSchema({
     },
 });
 
-const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 20,
-});
+// const limiter = rateLimit({
+//     windowMs: 1 * 60 * 1000, // 1 minute
+//     max: 20,
+// });
 
 // create the express application.
 const app = express();
