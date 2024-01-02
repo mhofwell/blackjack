@@ -9,6 +9,7 @@ import { WebSocketServer } from 'ws';
 // middleware
 import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import bodyParser from 'body-parser';
 // import helmet from 'helmet';
 // import rateLimit from 'express-rate-limit';
@@ -53,10 +54,16 @@ const schema = makeExecutableSchema({
     },
 });
 
-// const limiter = rateLimit({
-//     windowMs: 1 * 60 * 1000, // 1 minute
-//     max: 20,
-// });
+let limiter;
+
+if (process.env.NODE_ENV === 'development') {
+    limiter = null;
+} else {
+    limiter = rateLimit({
+        windowMs: 1 * 60 * 1000, // 1 minute
+        max: 20,
+    });
+}
 
 // create the express application.
 const app = express();
@@ -135,7 +142,7 @@ const main = async () => {
         '/graphql',
         // helmet(),
         cors(corsConfig),
-        // limiter,
+        limiter,
         bodyParser.json(),
         expressMiddleware(server, {
             context: async ({ req }) => {
