@@ -57,7 +57,10 @@ const schema = makeExecutableSchema({
 let limiter;
 
 if (process.env.NODE_ENV === 'development') {
-    limiter = null;
+    limiter = rateLimit({
+        windowMs: 1 * 60 * 1000, // 1 minute
+        max: 100000,
+    });
 } else {
     limiter = rateLimit({
         windowMs: 1 * 60 * 1000, // 1 minute
@@ -140,8 +143,8 @@ const main = async () => {
     // Middleware for the express application.
     app.use(
         '/graphql',
-        // helmet(),
         cors(corsConfig),
+        // helmet(),
         limiter,
         bodyParser.json(),
         expressMiddleware(server, {
