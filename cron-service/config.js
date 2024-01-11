@@ -7,7 +7,9 @@ let HOST,
     REDIS_URL,
     ITERATION_LENGTH,
     ITERATIONS,
-    EPL_API;
+    EPL_API,
+    API_URL,
+    API_PORT;
 
 if (process.env.NODE_ENV === 'development') {
     PORT = 9000;

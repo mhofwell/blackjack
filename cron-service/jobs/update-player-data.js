@@ -4,6 +4,9 @@ const { workerData, parentPort } = require('worker_threads');
 const dotenv = require('dotenv');
 dotenv.config();
 
+// utility functions
+const getGameweekPlayers = require('./utils/getGameweekPlayers.js');
+
 // test data
 const testData = require('./test-data.js');
 
@@ -19,49 +22,30 @@ const { ITERATION_LENGTH, ITERATIONS } = require('../config.js');
 
 // logging
 const getLogger = require('../logging/logger.js');
+const { worker } = require('../logging/log-level.js');
 
 const logger = getLogger('worker');
 
+// globals
+let kickoffTime, gameWeekId;
+
+// environment config
+if (process.env.NODE_ENV === production) {
+    kickoffTime = workerData.kickoffTime;
+    gameWeekId = worker.gameWeekId;
+} else {
+    kickoffTime = '2023-11-04T17:30:00Z';
+    gameWeekId = 11;
+}
+
 const updateGoalData = async () => {
-    let { kickoffTime, gameWeekId } = workerData;
+    const players = getGameweekPlayers(kickoffTime, gameWeekId);
 
-    // const kickoffTime = '2023-11-04T17:30:00Z';
-    // const gameWeekId = 11;
-
-    if (parentPort) {
-        parentPort.postMessage(`Worker starting...👷 `);
-    } else {
-        logger.info(`Worker starting...👷 `);
-    }
-
-    const queryData = {
-        input: {
-            kickoffTime,
-            gameWeekId,
-        },
-    };
-
-    const query = `query Query($input: getGameweekPlayers) {
-        getGameweekPlayers(input: $input) {
-          id
-          goals
-          own_goals
-          net_goals
-        }
-      }`;
-
-    const res = await fetchGQL(query, queryData);
-
-    if (!res) {
-        throw new Error('Could not fetch gameweek players from the database.');
-    }
-
-    let players = res.getGameweekPlayers;
+    console.log(players);
 
     let i = 0;
 
     setInterval(async () => {
-        console.log('test');
         i++;
 
         if (parentPort) {
@@ -73,6 +57,7 @@ const updateGoalData = async () => {
                 `Fetching gameweek players in the database for i: ${i}`
             );
         }
+        // get live player data for each interval, remove the try/catch here. 
         try {
             // fetch gameweek players from EPL
             const res = await fetch(
