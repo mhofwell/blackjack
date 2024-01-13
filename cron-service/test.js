@@ -32,36 +32,38 @@
 // const array1a = stats[0].a
 // const array1h = stats[0].h
 
-async function getLiveGoalData() {
-    const res = await fetch(
-        'https://fantasy.premierleague.com/api/fixtures?event=20'
-    );
-    const obj = await res.json();
+const kt = '2023-12-30T12:30:00Z';
 
-    // we have to get kt here and search the object by kt
+async function getLiveGameweekData() {
+    try {
+        const res = await fetch(
+            'https://fantasy.premierleague.com/api/fixtures?event=20'
+        );
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error(err);
+    }
+}
 
-    const allStats = obj[0].stats;
-
-    const goalStats = allStats.find(
-        (stat) => stat.identifier === 'goals_scored'
-    );
-
-   // if away or home have no goals return 
-   // if yes then combine?  
-
-    
-
-    const ownGoalStats = allStats.find(
-        (stat) => stat.identifier === 'own_goals'
-    );
-
-    return { goalStats, ownGoalStats };
+function getFixtures(data, kt) {
+    const fixtures = [];
+    for (const fixture of data) {
+        if (fixture.kickoff_time === kt) {
+            fixtures.push(fixture);
+        }
+    }
+    return fixtures;
 }
 
 async function main() {
-    const liveGoalData = await getLiveGoalData();
+    const liveGameweekData = await getLiveGameweekData();
 
-    console.log(liveGoalData);
+    // console.log('liveGoalData', liveGameweekData);
+
+    const fixtures = await getFixtures(liveGameweekData, kt);
+
+    console.log('fixtures', fixtures);
 }
 
 main();
