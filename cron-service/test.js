@@ -2,18 +2,12 @@
 // can we get a list of all the players, and the entry UUID's they belong to? Get that, save it and use it below.
 // replace console.log with logger
 
-// --
-
-// inputs for the function set to work properly. 
-const kt = '2023-12-30T12:30:00Z';
-const gw = 20;
-
-// this returns the life Gameweek Data
+// this returns the live Gameweek Data
 // this requires the input of the gameweek week.
-async function getLiveGameweekData() {
+async function getLiveGameweekData(gameWeek) {
     try {
         const res = await fetch(
-            `https://fantasy.premierleague.com/api/fixtures?event=${gw}`
+            `https://fantasy.premierleague.com/api/fixtures?event=${gameWeek}`
         );
         const data = await res.json();
         return data;
@@ -22,50 +16,110 @@ async function getLiveGameweekData() {
     }
 }
 
-function getFixtures(data, kt) {
+function getFixturesFromData(data, kickoffTime) {
     const fixtures = [];
     for (const fixture of data) {
-        if (fixture.kickoff_time === kt) {
+        if (fixture.kickoff_time === kickoffTime) {
             fixtures.push(fixture);
         }
     }
     return fixtures;
 }
 
-// check for a change in the size of the goal and own goal arrays.
-function checkForGoalEvent() {}
-
-// check if the goal was from a player in a pool entry.
-function checkForValidPlayer() {}
-
-// if we care about the player, create the cached player data array.
-// maybe we should create a db entry for all of the players in all entries so we can quick index that.
-async function cacheGoalData(fixtures) {}
-
-// get the db ppol entries that contain the player who scored
-async function getEntries() {}
-
-// update the pool entries goals and net goals by the number og goals that scored
-// update entry status here as well: RANKED, UNRANKED, LOST
-// save entries
-// return entries (or maybe only pool UUID of the entries to sort)
-async function updateEntries() {}
-
-// Take in pool UUID's that we need to sort
-// if RANKED, sortByDesc net goals, assign # rank, push into array.
-// if UNRANKED, push into array
-// if LOST, push into array
-// push subscription event through with newly sorted pools.
-async function sortPools() {}
-
-async function main() {
-    const liveGameweekData = await getLiveGameweekData();
-
-    // console.log('liveGoalData', liveGameweekData);
-
-    const fixtures = await getFixtures(liveGameweekData, kt);
-
-    console.log('fixtures', fixtures);
+// This function returns all the players in the database.
+async function getPlayerList() {
+    // call the API route to return player ID's for clubs that play in this kt.
+    // create the GraphQL API route
+    return [362, 154, 222];
 }
 
-main();
+// return players who have scored a goal or an own goal
+function getGoalStats(fixtures, playerList) {
+    let goalStats = [];
+    let ownGoalStats = [];
+
+    for (let fixture of fixtures) {
+        const goalsScored = fixture.stats.find(
+            (stat) => stat.identifier === 'goals_scored'
+        );
+        const ownGoals = fixture.stats.find(
+            (stat) => stat.identifier === 'own_goals'
+        );
+
+        goalStats = goalStats.concat(goalsScored.a, goalsScored.h);
+        ownGoalStats = ownGoalStats.concat(ownGoals.a, ownGoals.h);
+    }
+
+    const stats = { goalStats, ownGoalStats };
+
+    return stats;
+}
+
+function filterGoalStats({ goalStats, ownGoalStats }, playerList) {
+    let filteredGoalStats = [];
+
+    console.log(playerList);
+
+    function removeNonEntryPlayers(stat) {
+        return playerList.indexOf(stat.element) > -1;
+    }
+
+    goalStats.length > 0
+        ? (filteredGoalStats = goalStats.filter(removeNonEntryPlayers))
+        : null;
+
+    let filteredOwnGoalStats = [];
+
+    ownGoalStats.length > 0
+        ? (filteredOwnGoalStats = ownGoalStats.filter(removeNonEntryPlayers))
+        : null;
+
+    const filteredStats = { filteredGoalStats, filteredOwnGoalStats };
+
+    return filteredStats;
+}
+
+// inputs for the function set to work properly.
+const ITERATION_LENGTH = 2000;
+const ITERATIONS = 1;
+const kt = '2023-12-30T12:30:00Z';
+const gw = 20;
+// Goal: Once a player scores a goal or own goal we need to update every user entry across all pools that contain the player(s) who scored.
+async function main(gw, kt) {
+    const playerList = await getPlayerList();
+
+    let i = 0;
+
+    setInterval(async () => {
+        i++;
+
+        // Get live game week data
+        const liveGameweekData = await getLiveGameweekData(gw);
+
+        // Extract the fixtures playing at this kickoff time
+        const fixtures = getFixturesFromData(liveGameweekData, kt);
+
+        // Retrieve live goal stats for players in this kickoff time. 
+        const stats = getGoalStats(fixtures, playerList);
+
+        // Early return. If no stats exist, end iteration.
+        if (stats.ownGoalStats.length === 0 && stats.goalStats.length === 0) {
+            console.log(
+                `i: ${i} No change in initial length. Ending iteration.`
+            );
+            return;
+        }
+
+        // Filter goal stats to remove players who are not in any active entry. 
+        const filteredStats = filterGoalStats(stats, playerList);
+
+        console.log(filteredStats);
+
+        if (i === ITERATIONS) {
+            console.log(`${kt} > Process complete...`);
+            process.exit(0);
+        }
+    }, ITERATION_LENGTH);
+}
+
+main(gw, kt);
