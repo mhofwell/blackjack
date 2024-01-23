@@ -58,21 +58,19 @@ function getGoalStats(fixtures, playerList) {
 function filterGoalStats({ goalStats, ownGoalStats }, playerList) {
     let filteredGoalStats = [];
 
-    console.log(playerList);
-
     function removeNonEntryPlayers(stat) {
         return playerList.indexOf(stat.element) > -1;
     }
 
     goalStats.length > 0
         ? (filteredGoalStats = goalStats.filter(removeNonEntryPlayers))
-        : null;
+        : (filteredGoalStats = goalStats);
 
     let filteredOwnGoalStats = [];
 
     ownGoalStats.length > 0
         ? (filteredOwnGoalStats = ownGoalStats.filter(removeNonEntryPlayers))
-        : null;
+        : (filteredOwnGoalStats = ownGoalStats);
 
     const filteredStats = { filteredGoalStats, filteredOwnGoalStats };
 
@@ -99,7 +97,7 @@ async function main(gw, kt) {
         // Extract the fixtures playing at this kickoff time
         const fixtures = getFixturesFromData(liveGameweekData, kt);
 
-        // Retrieve live goal stats for players in this kickoff time. 
+        // Retrieve live goal stats for players in this kickoff time.
         const stats = getGoalStats(fixtures, playerList);
 
         // Early return. If no stats exist, end iteration.
@@ -110,8 +108,12 @@ async function main(gw, kt) {
             return;
         }
 
-        // Filter goal stats to remove players who are not in any active entry. 
+        // Filter goal stats to remove players who are not in any active entry.
         const filteredStats = filterGoalStats(stats, playerList);
+
+        // check if there's a cache.
+
+        // if cahce and this array are DE, early return #2.
 
         console.log(filteredStats);
 
