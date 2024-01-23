@@ -37,7 +37,7 @@ import getLogger from './logging/logger.js';
 const logger = getLogger('express');
 
 // constants
-import { PORT } from './config.js';
+import { PORT, API_PRIVATE_URL } from './config.js';
 
 // env
 import dotenv from 'dotenv';
@@ -119,13 +119,14 @@ const server = new ApolloServer({
     ],
 });
 
-const corsConfig = {
-    origin: [
-        'https://client.railway.internal',
-        'https://client-development.up.railway.app',
-        'https://epl-blackjack.up.railway.app',
-    ],
-};
+// const corsConfig = {
+//     origin: [
+//         'https://client.railway.internal',
+//         'https://client-development.up.railway.app',
+//         'https://epl-blackjack.up.railway.app',
+//         'http://localhost:*',
+//     ],
+// };
 
 const main = async () => {
     // Apollo/GraphQL server start
@@ -133,7 +134,7 @@ const main = async () => {
 
     if (server) {
         logger.info(
-            `Apollo/GraphQL API is now live on endpoint: ${PORT}/graphql`
+            `Apollo/GraphQL API is now live on endpoint: ${API_PRIVATE_URL}:${PORT}/graphql`
         );
     } else {
         logger.fatal(`Could not start Apollo/GraphQL API`);
@@ -143,7 +144,7 @@ const main = async () => {
     // Middleware for the express application.
     app.use(
         '/graphql',
-        cors(corsConfig),
+        // cors(corsConfig),
         // helmet(),
         limiter,
         bodyParser.json(),
@@ -162,7 +163,7 @@ const main = async () => {
     // http server start
     httpServer.listen(PORT, hostname, () => {
         logger.info(
-            `Apollo/GraphQL websocket service is live on endpoint: ${PORT}/graphql`
+            `Apollo/GraphQL websocket service is live on endpoint: ${API_PRIVATE_URL}:${PORT}/graphql`
         );
     });
 

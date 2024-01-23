@@ -46,7 +46,7 @@ model Entry {
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   winner    Winner   @default(NO)
-  standing  Int?
+  rank      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
