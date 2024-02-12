@@ -92,7 +92,7 @@ export default function UserTable() {
                 <FieldGroup>
                     <Field>
                         <div className="flex items-center justify-between">
-                            <Description>
+                            <Description className="w-1/2">
                                 Select from all of the pools that you organize.
                             </Description>
                             <Select className="w-1/4" name="country">
