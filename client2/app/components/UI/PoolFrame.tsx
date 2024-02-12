@@ -22,6 +22,7 @@ import { Text } from '../text';
 import { Textarea } from '../textarea';
 import { Badge } from '../badge';
 import { Strong, TextLink } from '../text';
+import { Avatar } from '../avatar';
 
 type User = {
     name: string;
@@ -94,15 +95,15 @@ export default function UserTable() {
                             <Description>
                                 Select from all of the pools that you organize.
                             </Description>
-                            <Select className="w-1/3 " name="country">
+                            <Select className="w-1/4" name="country">
                                 <option>Canada</option>
                                 <option>UK</option>
                             </Select>
                         </div>
                     </Field>
                 </FieldGroup>
-               
-                <Table className="py-10 mx-auto">
+
+                <Table className="py-10 px-1 mx-auto">
                     <TableHead>
                         <TableRow>
                             <TableHeader>Avatar</TableHeader>
@@ -117,19 +118,17 @@ export default function UserTable() {
                             <>
                                 <TableRow key={user.handle}>
                                     <TableCell>
-                                        <Image
-                                            className="h-11 w-8"
-                                            src="/mh.png"
-                                            width={1}
-                                            height={1}
-                                            alt="PL Blackjack Logo"
-                                            unoptimized
-                                        ></Image>
+                                        <Avatar 
+                                            className="size-8 pb-10"
+                                            src="mh.png"
+                                            
+                                        />
+                                        {/* fix this so the avatar circle doesn't stretch to fit image */}
                                     </TableCell>
                                     <TableCell className="font-medium">
                                         {user.name}
                                     </TableCell>
-                                    <TableCell className="">
+                                    <TableCell>
                                         {user.net_goals}
                                     </TableCell>
                                     <TableCell className="text-zinc-500">
