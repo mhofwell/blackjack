@@ -118,19 +118,16 @@ export default function UserTable() {
                             <>
                                 <TableRow key={user.handle}>
                                     <TableCell>
-                                        <Avatar 
+                                        <Avatar
                                             className="size-8 pb-10"
                                             src="mh.png"
-                                            
                                         />
                                         {/* fix this so the avatar circle doesn't stretch to fit image */}
                                     </TableCell>
                                     <TableCell className="font-medium">
                                         {user.name}
                                     </TableCell>
-                                    <TableCell>
-                                        {user.net_goals}
-                                    </TableCell>
+                                    <TableCell>{user.net_goals}</TableCell>
                                     <TableCell className="text-zinc-500">
                                         <Badge color="purple">NO</Badge>
                                         {/* {user.status} */}

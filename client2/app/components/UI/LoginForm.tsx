@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 type formProps = {
     isLoggedIn: boolean;
@@ -7,7 +8,8 @@ type formProps = {
 };
 
 export default function Form(props: formProps) {
-    console.log(props.isLoggedIn, props.isNew);
+    const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
+    const [isNew, setIsNew] = useState(props.isNew);
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
