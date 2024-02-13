@@ -2,17 +2,14 @@
 import Image from 'next/image';
 import { FormEvent } from 'react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { useRouter } from 'next/navigation';
 
 export default function Form() {
-    const router = useRouter();
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
 
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch('/api/auth/signup', {
             method: 'POST',
             body: JSON.stringify({
                 email: formData.get('email'),
@@ -21,11 +18,8 @@ export default function Form() {
         });
 
         const data = await res.json();
-        console.log('Status', data.status);
 
-        if (data.status === 200) {
-            router.push('/home');
-        }
+        console.log('Status', data.status);
     }
 
     return (
@@ -39,10 +33,7 @@ export default function Form() {
                     alt="PL Blackjack Logo"
                 />
                 <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight ">
-                    Welcome back to
-                </h2>
-                <h2 className="text-center text-2xl font-bold leading-9 tracking-tight ">
-                    Premier League Blackjack!
+                    Sign in to Premier League Blackjack!
                 </h2>
                 {/* Change the color of PL Blackjack and size up the logo. */}
             </div>

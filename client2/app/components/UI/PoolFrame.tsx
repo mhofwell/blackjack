@@ -84,7 +84,7 @@ const users: User[] = [
     },
 ];
 
-export default function UserTable() {
+export default function PoolFrame() {
     return (
         <>
             <h1 className="text-2xl font-semibold">Pool Manager</h1>
@@ -115,29 +115,27 @@ export default function UserTable() {
                     </TableHead>
                     <TableBody>
                         {users.map((user) => (
-                            <>
-                                <TableRow key={user.handle}>
-                                    <TableCell>
-                                        <Avatar
-                                            className="size-8 pb-10"
-                                            src="mh.png"
-                                        />
-                                        {/* fix this so the avatar circle doesn't stretch to fit image */}
-                                    </TableCell>
-                                    <TableCell className="font-medium">
-                                        {user.name}
-                                    </TableCell>
-                                    <TableCell>{user.net_goals}</TableCell>
-                                    <TableCell className="text-zinc-500">
-                                        <Badge color="purple">NO</Badge>
-                                        {/* {user.status} */}
-                                    </TableCell>
-                                    <TableCell className="text-zinc-500">
-                                        <Badge color="lime">ACTIVE</Badge>
-                                        {/* {user.status} */}
-                                    </TableCell>
-                                </TableRow>
-                            </>
+                            <TableRow key={user.handle}>
+                                <TableCell>
+                                    <Avatar
+                                        className="size-8 pb-10"
+                                        src="mh.png"
+                                    />
+                                    {/* fix this so the avatar circle doesn't stretch to fit image */}
+                                </TableCell>
+                                <TableCell className="font-medium">
+                                    {user.name}
+                                </TableCell>
+                                <TableCell>{user.net_goals}</TableCell>
+                                <TableCell className="text-zinc-500">
+                                    <Badge color="purple">NO</Badge>
+                                    {/* {user.status} */}
+                                </TableCell>
+                                <TableCell className="text-zinc-500">
+                                    <Badge color="lime">ACTIVE</Badge>
+                                    {/* {user.status} */}
+                                </TableCell>
+                            </TableRow>
                         ))}
                     </TableBody>
                 </Table>
