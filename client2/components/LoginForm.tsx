@@ -1,27 +1,10 @@
-'use client';
 import Image from 'next/image';
 import { FormEvent } from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { login } from '../lib/auth/utils';
 
 export default function Form() {
-    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-
-        const formData = new FormData(e.currentTarget);
-
-        const res = await fetch('/api/auth/signup', {
-            method: 'POST',
-            body: JSON.stringify({
-                email: formData.get('email'),
-                password: formData.get('password'),
-            }),
-        });
-
-        const data = await res.json();
-
-        console.log('Status', data.status);
-    }
-
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -33,17 +16,22 @@ export default function Form() {
                     alt="PL Blackjack Logo"
                 />
                 <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight ">
-                    Sign in to Premier League Blackjack!
+                    Welcome back to
+                </h2>
+                <h2 className="text-center text-2xl font-bold leading-9 tracking-tight ">
+                    Premier League Blackjack!
                 </h2>
                 {/* Change the color of PL Blackjack and size up the logo. */}
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form
-                    onSubmit={handleSubmit}
                     className="space-y-6"
-                    action="#"
-                    method="POST"
+                    action={async (formData) => {
+                        'use server';
+                        await login(formData);
+                        redirect('/home');
+                    }}
                 >
                     <div>
                         <label
@@ -81,6 +69,7 @@ export default function Form() {
                                 </a>
                             </div>
                         </div>
+                        
                         <div className="mt-2">
                             <input
                                 id="password"
@@ -95,7 +84,7 @@ export default function Form() {
 
                     <div>
                         <button
-                            type="submit"
+                            // type="submit"
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >
                             Sign in
@@ -152,7 +141,7 @@ export default function Form() {
                     <p className="mt-10 text-center text-sm text-gray-500">
                         Not a member?{' '}
                         <Link
-                            href="/login"
+                            href="/signup"
                             className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
                         >
                             Sign up here.

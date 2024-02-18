@@ -1,24 +1,26 @@
-import { NextResponse } from 'next/server';
-import { hash } from 'bcrypt';
+import { login } from '@/lib/auth/utils';
+import prisma from '@/lib/prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
+import { registerSchema } from '@/lib/validator/authSchema';
+import vine, { errors } from '@vinejs/vine';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const { email, password } = await req.json();
-        // validate email and password
-        console.log(email, password);
+        const data = await req.json();
+        const inputValidator = vine.compile(registerSchema);
+        const output = await inputValidator.validate(data);
 
-        const hashedPw = await hash(password, 10);
+        console.log('Validated Form');
 
-        const response = NextResponse.json({ status: 200 });
+        // login
 
-        return response;
+        // redirect
 
-        // zod is a good validator package
-    } catch (e) {
-        console.log('Error', { e });
-
-        const response = NextResponse.json({ status: 400 });
-
-        return response;
+        return NextResponse.json(output, { status: 200 });
+    } catch (error) {
+        if (error instanceof errors.E_VALIDATION_ERROR) {
+            return NextResponse.json(error.messages, { status: 400 });
+        }
+        return NextResponse.json(error);
     }
 }

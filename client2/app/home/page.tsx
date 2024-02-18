@@ -1,11 +1,11 @@
-import Dashboard from '../components/UI/Dashboard';
+import Dashboard from '../../components/Dashboard';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Dasbhoard',
 };
 
-export default function Home() {
+export default async function Home() {
     return (
         <div className="h-screen">
             <Dashboard />

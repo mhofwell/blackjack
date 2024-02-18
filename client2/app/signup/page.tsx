@@ -1,6 +1,6 @@
-import SignUpForm from '../components/UI/SignUpForm';
+import SignUpForm from '../../components/SignUpForm';
 
-export default async function SignUp() {
+export default async function SignUpPage() {
     return (
         <div className="flex h-screen">
             <SignUpForm />

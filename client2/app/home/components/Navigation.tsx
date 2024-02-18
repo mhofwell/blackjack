@@ -1,8 +1,7 @@
 'use client';
-import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
+import { Fragment } from 'react';
 
 interface User {
     name: string;
@@ -28,18 +27,22 @@ const navigation: NavigationItem[] = [
     { name: 'PL News', href: '#', current: false },
     { name: 'About', href: '#', current: false },
 ];
+
 const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#' },
+    { name: 'Your Profile', href: '#', action: null },
+    { name: 'Settings', href: '#', action: null },
+    { name: 'Sign out', href: '#', action: null },
 ];
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
 }
+type NavProps = {
+    username: string;
+};
 
-export default function Navigation() {
-    const greeting: string = `Your Dashboard`;
+export default function Navigation(props: NavProps) {
+    console.log('Props', props);
 
     return (
         <div className="min-h-full">
@@ -267,7 +270,7 @@ export default function Navigation() {
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex">
                             <h1 className="text-3xl font-bold tracking-tight text-white">
-                                {greeting}
+                                {props.username}'s Dashboard
                             </h1>
                             <p className="px-3">🚀</p>
                         </div>

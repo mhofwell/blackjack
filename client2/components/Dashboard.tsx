@@ -1,8 +1,7 @@
-'use client';
-import DataBanner from '../UI/DataBanner';
+import DataBanner from '../components/DataBanner';
 import PoolFrame from './PoolFrame';
 
-export default function Dashboard() {
+export default async function Dashboard() {
     return (
         <>
             <section className="-mt-32">

@@ -1,32 +1,76 @@
 'use client';
 import Image from 'next/image';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
+type Error = {
+    field: string;
+    message: string;
+    rule: string;
+    index?: string;
+    meta?: string;
+};
+
+type ErrorArray = Error[];
+
 export default function Form() {
+    let errorArray: ErrorArray = [];
+
+    const [errors, setErrors] = useState(errorArray);
+    const [isError, setIsError] = useState(false);
+
     const router = useRouter();
+
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
 
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({
-                email: formData.get('email'),
-                password: formData.get('password'),
-            }),
-        });
+        try {
+            const res = await fetch('/api/auth/signup', {
+                method: 'POST',
+                body: JSON.stringify({
+                    username: formData.get('username'),
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    password_confirmation: formData.get(
+                        'password_confirmation'
+                    ),
+                }),
+            });
 
-        const data = await res.json();
-        console.log('Status', data.status);
+            const data = await res.json();
 
-        if (data.status === 200) {
-            router.push('/home');
+            if (!data) {
+                throw new Error('Something went wrong.');
+            }
+
+            if (!data.username) {
+                const errors: Error[] = [];
+                data.forEach((entry: any) => {
+                    errors.push(entry.message);
+                });
+                setErrors(errors);
+                setIsError(true);
+                return;
+            }
+
+            // submit data to database to store credentials.
+
+            console.log('OK!', data);
+
+            router.push('/login');
+        } catch (e) {
+            console.log(e);
         }
     }
+
+    useEffect(() => {
+        if (errors.length > 0) {
+            console.log(errors);
+        }
+    }, [errors]);
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -39,10 +83,7 @@ export default function Form() {
                     alt="PL Blackjack Logo"
                 />
                 <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight ">
-                    Welcome back to
-                </h2>
-                <h2 className="text-center text-2xl font-bold leading-9 tracking-tight ">
-                    Premier League Blackjack!
+                    Create a Premier League Blackjack Account
                 </h2>
                 {/* Change the color of PL Blackjack and size up the logo. */}
             </div>
@@ -59,16 +100,36 @@ export default function Form() {
                             htmlFor="email"
                             className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
                         >
+                            Username
+                        </label>
+                        <div className="mt-2 ">
+                            <input
+                                id="username"
+                                name="username"
+                                type="text"
+                                autoComplete="username"
+                                placeholder="Burntelli"
+                                required
+                                className="block  w-full autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_rgb(55,65,81)]  rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+                        >
                             Email address
                         </label>
                         <div className="mt-2 ">
                             <input
                                 id="email"
+                                placeholder="cristiano@ronaldo.com"
                                 name="email"
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="block w-full autofill:text-color-b rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_rgb(55,65,81)] rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
                         </div>
                     </div>
@@ -81,23 +142,43 @@ export default function Form() {
                             >
                                 Password
                             </label>
-                            <div className="text-sm">
-                                <a
-                                    href="#"
-                                    className="font-semibold text-indigo-600 hover:text-indigo-500"
-                                >
-                                    Forgot password?
-                                </a>
-                            </div>
+                            <div className="text-sm"></div>
                         </div>
+                        <p className="text-xs text-gray-500 italic">
+                            A minimum of 8 characters is required.
+                        </p>
+
                         <div className="mt-2">
                             <input
                                 id="password"
+                                placeholder="********"
                                 name="password"
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <label
+                                htmlFor="password_confirmation"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+                            >
+                                Confirm password
+                            </label>
+                            <div className="text-sm"></div>
+                        </div>
+                        <div className="mt-2">
+                            <input
+                                id="password_confirmation"
+                                placeholder="********"
+                                name="password_confirmation"
+                                type="password"
+                                autoComplete="current-password"
+                                required
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
                         </div>
                     </div>
@@ -107,12 +188,20 @@ export default function Form() {
                             type="submit"
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >
-                            Sign in
+                            Create Account
                         </button>
                     </div>
                 </form>
+
+                {errors.length > 0 && (
+                    <ul className="text-xs pt-1 text-red-500">
+                        {errors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                        ))}
+                    </ul>
+                )}
                 <div>
-                    <div className="relative mt-20">
+                    <div className="relative mt-10">
                         <div
                             className="absolute inset-0 flex items-center"
                             aria-hidden="true"
@@ -158,13 +247,13 @@ export default function Form() {
                             </span>
                         </a>
                     </div>
-                    <p className="mt-10 text-center text-sm text-gray-500">
-                        Not a member?{' '}
+                    <p className="mt-5 text-center text-sm text-gray-500">
+                        Already a member?{' '}
                         <Link
                             href="/login"
                             className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
                         >
-                            Sign up here.
+                            Log in here.
                         </Link>
                     </p>
                 </div>

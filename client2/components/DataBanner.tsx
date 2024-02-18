@@ -1,5 +1,4 @@
-'use client';
-import { Badge } from '../badge';
+import { Badge } from './UI/badge';
 
 const stats = [
     { name: 'Active Pools', value: '2' },
@@ -8,7 +7,7 @@ const stats = [
     { name: 'Eliminated', value: '3' },
 ];
 
-export default function Example() {
+export default async function Banner() {
     return (
         <div className="bg-gray-900">
             <div className="mx-auto max-w-7xl">
@@ -28,11 +27,11 @@ export default function Example() {
                                     </span>
                                 </p>
                                 {stat.unit === 'OK' ? (
-                                    <div className='py-[10px]'>
+                                    <div className="py-[10px]">
                                         <Badge color="lime">All Paid</Badge>
                                     </div>
                                 ) : stat.unit ? (
-                                    <div className='py-4'>
+                                    <div className="py-4">
                                         <span className="text-sm text-gray-400">
                                             {stat.unit}
                                         </span>
