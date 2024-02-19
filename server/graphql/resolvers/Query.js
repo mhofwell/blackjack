@@ -99,10 +99,11 @@ const Query = {
                 'All pools query request.'
             );
             logger.info('Fetching all pools.');
+
             const pools = await prisma.pool.findMany({
                 include: {
                     entries: {
-                        include: {
+                        select: {
                             players: true,
                             user: true,
                         },
@@ -110,6 +111,7 @@ const Query = {
                     owner: true,
                 },
             });
+
             logger.info('Fetched all pools successfully.');
             logger.debug({ pools: pools }, 'Pools');
 
@@ -297,12 +299,14 @@ const Query = {
 
             return players;
         } catch (err) {
-            logger.warn(`gw-worker-${kt} > Error fetching club players from EPL.`);
+            logger.warn(
+                `gw-worker-${kt} > Error fetching club players from EPL.`
+            );
             logger.error(err);
             process.exit(1);
         }
     },
-    
+
     allKickoffTimes: async (parent, args, { prisma, req }) => {
         try {
             logger.debug(
