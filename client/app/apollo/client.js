@@ -15,12 +15,12 @@ import { API_URL, WS_URL } from '@/config.js';
 
 const wsLink = new GraphQLWsLink(
     createClient({
-        url: WS_URL,
+        url: 'wss://api-production-9332.up.railway.app/graphql',
     })
 );
 
 const httpLink = new HttpLink({
-    uri: API_URL,
+    uri: 'https://api-production-9332.up.railway.app/graphql',
 });
 
 const splitLink = split(
