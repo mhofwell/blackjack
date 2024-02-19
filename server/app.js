@@ -114,6 +114,7 @@ const corsConfig = {
         'https://client.railway.internal',
         'https://client-development.up.railway.app',
         'https://epl-blackjack.up.railway.app',
+        'https://studio.apollographql.com'
     ],
 };
 
