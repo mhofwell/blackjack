@@ -109,14 +109,14 @@ const server = new ApolloServer({
     ],
 });
 
-const corsConfig = {
-    origin: [
-        'https://client.railway.internal',
-        'https://client-development.up.railway.app',
-        'https://epl-blackjack.up.railway.app',
-        'https://studio.apollographql.com'
-    ],
-};
+// const corsConfig = {
+//     origin: [
+//         'https://client.railway.internal',
+//         'https://client-development.up.railway.app',
+//         'https://epl-blackjack.up.railway.app',
+//         'https://studio.apollographql.com'
+//     ],
+// };
 
 const main = async () => {
     // Apollo/GraphQL server start
@@ -136,7 +136,7 @@ const main = async () => {
     app.use(
         '/graphql',
         // helmet(),
-        cors(corsConfig),
+        // cors(corsConfig),
         // limiter,
         bodyParser.json(),
         expressMiddleware(server, {
