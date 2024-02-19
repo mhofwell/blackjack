@@ -28,7 +28,7 @@ const POOL_QUERY = gql`
                     fn
                     ln
                 }
-                standing
+                rank
                 goals
                 net_goals
                 own_goals
